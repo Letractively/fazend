@@ -1,4 +1,5 @@
 #summary Nice HTML tables
+#labels Featured,Phase-Design
 
 = htmlTable() view helper =
 
@@ -21,3 +22,5 @@ You can use it like this in your view script:
 }}}
 
 = All functions =
+
+Full list of functions is available in the code, file: FaZend/View/Helper/HtmlTable.php
