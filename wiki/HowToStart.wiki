@@ -1,0 +1,12 @@
+#summary How to use FaZend in your Zend projects
+
+= Key steps =
+
+1. To the directory structure recommended by Zend you will have to add /library/FaZend
+2. Checkout latest version of FaZend from Google Code to some temp dir
+3. Rsync files
+4. Commit changes to your project SVN
+
+= Details =
+
+rsync for [http://www.rsync.net/resources/howto/windows_rsync.html windows]
