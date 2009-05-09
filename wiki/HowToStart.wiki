@@ -1,7 +1,7 @@
 #summary How to use FaZend in your Zend projects
 #labels Featured
 
-= Configuration =
+= Configuration of Repository =
 
 Your project structure should be like this:
 
@@ -10,6 +10,8 @@ Your project structure should be like this:
 /tags
 /trunk
   /php
+    build.properties
+    build.xml
     /src
       /library
 }}}
@@ -34,3 +36,26 @@ Save the file and do this:
 svn commit test -m "svn:externals properly set"
 rm -rf test
 }}}
+
+== Phing build.xml ==
+
+Add this to your build.xml:
+
+{{{
+<target name="deploy" description="Copy working files to FTP">
+  <svnlastrevision
+    workingcopy="${project.basedir}"
+    propertyname="svn.revision" />
+  <echo msg="${svn.revision}"
+        file="${project.basedir}/${srcdir}/application/deploy/subversion/revision.txt" />	
+  <taskdef name="uploadByFTP" classname="src.library.FaZend.UploadByFTP" />
+  <uploadByFTP server="${ftp.server}"
+    username="${ftp.user}"
+    password="${ftp.password}"
+    srcdir="${project.basedir}/${ftp.srcdir}"
+    destdir="${ftp.destdir}">
+  </uploadByFTP>
+</target>
+}}}
+
+
