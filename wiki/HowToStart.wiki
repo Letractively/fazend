@@ -1,12 +1,36 @@
 #summary How to use FaZend in your Zend projects
+#labels Featured
 
-= Key steps =
+= Configuration =
 
-1. To the directory structure recommended by Zend you will have to add /library/FaZend
-2. Checkout latest version of FaZend from Google Code to some temp dir
-3. Rsync files
-4. Commit changes to your project SVN
+Your project structure should be like this:
 
-= Details =
+{{{
+/branches
+/tags
+/trunk
+  /php
+    /src
+      /library
+}}}
 
-rsync for [http://www.rsync.net/resources/howto/windows_rsync.html windows]
+Then do this (on Linux machine):
+
+{{{
+svn co svn://yourserver/yourproject test
+svn propedit svn:externals test/trunk/php/src/library -editor-cmd=vi
+}}}
+
+In the file opened for edit add these two lines:
+
+{{{
+Zend http://framework.zend.com/svn/framework/standard/trunk/library/Zend
+FaZend http://fazend.googlecode.com/svn/trunk/FaZend
+}}}
+
+Save the file and do this:
+
+{{{
+svn commit test -m "svn:externals properly set"
+rm -rf test
+}}}
