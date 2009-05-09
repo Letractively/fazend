@@ -13,7 +13,9 @@ Your project structure should be like this:
     build.properties
     build.xml
     /src
+      /application
       /library
+      /public
 }}}
 
 Then do this ("vi" on Linux machine, "notepad" on Windows):
@@ -57,3 +59,20 @@ Add this to your build.xml:
   </uploadByFTP>
 </target>
 }}}
+
+== Automatic Deployment ==
+
+Now you do this regularly (in continuous integration cycle):
+
+{{{
+svn up
+phing deploy
+}}}
+
+And your product will be automatically assembled from:
+
+# your code
+# Zend framework (v1.8 in this example)
+# FaZend classes
+
+It will be assembled and uploaded by FTP to your hosting (we assume that you use shared hosting, as a clever boy :)
