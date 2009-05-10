@@ -32,6 +32,12 @@ Zend http://framework.zend.com/svn/framework/standard/branches/release-1.8/libra
 FaZend http://fazend.googlecode.com/svn/trunk/FaZend
 }}}
 
+Use this URL instead if you want to get Zend from trunk (latest version):
+
+{{{
+Zend http://framework.zend.com/svn/framework/standard/trunk/library/Zend
+}}}
+
 Save the file and do this:
 
 {{{
