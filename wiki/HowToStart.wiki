@@ -3,7 +3,7 @@
 
 = Configuration of Repository =
 
-Your project structure should be like this:
+Your project structure should be like this (full example in /directory-structure):
 
 {{{
 /branches
