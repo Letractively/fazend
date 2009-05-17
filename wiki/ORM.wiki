@@ -8,7 +8,7 @@ We assume that:
   * All tables have primary key 'ID'
   * Foreign keys are named the same way as referenced tables
 
-= Example =
+= Active Record =
 
 {{{
 // create table Owner (
@@ -32,4 +32,13 @@ $product->save();
 
 $product = new Product(10);
 $name = $product->owner->name;
+}}}
+
+= List of Active Records =
+
+{{{
+$list = Owner::retrieve()
+  ->where('name is not null')
+  ->order('id desc')
+  ->fetchAll();
 }}}
