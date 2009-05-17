@@ -1,0 +1,28 @@
+#summary Zend Object-Relational Mapping (ORM)
+#labels Featured
+
+= Example =
+
+{{{
+create table Owner (
+  id integer not null primary key autoincrement, 
+  name varchar(50) not null)
+
+create table Product (
+  id integer not null primary key autoincrement, 
+  text varchar(1024) not null, 
+  owner integer not null constraint fk_product_owner references owner(id))
+
+class Owner extends FaZend_Db_Table_ActiveRow_Owner {}
+class Product extends FaZend_Db_Table_ActiveRow_Product {}
+
+$owner = new Owner(13);
+
+$product = new Product();
+$product->text = 'just test';
+$product->owner = $owner;
+$product->save();
+
+$product = new Product(10);
+$name = $product->owner->name;
+}}}
