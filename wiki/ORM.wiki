@@ -10,6 +10,8 @@ We assume that:
 
 = Active Record =
 
+For example, you have two tables in the DB:
+
 {{{
 // create table Owner (
 //   id integer not null primary key autoincrement, 
@@ -19,26 +21,52 @@ We assume that:
 //   id integer not null primary key autoincrement, 
 //   text varchar(1024) not null, 
 //   owner integer not null constraint fk_product_owner references owner(id))
+}}}
 
+You declare two classes:
+
+{{{
 class Owner extends FaZend_Db_Table_ActiveRow_Owner {}
 class Product extends FaZend_Db_Table_ActiveRow_Product {}
+}}}
 
+Now, in order to get the active row from the table:
+
+{{{
 $owner = new Owner(13);
+}}}
 
+To work with it, save, update, etc:
+
+{{{
 $product = new Product();
 $product->text = 'just test';
 $product->owner = $owner;
 $product->save();
+}}}
 
+You can get other active rows from this row:
+
+{{{
 $product = new Product(10);
 $name = $product->owner->name;
 }}}
 
 = List of Active Records =
 
+You can get a row set in a convenient way:
+
 {{{
 $list = Owner::retrieve()
   ->where('name is not null')
   ->order('id desc')
   ->fetchAll();
+}}}
+
+Or, for example:
+
+{{{
+FaZend_Db_ActiveTable_OtherTable::retrieve()
+  ->table()
+  ->update('time = NOW()');
 }}}
