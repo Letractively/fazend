@@ -1,6 +1,13 @@
 #summary Zend Object-Relational Mapping (ORM)
 #labels Featured
 
+= Assumptions =
+
+We assume that:
+
+  * All tables have primary key 'ID'
+  * Foreign keys are named the same way as referenced tables
+
 = Example =
 
 {{{
