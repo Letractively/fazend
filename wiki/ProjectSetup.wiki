@@ -1,10 +1,10 @@
 #labels Featured
 Key steps for a new project setup:
 
-# Create SVN repository
-# Create new Trac project (or similar tool)
-# Configure access to SVN
-# Configure access to Trac
-# Create repository structure in SVN (as in the example)
-# Setup "google analytics" and configure it in app.ini
-# Setup "google webmasters" and verify it
+  # Create SVN repository
+  # Create new Trac project (or similar tool)
+  # Configure access to SVN
+  # Configure access to Trac
+  # Create repository structure in SVN (as in the example)
+  # Setup "google analytics" and configure it in app.ini
+  # Setup "google webmasters" and verify it
