@@ -10,6 +10,7 @@ This is a sample view script:
 <?=$this->ajaxCall()
   ->setUrl($this->url(array(), 'status', true))
   ->setImmediateExecution()
+  ->setTitle('click to load status report')
   ->setTag('span')
   ->setMessage('loading...')?></p>
 }}}
