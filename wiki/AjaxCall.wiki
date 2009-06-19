@@ -1,0 +1,20 @@
+#summary AjaxCall view helper
+#labels Phase-Design
+
+= Example usage of AjaxCall view helper =
+
+This is a sample view script:
+
+{{{
+<p>The status of file system is: <?=$this->ajaxCall($this->url(array(), 'status', true))?></p>
+}}}
+
+This is controller in "status" route:
+
+{{{
+function statusAction() {
+    $this->_returnJSON("OK");
+}
+}}}
+
+You will see OK after a dynamic AJAX call. Simple and easy.
