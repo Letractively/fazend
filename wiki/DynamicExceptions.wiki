@@ -1,7 +1,7 @@
 #summary Simple way of working with exceptions
 #labels Phase-Design
 
-= Example =
+= Example usage of FaZend_Exception =
 
 {{{
 /**
