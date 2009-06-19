@@ -9,9 +9,14 @@ This is a sample view script:
 <p>The status of file system is: <?=$this->ajaxCall($this->url(array(), 'status', true))?></p>
 }}}
 
-This is controller in "status" route:
+This is a method in a controller in the "status" route:
 
 {{{
+/**
+ * Calculates the status and returns is in JSON (time consuming operation)
+ *
+ * @return void
+ */
 function statusAction() {
     $this->_returnJSON("OK");
 }
