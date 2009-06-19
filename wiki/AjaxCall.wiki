@@ -6,7 +6,12 @@
 This is a sample view script:
 
 {{{
-<p>The status of file system is: <?=$this->ajaxCall($this->url(array(), 'status', true))?></p>
+<p>The status of file system is: 
+<?=$this->ajaxCall()
+  ->setUrl($this->url(array(), 'status', true))
+  ->setImmediateExecution()
+  ->setTag('span')
+  ->setMessage('loading...')?></p>
 }}}
 
 This is a method in a controller in the "status" route:
