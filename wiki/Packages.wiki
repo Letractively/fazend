@@ -1,0 +1,17 @@
+#summary Full list of packages
+#labels Phase-Design
+
+= All FaZend packages =
+
+ * [Application]
+ * [Auth]
+ * [Backup]
+ * [Cache]
+ * [Cli]
+ * [Controller]
+ * [Db]
+ * [Filter]
+ * [Form]
+ * [Test]
+ * [User]
+ * [View]
