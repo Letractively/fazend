@@ -20,7 +20,10 @@ This is a method in a controller in the "status" route:
 
 {{{
 /**
- * Calculates the status and returns is in JSON (time consuming operation)
+ * Calculates the status and returns is in JSON
+ *
+ * We assume that this is a time consuming operation, that should be executed
+ * only after a user clicks the DIV or maybe automatically after the page is loaded.
  *
  * @return void
  */
