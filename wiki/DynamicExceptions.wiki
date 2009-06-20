@@ -38,3 +38,4 @@ In this code snippet you raise an exception without actual class creation.
 The benefits you get:
  * You don't need to create special class (and file) for the exception
  * You may create a class, FaZend_Exception will find it automatically and will use
+ * You don't use Exception class for all types of exception
