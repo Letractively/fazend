@@ -8,11 +8,12 @@ This is a sample view script:
 {{{
 <p>The status of file system is: 
 <?=$this->ajaxCall()
-  ->setUrl($this->url(array(), 'status', true))
-  ->setImmediateExecution()
-  ->setTitle('click to load status report')
-  ->setTag('span')
-  ->setMessage('loading...')?></p>
+  ->setUrl($this->url(array(), 'status', true)) // this URL will be called
+  ->setImmediateExecution() // immediately call the URL or after a user mouse-click
+  ->setTitle('click to load status report') // 'title' attribute for the tag
+  ->setTag('span') // the tag to use (a, span, div, etc..)
+  ->setMessage('loading...') // this message to be shown before loading
+?></p>
 }}}
 
 This is a method in a controller in the "status" route:
