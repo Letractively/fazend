@@ -1,0 +1,20 @@
+#summary Metric calculator
+#labels Phase-Design
+
+= Usage =
+
+{{{
+class SomeClass {
+  function getBigValue($param) {
+    // very slow and resource consuming method...
+    return $data;
+  }
+
+  function getItFast() {
+    return Metric::create()
+      ->setMethod('getBigValue') // name of the method, it should be public
+      ->setClass($this) // call the method in this class
+      ->setArgument('param', 13); // $param will be equal to 13
+  }
+}
+}}}
