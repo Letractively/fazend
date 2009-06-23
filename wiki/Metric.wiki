@@ -18,3 +18,27 @@ class SomeClass {
   }
 }
 }}}
+
+You can delete rowset of metrics:
+
+{{{
+Metric::deleteByRegexp('/BigValue/'); // actual metric name is 'SomeClass::getBigValue'
+}}}
+
+You can setup your own environment proxy. This class is responsible for collecting environment data from other classes, when metric is created or analyzed.
+
+{{{
+Metric::setEnvironmentProxy(new Proxy());
+}}}
+
+While metric is calculated you can indicate that it depends on some resource:
+
+{{{
+Metric::dependsOn('system file');
+}}}
+
+And later you can destroy all metrics by resource name:
+
+{{{
+Metric::deleteByResource('system file');
+}}}
