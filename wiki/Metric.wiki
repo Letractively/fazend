@@ -42,3 +42,14 @@ And later you can destroy all metrics by resource name:
 {{{
 Metric::deleteByResource('system file');
 }}}
+
+There is a function for system time calculating, which automatically connects the metric to current time and destroys the metric when time arrives:
+
+{{{
+$time = Metric::time(60 * 60); // destroy it in 1 hour (24 hours by default)
+}}}
+
+== Technical spec ==
+
+The class automatically creates three tables in the DB: fz_metric, fz_source, fz_dependency. If the tables already exist and their schema differs from the required - Fazend automatically drops the tables and create new ones.
+
