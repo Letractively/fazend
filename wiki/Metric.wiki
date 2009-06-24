@@ -11,7 +11,7 @@ class SomeClass {
   }
 
   function getItFast() {
-    return Metric::create()
+    return FaZend_Metric::create()
       ->setMethod('getBigValue') // name of the method, it should be public
       ->setClass($this) // call the method in this class
       ->setArgument('param', 13); // $param will be equal to 13
@@ -22,34 +22,33 @@ class SomeClass {
 You can delete rowset of metrics:
 
 {{{
-Metric::deleteByRegexp('/BigValue/'); // actual metric name is 'SomeClass::getBigValue'
+FaZend_Metric::deleteByRegexp('/BigValue/'); // actual metric name is 'SomeClass::getBigValue'
 }}}
 
 You can setup your own environment proxy. This class is responsible for collecting environment data from other classes, when metric is created or analyzed.
 
 {{{
-Metric::setEnvironmentProxy(new Proxy());
+FaZend_Metric::setEnvironmentProxy(new Proxy());
 }}}
 
 While metric is calculated you can indicate that it depends on some resource:
 
 {{{
-Metric::dependsOn('system file');
+FaZend_Metric::dependsOn('system file');
 }}}
 
 And later you can destroy all metrics by resource name:
 
 {{{
-Metric::deleteByResource('system file');
+FaZend_Metric::deleteByResource('system file');
 }}}
 
 There is a function for system time calculating, which automatically connects the metric to current time and destroys the metric when time arrives:
 
 {{{
-$time = Metric::time(60 * 60); // destroy it in 1 hour (24 hours by default)
+$time = FaZend_Metric::time(60 * 60); // destroy it in 1 hour (24 hours by default)
 }}}
 
 == Technical spec ==
 
 The class automatically creates three tables in the DB: fz_metric, fz_source, fz_dependency. If the tables already exist and their schema differs from the required - Fazend automatically drops the tables and create new ones.
-
