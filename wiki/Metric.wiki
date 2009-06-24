@@ -29,7 +29,7 @@ FaZend_Metric::deleteByRegexp('/BigValue/'); // actual metric name is 'SomeClass
 You can setup your own environment proxy. This class is responsible for collecting environment data from other classes, when metric is created or analyzed.
 
 {{{
-FaZend_Metric::setEnvironmentProxy(new Proxy());
+FaZend_Metric::setProxy(new FaZend_Metric_Proxy());
 }}}
 
 While metric is calculated you can indicate that it depends on some resource:
