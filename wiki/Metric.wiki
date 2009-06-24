@@ -1,7 +1,7 @@
-#summary Metric calculator
+#summary FaZend_Metric calculator
 #labels Phase-Design
 
-= Usage =
+= Usage of FaZend_Metric =
 
 {{{
 class SomeClass {
