@@ -14,7 +14,8 @@ class SomeClass {
     return FaZend_Metric::create()
       ->setMethod('getBigValue') // name of the method, it should be public
       ->setClass($this) // call the method in this class
-      ->setArgument('param', 13); // $param will be equal to 13
+      ->setArgument('param', 13) // $param will be equal to 13
+      ->calculate(); // prepares for calculation
   }
 }
 }}}
