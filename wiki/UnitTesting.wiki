@@ -37,4 +37,6 @@ Total time: 26.4778 seconds
 
 == How it works? ==
 
-Phing finds all files located in `/test` directory, which are named like `*Test.php`. Every file is inherited from
+Phing finds all files located in `/test/FaZend` directory, which are named like `*Test.php`. Every file is inherited from `/test/AbstractTestCase.php`. Every test when started emulate the execution of a real application. The application is located in `/test/test-application`.
+
+One test is testing one class and is named by the name of that class. For example `EmailTest.php` contains a class `FaZend_EmailTest`, which tests class `FaZend_Email`.
