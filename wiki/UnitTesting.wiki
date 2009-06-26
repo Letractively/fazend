@@ -9,6 +9,12 @@ To test FaZend framework you should have installed:
  * [http://www.phpunit.de/ phpUnit 2+]
  * [http://us3.php.net/manual/en/ref.pdo-sqlite.php Pdo_sqlite] PHP extension
 
+You should be familiar with these concepts:
+
+ * [http://en.wikipedia.org/wiki/Unit_testing Unit Testing]
+ * [http://en.wikipedia.org/wiki/Test-driven_development TDD]
+ * [http://en.wikipedia.org/wiki/Continuous_Integration Continuous Integration]
+
 = Running tests =
 
 Checkout the latest version of FaZend into something like `/home/john/dev/fazend` and then do this:
