@@ -16,6 +16,7 @@ Any object you get from the registry can be managed like this:
 {{{
 $car->getVersion(); // version of the document, instance of class FaZend_Registry_Version
 $car->getVersion()->__toString(); // 1.0, 2.13, 15.76, etc.
+$car->getType(); // class name
 $car->getName(); // = 'bmw328i'
 $car->getValue(); // similar to __toString()
 $car->getParent(); // the parent object, instance of FaZend_Registry_Object
@@ -94,4 +95,11 @@ $car = new Car('cars/bmw/bmw328i'); // get or create a new object in registry
 $car->isGermanCar(); // returns TRUE
 $car->color = 'red'; // saves this into object and into DB
 $car->speed = '250km/h'; // same story
+}}}
+
+Later in another part of the application:
+
+{{{
+$cars = new Cars();
+$bmw = $cars->getChild('bmw328i');
 }}}
