@@ -1,0 +1,24 @@
+#summary How to unit-test fazend itself
+#labels Phase-Support
+
+= Prerequisites =
+
+To test FaZend framework you should have installed:
+
+ * [http://phing.info/docs/guide/current/ phing]
+ * [http://www.phpunit.de/ phpUnit 2+]
+ * [http://us3.php.net/manual/en/ref.pdo-sqlite.php Pdo_sqlite] PHP extension
+
+= Running tests =
+
+Checkout the latest version of FaZend into something like `/home/john/dev/fazend` and then do this:
+
+{{{
+cd /home/john/dev/fazend
+phing test
+}}}
+
+You should see something like this:
+
+{{{
+}}}
