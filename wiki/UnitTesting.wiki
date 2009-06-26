@@ -17,7 +17,7 @@ You should be familiar with these concepts:
 
 = Running tests =
 
-Checkout the latest version of FaZend into something like `/home/john/dev/fazend` and then do this:
+Checkout the latest version of FaZend into something like `/home/john/dev/fazend`. Then checkout the latest version of Zend into `/home/john/dev/zend-trunk`. Then do this:
 
 {{{
 cd /home/john/dev/fazend
