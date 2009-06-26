@@ -6,23 +6,23 @@
 Your project structure should be like this (full example in /directory-structure):
 
 {{{
-/branches
-/tags
-/trunk
-  /php
-    build.properties
-    build.xml
-    /src
-      /application
-      /library
-      /public
+/projectName
+  /branches
+  /tags
+  /trunk
+    /php
+      build.properties
+      build.xml
+      /src
+        /application
+        /library
+        /public
 }}}
 
-Then do this ("vi" on Linux machine, "notepad" on Windows):
+Then do this (`vi` on Linux machine, `notepad` on Windows):
 
 {{{
-svn co svn://yourserver/yourproject test
-svn propedit svn:externals test/trunk/php/src/library --editor-cmd=vi
+svn propedit svn:externals ProjectName/trunk/php/src/library --editor-cmd=vi
 }}}
 
 In the file opened for edit add these two lines:
@@ -35,6 +35,11 @@ FaZend http://fazend.googlecode.com/svn/trunk/FaZend
 Save the file and do this:
 
 {{{
-svn commit test -m "svn:externals properly set"
-rm -rf test
+svn commit projectName -m "svn:externals properly set"
 }}}
+
+From now on the directory `/library` will have two subdirectories: `Zend` and `FaZend`, which will updated automatically from other repositories every time you `svn update` your project. The benefits you get:
+
+ * Your repository is not flooded with "not your" files
+ * Your repository is small enough, just your application files
+ * You always have the latest version of Zend and FaZend
