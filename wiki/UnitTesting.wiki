@@ -21,4 +21,20 @@ phing test
 You should see something like this:
 
 {{{
+Buildfile: D:\dev\fazend\build.xml
+
+fazend tests > test:
+
+ [phpunit2] Testsuite: FaZend_Auth_Adapter_Http_Resolver_AdminsTest
+ [phpunit2] Tests run: 1, Failures: 0, Errors: 0, Incomplete: 0, Skipped: 0, Time elapsed: 0.45559 s
+ [phpunit2] Test: FaZend_Auth_Adapter_Http_Resolver_AdminsTest, Run: 1, Failures: 0, Errors: 0, Incomplete: 0, Skipped: 0, Time elapsed: 0.45579 s
+...
+
+BUILD FINISHED
+
+Total time: 26.4778 seconds
 }}}
+
+== How it works? ==
+
+Phing finds all files located in `/test` directory, which are named like `*Test.php`. Every file is inherited from
