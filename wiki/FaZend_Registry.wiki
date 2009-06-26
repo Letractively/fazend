@@ -101,5 +101,5 @@ Later in another part of the application:
 
 {{{
 $cars = new Cars();
-$bmw = $cars->getChild('bmw328i');
+$bmw = $cars['bmw328i'];
 }}}
