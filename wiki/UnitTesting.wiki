@@ -35,6 +35,10 @@ BUILD FINISHED
 Total time: 26.4778 seconds
 }}}
 
+Every time you make any change to the source code you should run `phing test` on your computer to make sure you didn't break the other code. 
+
+And every time you add new functionality make sure that you add a unit-test, that tests this particular functionality. In this case you will be sure that nobody else can break the functionality you created.
+
 == How it works? ==
 
 Phing finds all files located in `/test/FaZend` directory, which are named like `*Test.php`. Every file is inherited from `/test/AbstractTestCase.php`. Every test, when is being started, emulates the execution of a real application. This "real" application itself is located in `/test/test-application`.
