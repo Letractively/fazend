@@ -65,6 +65,17 @@ $pos->id; // int - unique id of the object in storage
 $pos->type; // full name of the class for this object
 }}}
 
+You can play with versions:
+
+{{{
+$car = FaZend_POS::root()->bmw328i;
+$version = $car->pos()->version;
+$car->pos()->workWithVersion($version - 1); // now the object has data from previous version
+$car->pos()->rollBack($version - 1); // roll back all changes to previous version
+$car->pos()->getVersions(10); // returns an array of 10 latest version
+$car->pos()->getAge(); // returns object age in storage, in seconds
+}}}
+
 = Access Control =
 
 You can setup an access control object, which will be responsible for user access rights management for any particular object. Before any operation `FaZend_POS` will ask this `ACL` whether this operation is permitted or not, giving the object name to it:
@@ -94,3 +105,7 @@ if ($car->waitingForApproval()) {
         $car->reject();
 }
 }}}
+
+= Other ideas =
+
+Maybe `xpath()` search on the full storage is a good option.
