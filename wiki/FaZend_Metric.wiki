@@ -1,0 +1,55 @@
+#summary Flexible cache for heavy PHP functions
+#labels Phase-Design
+
+= Usage samples =
+
+{{{
+class SomeClass {
+  function getBigValue($param) {
+    // very slow and resource consuming method...
+    return $data;
+  }
+
+  function getItFast() {
+    return FaZend_Metric::create()
+      ->setMethod('getBigValue') // name of the method, it should be public
+      ->setClass($this) // call the method in this class
+      ->setArgument('param', 13) // $param will be equal to 13
+      ->calculate(); // prepares for calculation
+  }
+}
+}}}
+
+You can delete rowset of metrics:
+
+{{{
+FaZend_Metric::deleteByRegexp('/BigValue/'); // actual metric name is 'SomeClass::getBigValue'
+}}}
+
+You can setup your own environment proxy. This class is responsible for collecting environment data from other classes, when metric is created or analyzed.
+
+{{{
+FaZend_Metric::setProxy(new FaZend_Metric_Proxy());
+}}}
+
+While metric is calculated you can indicate that it depends on some resource:
+
+{{{
+FaZend_Metric::dependsOn('system file');
+}}}
+
+And later you can destroy all metrics by resource name:
+
+{{{
+FaZend_Metric::deleteByResource('system file');
+}}}
+
+There is a function for system time calculating, which automatically connects the metric to current time and destroys the metric when time arrives:
+
+{{{
+$time = FaZend_Metric::time(60 * 60); // destroy it in 1 hour (24 hours by default)
+}}}
+
+== Technical spec ==
+
+The class automatically creates three tables in the DB: fz_metric, fz_source, fz_dependency. If the tables already exist and their schema differs from the required - Fazend automatically drops the tables and create new ones.
