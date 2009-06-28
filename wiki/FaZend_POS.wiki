@@ -1,0 +1,40 @@
+#summary Persistence Object Storage (POS), prototype
+
+The idea is to create a flexible storage of PHP objects in the DB, without the necessity to create many tables for them. Even bigger strategic goal is to create a good platform for "application server"-like applications in PHP.
+
+= Usage samples =
+
+You create a new object and assign it to the storage (POS):
+
+{{{
+class Car extends FaZend_POS_Object {
+    public $color;
+    public $model;
+
+    public isGermanCar() {
+        if ($model == 'bmw')
+            return true;
+        return false;
+    }
+}
+
+FaZend_POS::root()->bmw328 = new Car();
+}}}
+
+You can create a simple object as well:
+
+{{{
+$root = FaZend_POS::root();
+$root->cars = array();
+$bmw = new Car();
+$root->cars[] = $bmw;
+$bmw->color = 'black';
+$bwm->model = 'bmw';
+}}}
+
+Later, in another part of the application:
+
+{{{
+$bmw = current(FaZend_POS::root()->cars);
+echo $bmw->isGermanCar(); // returns TRUE
+}}}
