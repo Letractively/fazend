@@ -59,7 +59,7 @@ Changes are under control, like in Subversion repository:
 
 {{{
 $car = FaZend_POS::root()->bmw328i;
-$pos = $car->pos(); // FaZend_POS_Properties - system properties of the object
+$pos = $car->posp(); // FaZend_POS_Properties - system properties of the object
 $pos->editor; // FaZend_User with the editor of latest changes
 $pos->version; // FaZend_POS_Version of the latest version
 $pos->updated; // time when the object was updated last time
@@ -71,12 +71,12 @@ You can play with versions:
 
 {{{
 $car = FaZend_POS::root()->bmw328i;
-$version = $car->pos()->version;
-$car->pos()->workWithVersion($version - 1); // now the object has data from previous version
-$car->pos()->setTimeBoundary(time() - 60*60); // ignore any changes made during the last hour
-$car->pos()->rollBack($version - 1); // roll back all changes to previous version
-$car->pos()->getVersions(10); // returns an array of 10 latest version
-$car->pos()->getAge(); // returns object age in storage, in seconds
+$version = $car->posp()->version;
+$car->posp()->workWithVersion($version - 1); // now the object has data from previous version
+$car->posp()->setTimeBoundary(time() - 60*60); // ignore any changes made during the last hour
+$car->posp()->rollBack($version - 1); // roll back all changes to previous version
+$car->posp()->getVersions(10); // returns an array of 10 latest version
+$car->posp()->getAge(); // returns object age in storage, in seconds
 }}}
 
 = Access Control =
@@ -94,18 +94,18 @@ You can baseline any object and request approval from other users. They can appr
 {{{
 $car = FaZend_POS::root()->bmw328i;
 $mary = new FaZend_User(13);
-$car->pos()->baseline(array($mary));
+$car->posp()->baseline(array($mary));
 }}}
 
 Later, Mary is current user:
 
 {{{
 $car = FaZend_POS::root()->bmw328i;
-if ($car->pos()->waitingForApproval()) {
+if ($car->posp()->waitingForApproval()) {
     if ($car->isGermanCar())
-        $car->pos()->approve();
+        $car->posp()->approve();
     else
-        $car->pos()->reject();
+        $car->posp()->reject();
 }
 }}}
 
@@ -113,9 +113,9 @@ You can check the status of the object's approval:
 
 {{{
 $car = FaZend_POS::root()->bmw328i;
-$car->pos()->isApproved();
-$car->pos()->isBaselined();
-$car->pos()->isRejected();
+$car->posp()->isApproved();
+$car->posp()->isBaselined();
+$car->posp()->isRejected();
 }}}
 
 = Other ideas =
