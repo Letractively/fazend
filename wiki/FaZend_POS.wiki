@@ -1,4 +1,5 @@
 #summary Persistence Object Storage (POS), prototype
+#labels Phase-Design
 
 The idea is to create a flexible storage of PHP objects in the DB, without the necessity to create many tables for them. Even bigger strategic goal is to create a good platform for "application server"-like applications in PHP.
 
@@ -38,4 +39,58 @@ Later, in another part of the application:
 $bmw = current(FaZend_POS::root()->cars);
 echo $bmw->isGermanCar(); // returns TRUE
 echo FaZend_POS::root()->bmw328i->color; // returns 'white'
+}}}
+
+You can delete an object, or wipe it out (delete forever):
+
+{{{
+$car = FaZend_POS::root()->bmw328i;
+$car->delete(); // still in storage, but marked as deleted
+$car->wipe(); // wipe it out, no more information in storage about it
+}}}
+
+Objects can include objects, and FaZend_POS will understand such links. Objects won't be copied, but symbolic links will be created.
+
+= Version Control =
+
+Changes are under control, like in Subversion repository:
+
+{{{
+$car = FaZend_POS::root()->bmw328i;
+$pos = $car->pos(); // FaZend_POS_Properties - system properties of the object
+$pos->editor; // FaZend_User with the editor of latest changes
+$pos->version; // FaZend_POS_Version of the latest version
+$pos->updated; // time when the object was updated last time
+$pos->id; // int - unique id of the object in storage
+$pos->type; // full name of the class for this object
+}}}
+
+= Access Control =
+
+You can setup an access control object, which will be responsible for user access rights management for any particular object. Before any operation `FaZend_POS` will ask this `ACL` whether this operation is permitted or not, giving the object name to it:
+
+{{{
+FaZend_POS::setACL(new Zend_ACL());
+}}}
+
+= Objects' Approval =
+
+You can baseline any object and request approval from other users. They can approve or reject.
+
+{{{
+$car = FaZend_POS::root()->bmw328i;
+$mary = new FaZend_User(13);
+$car->baseline(array($mary));
+}}}
+
+Later, Mary is current user:
+
+{{{
+$car = FaZend_POS::root()->bmw328i;
+if ($car->waitingForApproval()) {
+    if ($car->isGermanCar())
+        $car->approve();
+    else
+        $car->reject();
+}
 }}}
