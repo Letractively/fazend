@@ -8,7 +8,7 @@ You create a new object and assign it to the storage (POS):
 
 {{{
 class Car extends FaZend_POS_Object {
-    public $color;
+    public $color = 'white';
     public $model;
 
     public isGermanCar() {
@@ -37,4 +37,5 @@ Later, in another part of the application:
 {{{
 $bmw = current(FaZend_POS::root()->cars);
 echo $bmw->isGermanCar(); // returns TRUE
+echo FaZend_POS::root()->bmw328i->color; // returns 'white'
 }}}
