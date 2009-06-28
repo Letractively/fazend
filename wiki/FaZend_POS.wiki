@@ -71,6 +71,7 @@ You can play with versions:
 $car = FaZend_POS::root()->bmw328i;
 $version = $car->pos()->version;
 $car->pos()->workWithVersion($version - 1); // now the object has data from previous version
+$car->pos()->setTimeBoundary(time() - 60*60); // ignore any changes made during the last hour
 $car->pos()->rollBack($version - 1); // roll back all changes to previous version
 $car->pos()->getVersions(10); // returns an array of 10 latest version
 $car->pos()->getAge(); // returns object age in storage, in seconds
@@ -81,7 +82,7 @@ $car->pos()->getAge(); // returns object age in storage, in seconds
 You can setup an access control object, which will be responsible for user access rights management for any particular object. Before any operation `FaZend_POS` will ask this `ACL` whether this operation is permitted or not, giving the object name to it:
 
 {{{
-FaZend_POS::setACL(new Zend_ACL());
+FaZend_POS::root()->setACL(new Zend_ACL());
 }}}
 
 = Objects' Approval =
@@ -91,18 +92,18 @@ You can baseline any object and request approval from other users. They can appr
 {{{
 $car = FaZend_POS::root()->bmw328i;
 $mary = new FaZend_User(13);
-$car->baseline(array($mary));
+$car->pos()->baseline(array($mary));
 }}}
 
 Later, Mary is current user:
 
 {{{
 $car = FaZend_POS::root()->bmw328i;
-if ($car->waitingForApproval()) {
+if ($car->pos()->waitingForApproval()) {
     if ($car->isGermanCar())
-        $car->approve();
+        $car->pos()->approve();
     else
-        $car->reject();
+        $car->pos()->reject();
 }
 }}}
 
