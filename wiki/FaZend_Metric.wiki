@@ -52,4 +52,4 @@ $time = FaZend_Metric::time(60 * 60); // destroy it in 1 hour (24 hours by defau
 
 == Technical spec ==
 
-The class automatically creates three tables in the DB: fz_metric, fz_source, fz_dependency. If the tables already exist and their schema differs from the required - Fazend automatically drops the tables and create new ones.
+The class automatically creates three tables in the DB: `fz_metric`, `fz_source`, `fz_dependency`. If the tables already exist and their schema differs from the required - FaZend_Metric automatically drops the tables and create new ones.
