@@ -3,6 +3,8 @@
 
 The idea is to create a flexible storage of PHP objects in the DB, without the necessity to create many tables for them. Even bigger strategic goal is to create a good platform for "application server"-like applications in PHP.
 
+To implement this functionality the FaZend_POS class will automatically create DB table: `fz_pos`. Everything will be stored in one table (_this is the idea so far_).
+
 = Usage samples =
 
 You create a new object and assign it to the storage (POS):
@@ -105,6 +107,15 @@ if ($car->pos()->waitingForApproval()) {
     else
         $car->pos()->reject();
 }
+}}}
+
+You can check the status of the object's approval:
+
+{{{
+$car = FaZend_POS::root()->bmw328i;
+$car->pos()->isApproved();
+$car->pos()->isBaselined();
+$car->pos()->isRejected();
 }}}
 
 = Other ideas =
