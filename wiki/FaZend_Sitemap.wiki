@@ -23,3 +23,5 @@ class Model_Sitemap extends FaZend_Sitemap {
 That's it. Now your website will have `/sitemap` URL, that will return site map formatted according to this requirements: [http://www.sitemaps.org/schemas/sitemap/0.9]
 
 Method `addPage()` has two parameters. First one is the URL itself, the second one is the date of the last modification of this URL.
+
+If you don't have class `Model_Sitemap` the URL `/sitemap` will return a map with just one URL: `/`.
