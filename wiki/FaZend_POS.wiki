@@ -65,6 +65,7 @@ $ps->version; // FaZend_POS_Version of the latest version
 $ps->updated; // time when the object was updated last time
 $ps->id; // int - unique id of the object in storage
 $ps->type; // full name of the class for this object
+$ps->parent; // parent object or NULL if it's root already
 }}}
 
 You can play with versions:
@@ -120,4 +121,7 @@ $car->ps()->isRejected();
 
 = Other ideas =
 
-Maybe `xpath()` search on the full storage is a good option.			
+ * Maybe `xpath()` search on the full storage is a good option.			
+ * Automated cleaning of very old version
+ * `exportXML()`, `importXML()`
+ * `diff()`
