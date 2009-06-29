@@ -119,6 +119,12 @@ $car->ps()->isBaselined();
 $car->ps()->isRejected();
 }}}
 
+And you can get a list of all objects waiting for user approval:
+
+{{{
+$objects = FaZend_POS::getWaitingApproval($mary);
+}}}
+
 = Other ideas =
 
  * Maybe `xpath()` search on the full storage is a good option.			
