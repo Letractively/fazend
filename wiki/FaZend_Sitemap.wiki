@@ -15,7 +15,7 @@ class Model_Sitemap extends FaZend_Sitemap {
     public function load() {
         // add personal pages of all users
         foreach (Model_User::retrieve()->fetchAll() as $user)
-            $this->addPage($this->view->url(array('user'=>$user), 'profile', true), $user->modified);
+            $this->addPage($this->getView()->url(array('user'=>$user), 'profile', true), $user->modified);
     }
 }
 }}}
