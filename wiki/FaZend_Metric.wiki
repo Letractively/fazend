@@ -3,6 +3,8 @@
 
 = Usage samples =
 
+When you have a function which is slow in calculation or consumes too much resources (memory, time), you just insert this prefix to the function. And every time you call the function FaZend will check whether the result of the function is cached? If it is - you get it from cache, very quick. If not, full calculation takes place.
+
 {{{
 class SomeClass {
   function getBigValue($param) {
