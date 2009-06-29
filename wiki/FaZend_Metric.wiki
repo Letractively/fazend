@@ -6,7 +6,7 @@
 {{{
 class SomeClass {
   function getBigValue($param) {
-    if ($value = FaZend_Metric::calculate()) // calculates this function or returns value from cache
+    if (FaZend_Metric::calculate('value')) // calculates this function or returns value from cache
         return $value;
 
     // very slow and resource consuming method...
