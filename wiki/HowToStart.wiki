@@ -43,3 +43,15 @@ From now on the directory `/library` will have two subdirectories: `Zend` and `F
  * Your repository is not flooded with "not your" files
  * Your repository is small enough, just your application files
  * You always have the latest version of Zend and FaZend
+
+= Starting a new project =
+
+Key steps for a new project setup:
+
+  # Create fazend.com account
+  # Create new project in fazend.com
+  # Configure access to SVN
+  # Create repository structure in SVN (as in the example)
+  # Setup Google Analytics and configure it in `app.ini`
+  # Setup Google Webmasters and verify it
+  # configure files in your project: `build.properties`, `app.ini`, `backup.ini`
