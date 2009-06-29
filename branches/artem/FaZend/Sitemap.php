@@ -16,15 +16,40 @@
 
  
 class Model_Sitemap {
-
+ 
+    /**
+     * Formation xml
+     *
+     * @var XML
+     */
     public $_xml;
 
+    /**
+     * Attribute xml
+     *
+     * @var  XML
+     */
 	public $_root;
 	
+    /**
+     * Attribute xml
+     *
+     * @var XML
+     */
 	public $_url;
 
+    /**
+     * Formation url
+     *
+     * @var Zend_View
+     */
 	public $_view;
-	
+
+    /**
+     * Creates an object of class DOMDocument 
+     *
+     * @return void
+     */	
    	public function __construct () {
         $this->_xml = new DOMDocument('1.0', 'utf-8');
         $this->_xml->formatOutput = true;
@@ -33,20 +58,35 @@ class Model_Sitemap {
         $this->_xml->appendChild($this->_root);
     }
 
+    /**
+     * Add page
+     *
+     * @return void
+     */	
     public function addPage ($url, $modified) {
-        $this->_url = $_xml->createElement('url');
+        $this->_url = $this->_xml->createElement('url');
         $this->_url->appendChild($this->_xml->createElement('loc', WEBSITE_URL.$url));
         $this->_url->appendChild($this->_xml->createElement('lastmod', $modified));
         $this->_root->appendChild($this->_url);
     }
-
+	
+    /**
+     * Load all add page
+     *
+     * @return array
+     */	
     public function load ($ModelArea) {
         foreach($ModelArea as $area) {
             $this->addPage($this->_view->url(array('id'=>$area->title), 'area', true), time());
         }
-        return $_xml->saveXML();
+        return $this->_xml->saveXML();
     }
 
+    /**
+     * Set view
+     *
+     * @return void
+     */		
     public function setView ($view){
         $this->_view = $view;
     }

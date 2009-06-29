@@ -14,6 +14,11 @@
  * @category FaZend
  */
  
+/**
+ * Sitemap
+ * 
+ *
+ */ 
 class Fazend_SitemapController extends FaZend_Controller_Action {
 	
     /**
