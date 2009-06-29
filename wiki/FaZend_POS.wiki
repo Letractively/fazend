@@ -75,6 +75,7 @@ $car = FaZend_POS::root()->bmw328i;
 $version = $car->ps()->version;
 $car->ps()->workWithVersion($version - 1); // now the object has data from previous version
 $car->ps()->setTimeBoundary(time() - 60*60); // ignore any changes made during the last hour
+$car->ps()->touch(); // increases the version of the object, no other changes
 $car->ps()->rollBack($version - 1); // roll back all changes to previous version
 $car->ps()->getVersions(10); // returns an array of 10 latest version
 $car->ps()->getAge(); // returns object age in storage, in seconds
