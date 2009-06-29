@@ -1,0 +1,23 @@
+#summary Sitemap controller and model
+#labels Phase-Design
+
+= Usage sample =
+
+You create a class `Model_Sitemap` in your `application/Model` directory and override method `load()`.
+
+{{{
+class Model_Sitemap extends FaZend_Sitemap {
+    /**
+     * Load sitemap, according to the project specifics
+     *
+     * @return void
+     */
+    public function load() {
+        // add personal pages of all users
+        foreach (Model_User::retrieve()->fetchAll() as $user)
+            $this->addPage($this->view->url(array('user'=>$user), 'profile', true));
+    }
+}
+}}}
+
+That's it. Now your website will have `/sitemap` URL, that will return site map formatted according to this requirements: [http://www.sitemaps.org/schemas/sitemap/0.9]
