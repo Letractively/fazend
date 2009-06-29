@@ -15,9 +15,11 @@ class Model_Sitemap extends FaZend_Sitemap {
     public function load() {
         // add personal pages of all users
         foreach (Model_User::retrieve()->fetchAll() as $user)
-            $this->addPage($this->view->url(array('user'=>$user), 'profile', true));
+            $this->addPage($this->view->url(array('user'=>$user), 'profile', true), $user->modified);
     }
 }
 }}}
 
 That's it. Now your website will have `/sitemap` URL, that will return site map formatted according to this requirements: [http://www.sitemaps.org/schemas/sitemap/0.9]
+
+Method `addPage()` has two parameters. First one is the URL itself, the second one is the date of the last modification of this URL.
