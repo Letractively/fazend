@@ -70,3 +70,20 @@ FaZend_Db_ActiveTable_OtherTable::retrieve()
   ->table()
   ->update('time = NOW()');
 }}}
+
+== Delayed `fetchAll()` ==
+
+Important improvement made to the standard method `fetchAll()`. Now you can do this operation with big amounts of data:
+
+{{{
+$rowset = FaZend_Db_ActiveTable_bigTable::retrieve()->fetchAll();
+$count = count($rowset);
+}}}
+
+Even if your `$rowset` is huge, this operation will be done fast and memory-safe. Method `fetchAll()` won't download any data to memory until you actually access them. Method `count()` doesn't work with any particular row in the set, so nothing will be downloaded. Instead, new SQL query will be created on-fly, which will look like: 
+
+{{{
+SELECT COUNT(*) FROM (...)
+}}}
+
+Where `...` will be replaced by your original SQL query. All this is done on-fly.
