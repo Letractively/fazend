@@ -5,7 +5,7 @@
 
 We assume that:
 
-  * All tables have primary key 'ID'
+  * All tables have one-column primary key, or column 'id'
   * Foreign keys are named the same way as referenced tables
 
 = Active Record =
