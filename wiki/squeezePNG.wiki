@@ -3,7 +3,7 @@
 
 = Usage examples =
 
-Go to google.com and review the source code of the page (when you're logged in). You will see this image:
+Go to google.com and review the source code of the page (when you're logged in). You will see this image at `http://www.google.com/images/nav_logo6.png`:
 
 [http://www.google.com/images/nav_logo6.png]
 
