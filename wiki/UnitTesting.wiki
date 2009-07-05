@@ -54,6 +54,13 @@ BUILD FINISHED
 Total time: 26.4778 seconds
 }}}
 
+Also you can run any individual test:
+
+{{{
+cd test
+phpunit FaZend/Cli/CliTest.php
+}}}
+
 Every time you make any change to the source code you should run `phing test` on your computer to make sure you didn't break the other code. 
 
 And every time you add new functionality make sure that you add a unit-test, that tests this particular functionality. In this case you will be sure that nobody else can break the functionality you created.
