@@ -26,6 +26,6 @@ For every new revision the following operations will be peformed:
  # An instance of class `FaZend_Db_Deploy_Abstract` will be created (`$deploy`)
  # `$deploy->deploy()` will be called
  # If the table description in file and in Db are different:
-  * `FaZend_Db_Deploy_Straight`: email notification to admin
-  * `FaZend_Db_Deploy_Alter`: try to ALTER the table in DB, if failure - email to admin
+  * `FaZend_Db_Deploy_Straight`: `DROP` table in DB and create a new one
+  * `FaZend_Db_Deploy_Alter`: try to `ALTER` the table in DB, if failure - email to admin
  # Email notification to admin with results of deployment
