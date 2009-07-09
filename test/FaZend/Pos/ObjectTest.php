@@ -23,7 +23,7 @@ class FaZend_Db_Table_ObjectTest extends AbstractTestCase {
 
         parent::setUp();
         
-        include_once ('Fixture/create_tables.php');
+        include ('Fixture/create_tables.php');
         foreach (new DirectoryIterator(dirname(__FILE__) . '/Fixture/') as $File) {
             if ($File->isDir()) continue;
             if (!fnmatch('table_*', "$File")) continue;
@@ -45,22 +45,25 @@ class FaZend_Db_Table_ObjectTest extends AbstractTestCase {
     {
         FaZend_Pos::root()->bmw328 = new FaZend_Pos_Mock_Car();
         FaZend_Pos::save();
+        
+        Zend_Debug::dump(Zend_Db_Table_Abstract::getDefaultAdapter()->fetchAll("SELECT * FROM classes"));
+        Zend_Debug::dump(Zend_Db_Table_Abstract::getDefaultAdapter()->fetchAll("SELECT * FROM classes_properties"));
+        
     }
     
-    public function testStoreParentOChildsbject()
+    public function t_estStoreParentOChildsbject()
     {
-        FaZend_Pos::root()->aboard_cars = new FaZend_Pos_Object();
-        FaZend_Pos::root()->aboard_cars->bmw = new FaZend_Pos_Object();
         FaZend_Pos::root()->aboard_cars->bmw->bmw328 = new FaZend_Pos_Mock_Car();
-        
-        FaZend_Pos::root()->aboard_cars = new FaZend_Pos_Object();
-        FaZend_Pos::root()->aboard_cars->opel = new FaZend_Pos_Object();
         FaZend_Pos::root()->aboard_cars->opel->astra = new FaZend_Pos_Mock_Car();
+        FaZend_Pos::root()->home_cars->zaz->volin    = new FaZend_Pos_Mock_Car();
         
-        FaZend_Pos::root()->home_cars = new FaZend_Pos_Object();
-        FaZend_Pos::root()->home_cars->zaz = new FaZend_Pos_Object();
-        FaZend_Pos::root()->home_cars->zaz->volin = new FaZend_Pos_Mock_Car();
+        FaZend_Pos::root()->aboard_cars->opel->astra->color = "yellow";
+        
+        FaZend_Pos::root()->home_cars->zaz->volin->color="green";
         
         FaZend_Pos::save();
+        
+        Zend_Debug::dump(Zend_Db_Table_Abstract::getDefaultAdapter()->fetchAll("SELECT * FROM classes"));
+        Zend_Debug::dump(Zend_Db_Table_Abstract::getDefaultAdapter()->fetchAll("SELECT * FROM classes_properties"));
     }
 }
