@@ -10,7 +10,7 @@ To implement this functionality the FaZend_POS class will automatically create D
 You create a new object and assign it to the storage (POS):
 
 {{{
-class Car extends FaZend_POS_Object {
+class Car extends FaZend_POS_Abstract {
     public $color = 'white';
     public $model;
 
@@ -28,7 +28,8 @@ You can create a simple object as well:
 
 {{{
 $root = FaZend_POS::root();
-$root->cars = array();
+$root->cars = array(); // throws Exception
+$root->cars = new FaZend_POS_Array();
 $bmw = new Car();
 $root->cars[] = $bmw;
 $bmw->color = 'black';
