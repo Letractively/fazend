@@ -20,24 +20,24 @@ $adapter->query(
     'create table classes (
         id integer not null primary key autoincrement, 
         parent integer default null,
-        name varchar(50) not null,
         class varchar(50) not null,
         
         version integer,
-        comment varchar(255),
         updated datetime
     )'
 );
 
 $adapter->query(
     'create table classes_properties (
-        class integer not null primary key autoincrement, 
+        class integer not null, 
         property varchar(50) not null,
-        value varchar(1024) not null,
+        value varchar(1024),
+        type tinyint(1) not null default 1,
         version integer
      )'
 );
 
+/*
 $adapter->query(
     'create table classes_versions (
         id integer not null primary key autoincrement, 
@@ -60,3 +60,4 @@ $adapter->query(
         version integer
      )'
 );
+*/

@@ -27,8 +27,7 @@ abstract class FaZend_Pos_Abstract implements RecursiveIterator
     
     public function __construct() 
     {
-        foreach ($this as $name=>$value) {
-            if (!ord($name)) continue;
+        foreach (get_class_vars(get_class($this)) as $name=>$value) {
             $this->_properties[$name] = &$this->$name;
         }
     }

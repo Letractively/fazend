@@ -17,6 +17,10 @@
 
 class FaZend_Pos 
 {
+    const STRING = 0;
+    const OBJECT = 1;
+    
+    
     static protected $_class = "FaZend_Pos_Object";
     
     static protected $_root = null;
@@ -29,13 +33,75 @@ class FaZend_Pos
     }
     
     static public function save()
-    {
-        //RecursiveIteratorIterator
-        var_dump(self::$_root);
-        
-        foreach (new RecursiveIteratorIterator(self::$_root) as $name=>$Object) {
-            echo "$name\n";
-            var_dump($Object);
+    {        
+        /*$Iterator = new RecursiveIteratorIterator(self::$_root);
+        $InnerIterator = null;
+        foreach ($Iterator as $name=>$value) {
+            if ($Iterator->getInnerIterator()!==$InnerIterator) {
+                 $InnerIterator = $Iterator->getInnerIterator();
+                 echo "----\n";
+            }
+            //var_dump($Iterator->getInnerIterator());
+            //var_dump($Iterator->getDepth());
+            //var_dump(get_class_methods($Iterator));
+            echo "$name=$value\n";
+        }*/        
+        self::_save(self::$_root);
+    }
+    
+    static public function _save(FaZend_Pos_Abstract $Iterator, FaZend_Pos_Abstract $Parent = null)
+    {     
+        self::_insert($Iterator, $Parent);
+        foreach ($Iterator as $name=>$value) {
+            $str_value = (is_object($value)) ? get_class($value) : $value;
+            if (is_object($value)) {
+                $value->setParent($Iterator);
+                $value->setName($name);
+                self::_save($value, $Iterator);
+                if ($value->hasChildren()) {
+                    self::_save($value->getChildren(), $value->name);
+                } 
+            }
         }
+        
+        
+    }
+    
+    static function _insert(FaZend_Pos_Abstract $Iterator, FaZend_Pos_Abstract $Parent=null) 
+    {
+        $parent = ($Parent) ? $Parent->getId() : 0;
+        
+        Zend_Db_Table_Abstract::getDefaultAdapter()->insert("classes", array(
+            "parent" => $parent,
+            "class"  => get_class($Iterator),
+            "version"=> 0,
+            "updated"=>date("Y-m-d H:i:s"),
+        ));
+        $id = Zend_Db_Table_Abstract::getDefaultAdapter()->lastInsertId();
+        $Iterator->setId($id);
+                
+        foreach ($Iterator as $property=>$value) {
+            if (is_object($value)) continue;
+            Zend_Db_Table_Abstract::getDefaultAdapter()->insert("classes_properties", array(
+                "class"  => $id,
+                "property" => $property,
+                "value"	=> $value,
+            	"version"=> 0,
+            ));
+        }
+        
+        if (empty($parent)) return $Iterator;
+        
+        Zend_Db_Table_Abstract::getDefaultAdapter()->insert("classes_properties", array(
+          "class"    => $parent,
+          "property" => $Iterator->getName(),
+          "value"	 => $Iterator->getId(),
+          "type"     => self::OBJECT,
+          "version"  => 0,
+        ));     
+        
+        
+        
+        return $Iterator;       
     }
 }
