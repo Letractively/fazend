@@ -55,4 +55,17 @@
 	</target>	
 
 
+	<target name="test-pos" description="Run only pos unit-tests">
+       		<phpunit2 printsummary="yes" haltonerror="yes" haltonfailure="yes">
+			<formatter type="plain" usefile="no" />
+			<batchtest>
+				<fileset dir="${project.basedir}/test/FaZend/Pos">
+					<include name="**/*Test*.php"/>
+					<exclude name="**/Abstract*.php"/>
+					<exclude name="**/_*.php"/>
+					<exclude name=".svn/**"/>
+				</fileset>
+			</batchtest>
+		</phpunit2>
+	</target>
 </project>

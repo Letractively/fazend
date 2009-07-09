@@ -20,12 +20,12 @@ $adapter->query(
     'create table classes (
         id integer not null primary key autoincrement, 
         parent integer default null,
-        name varchar(50) not null
+        name varchar(50) not null,
         class varchar(50) not null,
         
         version integer,
         comment varchar(255),
-        updated datetime,
+        updated datetime
     )'
 );
 
@@ -34,7 +34,7 @@ $adapter->query(
         class integer not null primary key autoincrement, 
         property varchar(50) not null,
         value varchar(1024) not null,
-        version integer,
+        version integer
      )'
 );
 
@@ -42,13 +42,13 @@ $adapter->query(
     'create table classes_versions (
         id integer not null primary key autoincrement, 
         parent integer default null,
-        name varchar(50) not null
+        name varchar(50) not null,
         class varchar(50) not null,
         
         version integer,
         comment varchar(255),
         updated datetime,
-        alive tinyint(1) unsigned not null default 1,
+        alive tinyint(1) not null default 1
     )'
 );
 
@@ -57,6 +57,6 @@ $adapter->query(
         class integer not null primary key autoincrement, 
         property varchar(50) not null,
         value varchar(1024) not null,
-        version integer,
+        version integer
      )'
 );
