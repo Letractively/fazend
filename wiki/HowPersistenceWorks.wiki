@@ -10,6 +10,8 @@ There are 4 tables in the database (SQL available at `FaZend/POS/database/*.sql`
  * `fzSnapshot`: collection of momentary values of objects
  * `fzApproval`: collection of approval requests
 
+We '''never''' delete any records from any of these tables. We only add new records. We delete only to remove some history, some expired records from `fzSnapshot` table. Other tables only get `INSERT` operations, never `UPDATE` or `DELETE`.
+
 = Sample Scenarios =
 
 == Creating a New Object ==
