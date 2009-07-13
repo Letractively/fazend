@@ -126,4 +126,38 @@ class FaZend_Db_Table_ObjectTest extends AbstractTestCase {
         
         $this->assertEquals($root->bmw328->color, 'white');
     }
+    
+    public function testLoadAndSave()
+    {
+        FaZend_Pos::root()->bmw328 = new FaZend_Pos_Mock_Car();
+        FaZend_Pos::save();
+        FaZend_Pos::reset();
+        
+        $root = FaZend_Pos::root();
+        $root->audi = new FaZend_Pos_Mock_Car();
+        $root->audi->model = "tt";
+        $root->audi->color = "silver";
+        FaZend_Pos::save();
+        
+        $rows = Zend_Db_Table_Abstract::getDefaultAdapter()->fetchAll("SELECT * FROM " . FaZend_Pos::TABLE_OBJECT);
+        foreach (array(1=>"FaZend_Pos_Object", 2=>"FaZend_Pos_Mock_Car", 3=>"FaZend_Pos_Mock_Car") as $id=>$class) {
+            $row = current($rows);
+            $this->assertEquals($row["class"], $class);
+            $this->assertEquals($row["id"], $id);
+            next($rows);
+        }
+        
+        $rows = Zend_Db_Table_Abstract::getDefaultAdapter()->fetchAll("SELECT * FROM " . FaZend_Pos::TABLE_OBJECT_PROPERTY);
+        foreach (array( "2::color"=>"0::white", 
+        				"2::model"=>"0::", 
+        				"1::bmw328"=>"2::",
+                        "3::color"=>"0::silver",
+                        "3::model"=>"0::tt",
+                        "1::audi"=>"3::") as $class_property=>$parent_value) {
+            $row = current($rows);
+            $this->assertEquals($row["object_id"]."::".$row["property"], $class_property);
+            $this->assertEquals($row["child_object_id"]."::".$row["value"], $parent_value);
+            next($rows);
+        }
+    }
 }

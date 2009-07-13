@@ -39,24 +39,13 @@ class FaZend_Pos
     
     static public function save()
     {        
-        /*$Iterator = new RecursiveIteratorIterator(self::$_root);
-        $InnerIterator = null;
-        foreach ($Iterator as $name=>$value) {
-            if ($Iterator->getInnerIterator()!==$InnerIterator) {
-                 $InnerIterator = $Iterator->getInnerIterator();
-                 echo "----\n";
-            }
-            //var_dump($Iterator->getInnerIterator());
-            //var_dump($Iterator->getDepth());
-            //var_dump(get_class_methods($Iterator));
-            echo "$name=$value\n";
-        }*/        
+        //Zend_Debug::dump(self::$_root);     
         self::_save(self::$_root);
     }
     
     static public function _save(FaZend_Pos_Abstract $Iterator, FaZend_Pos_Abstract $Parent = null)
     {     
-        self::_insert($Iterator, $Parent);
+        self::_saveObject($Iterator, $Parent);
         foreach ($Iterator as $name=>$value) {
             $str_value = (is_object($value)) ? get_class($value) : $value;
             if (is_object($value)) {
@@ -70,19 +59,42 @@ class FaZend_Pos
         }
     }
     
-    static function _insert(FaZend_Pos_Abstract $Iterator, FaZend_Pos_Abstract $Parent=null) 
+    static function _saveObject(FaZend_Pos_Abstract $Iterator, FaZend_Pos_Abstract $Parent=null) 
     {
-        Zend_Db_Table_Abstract::getDefaultAdapter()->insert(self::TABLE_OBJECT, array(
-            "class"  => get_class($Iterator),
-            "version"=> 1,
-            "updated"=>date("Y-m-d H:i:s"),
-        ));
-        $id = Zend_Db_Table_Abstract::getDefaultAdapter()->lastInsertId();
-        $Iterator->setId($id);
-                
+        $db = Zend_Db_Table_Abstract::getDefaultAdapter();
+        
+        if ($Iterator instanceof FaZend_Pos_Null) {
+            $parent = ($Parent) ? $Parent->getId() : 0;
+            if (empty($parent)) return $Iterator;
+            $db->insert(self::TABLE_OBJECT_PROPERTY, array(
+              "object_id"    => $parent,
+              "child_object_id" => $Iterator->getId(),
+              "property" => $Iterator->getName(),
+              "value"	 => null,
+              "version"  => 1,
+            ));
+            
+            return $Iterator;
+        }
+        
+        if ($Iterator->hasId()) {
+            $db->update(self::TABLE_OBJECT, array(
+            	"version"=> 2,
+                "updated"=>date("Y-m-d H:i:s"),
+            ), $db->quoteInto("id=?", $Iterator->getId()));
+            $db->delete(self::TABLE_OBJECT_PROPERTY, $db->quoteInto("object_id=?", $Iterator->getId())." AND object_id>0");
+        } else {
+            $db->insert(self::TABLE_OBJECT, array(
+            	"class"  => get_class($Iterator),
+            	"version"=> 1,
+                "updated"=>date("Y-m-d H:i:s"),
+            ));
+            $id = $db->lastInsertId();
+            $Iterator->setId($id);
+        }
         foreach ($Iterator as $property=>$value) {
             if (is_object($value)) continue;
-            Zend_Db_Table_Abstract::getDefaultAdapter()->insert(self::TABLE_OBJECT_PROPERTY, array(
+            $db->insert(self::TABLE_OBJECT_PROPERTY, array(
                 "object_id"  => $id,
                 "property" => $property,
                 "value"	=> $value,
@@ -92,7 +104,7 @@ class FaZend_Pos
         
         $parent = ($Parent) ? $Parent->getId() : 0;
         if (empty($parent)) return $Iterator;
-        Zend_Db_Table_Abstract::getDefaultAdapter()->insert(self::TABLE_OBJECT_PROPERTY, array(
+        $db->insert(self::TABLE_OBJECT_PROPERTY, array(
           "object_id"    => $parent,
           "child_object_id" => $Iterator->getId(),
           "property" => $Iterator->getName(),

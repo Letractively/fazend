@@ -96,6 +96,11 @@ abstract class FaZend_Pos_Abstract implements RecursiveIterator
         return $this->_id;
     }
     
+    public function hasId()
+    {
+        return (bool)$this->_id;
+    }
+    
     public function setParent(FaZend_Pos_Abstract $Parent=null)
     {
         return $this->_Parent = $Parent;
