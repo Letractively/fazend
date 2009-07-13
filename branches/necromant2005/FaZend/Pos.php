@@ -26,8 +26,9 @@ class FaZend_Pos
     
     static public function root()
     {
-        $class=self::$_class;
-        if (is_null(self::$_root)) return self::$_root = new $class;
+        if (is_null(self::$_root)) {
+            return self::$_root = self::loadObject();
+        }
         return self::$_root;
     }
     
@@ -100,5 +101,59 @@ class FaZend_Pos
         ));
         
         return $Iterator;       
+    }
+    
+    /**
+     * Load object by id
+     * @param int $id; unique object id
+     * @return FaZend_Pos_Abstract
+     */
+    public function loadObject($id=1)
+    {
+        if (empty($id)) throw new Exception();
+        $db = Zend_Db_Table_Abstract::getDefaultAdapter();
+        $dbSelect = $db
+            ->select()
+            ->from(self::TABLE_OBJECT)
+            ->where($db->quoteInto("id=?", $id));
+        $row = $db->fetchRow($dbSelect);
+        if (empty($row)) {
+            $class = self::$_class;
+            return new $class();
+        }
+        $class = $row['class'];
+        $Object = new $class;
+        $Object->setId($id);
+        
+        return self::loadProperties($Object);
+    }
+    
+    /**
+     * Load Object properties
+     * @param FaZend_Pos_Abstract $Object
+     * @return FaZend_Pos_Abstract
+     */
+    public function loadProperties(FaZend_Pos_Abstract $Object)
+    {
+        $db = Zend_Db_Table_Abstract::getDefaultAdapter();
+        $dbSelect = $db
+            ->select()
+            ->from(self::TABLE_OBJECT_PROPERTY)
+            ->where($db->quoteInto("object_id=?", $Object->getId()));
+        $rows = $db->fetchAll($dbSelect);
+        foreach ($rows as $row) {
+            $property = $row['property'];
+            $value = $row['value'];
+            $child_object_id = $row['child_object_id'];
+            if (!$child_object_id) {
+                $Object->$property = $value;
+                continue;
+            }
+            $NullObject = new FaZend_Pos_Null();
+            $NullObject->setId($child_object_id);
+            $Object->$property = $NullObject;
+        }
+        
+        return $Object;
     }
 }

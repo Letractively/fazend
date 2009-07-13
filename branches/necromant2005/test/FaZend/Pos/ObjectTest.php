@@ -122,7 +122,8 @@ class FaZend_Db_Table_ObjectTest extends AbstractTestCase {
         FaZend_Pos::root()->bmw328 = new FaZend_Pos_Mock_Car();
         FaZend_Pos::save();
         FaZend_Pos::reset();
+        $root = FaZend_Pos::loadObject(1);
         
-        $this->assertEquals(FaZend_Pos::root()->bmw328->color, 'white');
+        $this->assertEquals($root->bmw328->color, 'white');
     }
 }

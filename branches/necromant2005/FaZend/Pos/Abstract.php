@@ -35,6 +35,9 @@ abstract class FaZend_Pos_Abstract implements RecursiveIterator
     public function __get($name)
     {
         if (!array_key_exists($name, $this->_properties)) return $this->__set($name, new FaZend_Pos_Object());
+        if ($this->_properties[$name] instanceof FaZend_Pos_Null) {
+            return $this->__set($name, FaZend_Pos::loadObject($this->_properties[$name]->getId()));
+        }
         return $this->_properties[$name];
     }
     
@@ -42,6 +45,7 @@ abstract class FaZend_Pos_Abstract implements RecursiveIterator
     {
         if (is_array($value)) throw FaZend_Pos_Exception('Array dissable only objcets extends FaZend_Pos_Abstract');
         if (is_object($value) && (!$value instanceof FaZend_Pos_Abstract)) throw FaZend_Pos_Exception(get_class($value) . ' dissable only objcets extends FaZend_Pos_Abstract');
+        if (is_object($value)) $value->setParent($this);
         
         return $this->_properties[$name] = $value;
     }
@@ -83,6 +87,7 @@ abstract class FaZend_Pos_Abstract implements RecursiveIterator
     
     public function setId($id)
     {
+        if (empty($id)) throw Exception("Empty id object!");
         return $this->_id = $id;
     }
     
