@@ -1,0 +1,72 @@
+#summary How `FaZend_POS` is implemented
+#labels Phase-Implementation
+
+= Database Schema =
+
+There are 4 tables in the database (SQL available at `FaZend/POS/database/*.sql`):
+
+ * `fzObject`: collection of all persistent objects
+ * `fzPartOf`: collection of ''part-of'' relations between objects
+ * `fzSnapshot`: collection of momentary values of objects
+ * `fzApproval`: collection of approval requests
+
+= Sample Scenarios =
+
+You do this:
+
+{{{
+$root = FaZend_POS::root();
+$root->cars = new FaZend_POS_Array();
+}}}
+
+The database gets this data:
+
+{{{
+fzObject {id: 1, class: 'FaZend_POS_Array'}
+}}}
+
+PHP code:
+
+{{{
+$bmw = new Car();
+}}}
+
+In database:
+
+{{{
+fzObject {id: 2, class: 'Car'}
+}}}
+
+In PHP:
+
+{{{
+$root->cars[] = $bmw;
+}}}
+
+In database:
+
+{{{
+fzObject {id: 3, class: 'FaZend_POS_PartOf'}
+fzPartOf {id: 1, fzObject: 3, parent: 1, kid: 2}
+}}}
+
+In PHP:
+
+{{{
+$bmw->color = 'black';
+$bwm->model = 'bmw';
+}}}
+
+In database:
+
+{{{
+fzSnapshot {id: 1, 
+    fzObject: 2, 
+    version: 1, 
+    properties: {color: 'black', model: 'bmw'},
+    alive: 1,
+    updated: '15-July-2009',
+    user: NULL,
+    comment: '',
+    baselined: NULL}
+}}}
