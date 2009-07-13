@@ -12,6 +12,8 @@ There are 4 tables in the database (SQL available at `FaZend/POS/database/*.sql`
 
 = Sample Scenarios =
 
+== Create a New Object ==
+
 You do this:
 
 {{{
@@ -25,30 +27,24 @@ The database gets this data:
 fzObject {id: 1, class: 'FaZend_POS_Array'}
 }}}
 
+== Building Relations Between Objects ==
+
 PHP code:
 
 {{{
 $bmw = new Car();
+$root->cars['my car'] = $bmw;
 }}}
 
 In database:
 
 {{{
 fzObject {id: 2, class: 'Car'}
-}}}
-
-In PHP:
-
-{{{
-$root->cars[] = $bmw;
-}}}
-
-In database:
-
-{{{
 fzObject {id: 3, class: 'FaZend_POS_PartOf'}
-fzPartOf {id: 1, fzObject: 3, parent: 1, kid: 2}
+fzPartOf {id: 1, name: 'my car', fzObject: 3, parent: 1, kid: 2}
 }}}
+
+== Changing Static PHP Properties of Objects ==
 
 In PHP:
 
@@ -69,4 +65,22 @@ fzSnapshot {id: 1,
     user: NULL,
     comment: '',
     baselined: NULL}
+}}}
+
+== Changing Relations Between Objects ==
+
+In PHP:
+
+{{{
+$audi = new Car();
+$root->cars['my car'] = $audi;
+}}}
+
+In database:
+
+{{{
+fzObject {id: 4, class: 'Car'}
+fzObject {id: 5, class: 'FaZend_POS_PartOf'}
+fzPartOf {id: 2, name: 'my car', fzObject: 5, parent: 1, kid: 4}
+fzSnapshot {id: 2, fzObject: 3, version: 1, alive: 0, ...}
 }}}
