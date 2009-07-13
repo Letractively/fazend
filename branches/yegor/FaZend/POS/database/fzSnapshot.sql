@@ -26,7 +26,7 @@ CREATE TABLE IF NOT EXISTS `fzSnapshot` (
     `updated` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT "When this snapshot was made",
     `user` INT UNSIGNED COMMENT "Author of the update, if any",
     `comment` TEXT COMMENT "Optional comment for the change made",
-    `baselined` BOOLEAN NOT NULL DEFAULT 0 COMMENT "The object is baselined (changes are blocked)",
+    `baselined` BOOLEAN NOT NULL DEFAULT 0 COMMENT "The object is baselined (the app may block changes)",
 
     PRIMARY KEY(`id`),
     FOREIGN KEY(`fzObject`) REFERENCES `fzObject`(`id`) ON DELETE CASCADE ON UPDATE CASCADE,
