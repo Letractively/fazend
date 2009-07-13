@@ -12,9 +12,9 @@ There are 4 tables in the database (SQL available at `FaZend/POS/database/*.sql`
 
 = Sample Scenarios =
 
-== Create a New Object ==
+== Creating a New Object ==
 
-You do this:
+You do this in PHP:
 
 {{{
 $root = FaZend_POS::root();
@@ -44,7 +44,7 @@ fzObject {id: 3, class: 'FaZend_POS_PartOf'}
 fzPartOf {id: 1, name: 'my car', fzObject: 3, parent: 1, kid: 2}
 }}}
 
-== Changing Static PHP Properties of Objects ==
+== Setting Static PHP Properties of Objects ==
 
 In PHP:
 
@@ -83,4 +83,21 @@ fzObject {id: 4, class: 'Car'}
 fzObject {id: 5, class: 'FaZend_POS_PartOf'}
 fzPartOf {id: 2, name: 'my car', fzObject: 5, parent: 1, kid: 4}
 fzSnapshot {id: 2, fzObject: 3, version: 1, alive: 0, ...}
+}}}
+
+== Changing Static PHP Properties of Objects ==
+
+In PHP:
+
+{{{
+$bmw->color = 'blue';
+}}}
+
+In database:
+
+{{{
+fzSnapshot {id: 3, 
+    fzObject: 2, 
+    version: 2, 
+    properties: {color: 'blue'}, ...}
 }}}
