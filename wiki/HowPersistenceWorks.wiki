@@ -29,11 +29,13 @@ The database gets this data:
 
 {{{
 fzObject {id: 1, class: 'FaZend_POS_Array'}
+fzObject {id: 2, class: 'FaZend_POS_PartOf'}
+fzPartOf {id: 1, name: 'cars', fzObject: 2, parent: NULL, child: 1}
 }}}
 
 While the object is created we just create a new record in `fzObject` and save no data into `fzSnapshot`. Since the class `FaZend_POS_Array` doesn't have any PHP properties encapsulated. Object id is `1`, object class is `FaZend_POS_Array`.
 
-Object `FaZend_POS::root()` has no instance in `fzObject` table, it is just a representative of the entire object storage.
+Object `FaZend_POS::root()` has no instance in `fzObject` table, it is just a representative of the entire object storage. That's why `parent` in `NULL` in the relationship record.
 
 == Building Relations Between Objects ==
 
@@ -47,12 +49,12 @@ $root->cars['my car'] = $bmw;
 In database:
 
 {{{
-fzObject {id: 2, class: 'Car'}
-fzObject {id: 3, class: 'FaZend_POS_PartOf'}
-fzPartOf {id: 1, name: 'my car', fzObject: 3, parent: 1, child: 2}
+fzObject {id: 3, class: 'Car'}
+fzObject {id: 4, class: 'FaZend_POS_PartOf'}
+fzPartOf {id: 1, name: 'my car', fzObject: 4, parent: 2, child: 3}
 }}}
 
-As you see, two new objects are created in `fzObject`: `#2` and `#3`. Object `#3` is a relationship between object `#1` (`FaZend_POS_Array`) and #2 (`Car`). To add this information to the relationship we create a record in `fzPartOf` table, where we give a name to this relationship (`my car`), link it to the relationship-object (`#3`) and set necessary links to the parent (`FaZend_POS_Array`) and child objects (`Car`).
+As you see, two new objects are created in `fzObject`: `#3` and `#3`. Object `#4` is a relationship between object `#1` (`FaZend_POS_Array`) and #3 (`Car`). To add this information to the relationship we create a record in `fzPartOf` table, where we give a name to this relationship (`my car`), link it to the relationship-object (`#4`) and set necessary links to the parent (`FaZend_POS_Array`) and child objects (`Car`).
 
 == Setting Static PHP Properties of Objects ==
 
@@ -67,7 +69,7 @@ In database:
 
 {{{
 fzSnapshot {id: 1, 
-    fzObject: 2, 
+    fzObject: 3, 
     version: 1, 
     properties: {color: 'black', model: 'bmw'},
     alive: 1,
@@ -79,7 +81,7 @@ fzSnapshot {id: 1,
 
 When we change an object in PHP, we should reflect these changes in the database. Every change has a record in `fzSnapshot` table. Every record in this table has information _comparing_ to the previous snapshot. In the example above we didn't have any snapshots before, that's why the first one will have full list of properties (`{color: 'black', model: 'bmw'}`).
 
-The snapshot record has a link to the object (`fzObject: 2`) and the number of version of this snapshot (`version: 1`). Versions are numbered from `1` to infinity. Every next snapshot gets a version one-bigger than the previous one.
+The snapshot record has a link to the object (`fzObject: 3`) and the number of version of this snapshot (`version: 1`). Versions are numbered from `1` to infinity. Every next snapshot gets a version one-bigger than the previous one.
 
 Alive-flag (`alive: 1`) tells that this snapshot has an object which is not deleted yet. If the object has to be deleted we just create a next snapshot where this flag we set to `false`. That's how we _delete_ objects from the storage. If you want to wipe the object out, together with its entire history and all links to it, you should use `ps()->wipe()` method, which will delete a record from `fzObject` table, together with snapshots, links and approval requests - it's a dangerous operation.
 
@@ -95,10 +97,10 @@ $root->cars['my car'] = $audi;
 In database:
 
 {{{
-fzObject {id: 4, class: 'Car'}
-fzObject {id: 5, class: 'FaZend_POS_PartOf'}
-fzPartOf {id: 2, name: 'my car', fzObject: 5, parent: 1, child: 4}
-fzSnapshot {id: 2, fzObject: 3, version: 1, alive: 0, ...}
+fzObject {id: 5, class: 'Car'}
+fzObject {id: 6, class: 'FaZend_POS_PartOf'}
+fzPartOf {id: 2, name: 'my car', fzObject: 6, parent: 1, child: 5}
+fzSnapshot {id: 2, fzObject: 4, version: 1, alive: 0, ...}
 }}}
 
 == Changing Static PHP Properties of Objects ==
@@ -113,7 +115,7 @@ In database:
 
 {{{
 fzSnapshot {id: 3, 
-    fzObject: 2, 
+    fzObject: 3, 
     version: 2, 
     properties: {color: 'blue'}, ...}
 }}}
