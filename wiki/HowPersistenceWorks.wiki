@@ -10,7 +10,9 @@ There are 4 tables in the database (SQL available at `FaZend/POS/database/*.sql`
  * `fzSnapshot`: collection of momentary values of objects
  * `fzApproval`: collection of approval requests
 
-We *never* delete any records from any of these tables. We only add new records. We delete only to remove some history, some expired records from `fzSnapshot` table. Other tables only get `INSERT` operations, never `UPDATE` or `DELETE`.
+We *never* delete or update any records in these tables. We may only add new records. We _may_ delete only to remove some history, some expired records from `fzSnapshot` table. Other tables get only `INSERT` operations, never `UPDATE` or `DELETE`.
+
+We may also sometimes perform a _garbage collection_, by means of selecting all classes from `fzObject.class` column and trying to instantiate them in PHP. Maybe some of them are from previous versions of the application and are no longer valid. In this case we *may* remove the objects from the database.
 
 = Sample Scenarios =
 
