@@ -17,13 +17,34 @@
 
 class FaZend_Pos 
 {
+    /**
+     * Name table in database where store objects
+     * @var string
+     */
     const TABLE_OBJECT = "object";
+    
+    /**
+     * Name table in database where store object properties
+     * @var string
+     */
     const TABLE_OBJECT_PROPERTY = "object_property";    
     
+    /**
+     * Default class name for root element the recursive tree
+     * @var string
+     */
     static protected $_class = "FaZend_Pos_Object";
     
+    /**
+     * The recursive tree
+     * @var FaZend_Pos_Abstract
+     */
     static protected $_root = null;
     
+    /**
+     * Return a root element the recursive tree
+     * @return FaZend_Pos_Abstract
+     */
     static public function root()
     {
         if (is_null(self::$_root)) {
@@ -32,18 +53,29 @@ class FaZend_Pos
         return self::$_root;
     }
     
+    /**
+     * Reset internal variable of recursive tree
+     * (need for testing)
+     */
     static public function reset()
     {
         self::$_root = null;
     }
     
+    /**
+     * Save objects structure in database
+     */
     static public function save()
     {        
-        //Zend_Debug::dump(self::$_root);     
         self::_save(self::$_root);
     }
     
-    static public function _save(FaZend_Pos_Abstract $Iterator, FaZend_Pos_Abstract $Parent = null)
+    /**
+     * Bypassing the recursive tree stored in self::$_root
+     * @param FaZend_Pos_Abstract $Iterator
+     * @param FaZend_Pos_Abstract $Parent
+     */
+    static protected function _save(FaZend_Pos_Abstract $Iterator, FaZend_Pos_Abstract $Parent = null)
     {     
         self::_saveObject($Iterator, $Parent);
         foreach ($Iterator as $name=>$value) {
@@ -59,7 +91,13 @@ class FaZend_Pos
         }
     }
     
-    static function _saveObject(FaZend_Pos_Abstract $Iterator, FaZend_Pos_Abstract $Parent=null) 
+    /**
+     * Save current object in database
+     * @param FaZend_Pos_Abstract $Iterator
+     * @param FaZend_Pos_Abstract $Parent
+     * @return FaZend_Pos_Abstract
+     */
+    static protected function _saveObject(FaZend_Pos_Abstract $Iterator, FaZend_Pos_Abstract $Parent=null) 
     {
         $db = Zend_Db_Table_Abstract::getDefaultAdapter();
         
