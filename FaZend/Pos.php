@@ -17,9 +17,8 @@
 
 class FaZend_Pos 
 {
-    const STRING = 0;
-    const OBJECT = 1;
-    
+    const TABLE_OBJECT = "object";
+    const TABLE_OBJECT_PROPERTY = "object_property";    
     
     static protected $_class = "FaZend_Pos_Object";
     
@@ -30,6 +29,11 @@ class FaZend_Pos
         $class=self::$_class;
         if (is_null(self::$_root)) return self::$_root = new $class;
         return self::$_root;
+    }
+    
+    static public function reset()
+    {
+        self::$_root = null;
     }
     
     static public function save()
@@ -63,18 +67,13 @@ class FaZend_Pos
                 } 
             }
         }
-        
-        
     }
     
     static function _insert(FaZend_Pos_Abstract $Iterator, FaZend_Pos_Abstract $Parent=null) 
     {
-        $parent = ($Parent) ? $Parent->getId() : 0;
-        
-        Zend_Db_Table_Abstract::getDefaultAdapter()->insert("classes", array(
-            "parent" => $parent,
+        Zend_Db_Table_Abstract::getDefaultAdapter()->insert(self::TABLE_OBJECT, array(
             "class"  => get_class($Iterator),
-            "version"=> 0,
+            "version"=> 1,
             "updated"=>date("Y-m-d H:i:s"),
         ));
         $id = Zend_Db_Table_Abstract::getDefaultAdapter()->lastInsertId();
@@ -82,25 +81,23 @@ class FaZend_Pos
                 
         foreach ($Iterator as $property=>$value) {
             if (is_object($value)) continue;
-            Zend_Db_Table_Abstract::getDefaultAdapter()->insert("classes_properties", array(
-                "class"  => $id,
+            Zend_Db_Table_Abstract::getDefaultAdapter()->insert(self::TABLE_OBJECT_PROPERTY, array(
+                "object_id"  => $id,
                 "property" => $property,
                 "value"	=> $value,
-            	"version"=> 0,
+            	"version"=> 1,
             ));
         }
         
+        $parent = ($Parent) ? $Parent->getId() : 0;
         if (empty($parent)) return $Iterator;
-        
-        Zend_Db_Table_Abstract::getDefaultAdapter()->insert("classes_properties", array(
-          "class"    => $parent,
+        Zend_Db_Table_Abstract::getDefaultAdapter()->insert(self::TABLE_OBJECT_PROPERTY, array(
+          "object_id"    => $parent,
+          "child_object_id" => $Iterator->getId(),
           "property" => $Iterator->getName(),
-          "value"	 => $Iterator->getId(),
-          "type"     => self::OBJECT,
-          "version"  => 0,
-        ));     
-        
-        
+          "value"	 => null,
+          "version"  => 1,
+        ));
         
         return $Iterator;       
     }
