@@ -11,6 +11,8 @@
 
 CREATE TABLE IF NOT EXISTS `fzPartOf` (
     
+    `name` VARBINARY(255) NOT NULL COMMENT "Unique name of the relation",
+
     `fzObject` INT UNSIGNED NOT NULL COMMENT "Unique ID of this object, FK to fzObject",
     `parent` INT UNSIGNED NOT NULL COMMENT "ID of the parent object, FK to fzObject",
     `kid` INT UNSIGNED NOT NULL COMMENT "ID of the child object, FK to fzObject",
@@ -20,8 +22,8 @@ CREATE TABLE IF NOT EXISTS `fzPartOf` (
     FOREIGN KEY(`parent`) REFERENCES `fzObject`(`id`) ON DELETE CASCADE ON UPDATE CASCADE,
     FOREIGN KEY(`child`) REFERENCES `fzObject`(`id`) ON DELETE CASCADE ON UPDATE CASCADE,
 
-    -- object can be a kid only once
-    UNIQUE(`parent`, `kid`)
+    -- relation name is unique for any particular object
+    UNIQUE(`parent`, `name`)
 
 ) AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 ENGINE=InnoDB;
 
