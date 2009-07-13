@@ -67,6 +67,10 @@ abstract class FaZend_Pos_Abstract implements RecursiveIterator
     
     public function current() 
     {
+        $current = current($this->_properties);
+        if ($current instanceof FaZend_Pos_Null) {
+            return $this->__set($this->key(), FaZend_Pos::loadObject($this->_properties[$this->key()]->getId()));
+        }
         return current($this->_properties);
     }
     

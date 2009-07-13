@@ -83,6 +83,7 @@ class FaZend_Pos
                 "updated"=>date("Y-m-d H:i:s"),
             ), $db->quoteInto("id=?", $Iterator->getId()));
             $db->delete(self::TABLE_OBJECT_PROPERTY, $db->quoteInto("object_id=?", $Iterator->getId())." AND object_id>0");
+            $id = $Iterator->getId();
         } else {
             $db->insert(self::TABLE_OBJECT, array(
             	"class"  => get_class($Iterator),
