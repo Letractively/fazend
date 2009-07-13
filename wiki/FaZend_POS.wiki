@@ -92,15 +92,15 @@ FaZend_POS::root()->ps()->setACL(new Zend_ACL());
 
 = Objects' Approval =
 
-You can baseline any object and request approval from other users. They can approve or reject.
+You can baseline any object and request an approval from other users. They will approve or reject. You can give them a message together with the approval request. Also, you can set the time boundary for the approval (24 hours in the example below).
 
 {{{
 $car = FaZend_POS::root()->bmw328i;
 $mary = new FaZend_User(13);
-$car->ps()->baseline(array($mary));
+$car->ps()->baseline(array($mary), 'please, approve my new car', 24);
 }}}
 
-Later, Mary is current user:
+Later, `Mary` is a current user:
 
 {{{
 $car = FaZend_POS::root()->bmw328i;
@@ -121,10 +121,10 @@ $car->ps()->isBaselined();
 $car->ps()->isRejected();
 }}}
 
-And you can get a list of all objects waiting for user approval:
+And you can get a list of all objects waiting for user's attention:
 
 {{{
-$objects = FaZend_POS::getWaitingApproval($mary);
+$objects = FaZend_POS::getWaiting($mary);
 }}}
 
 = Other ideas =
