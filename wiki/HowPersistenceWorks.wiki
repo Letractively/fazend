@@ -119,3 +119,23 @@ fzSnapshot {id: 3,
     version: 2, 
     properties: {color: 'blue'}, ...}
 }}}
+
+= SQL Queries =
+
+In PHP:
+
+{{{
+$root = FaZend_POS::root();
+foreach ($root->cars as $car)
+    // ...
+}}}
+
+In SQL:
+
+{{{
+SELECT * FROM (SELECT fzSnapshot.* FROM fzObject
+    JOIN fzPartOf ON parent IS NULL
+    JOIN fzSnapshot ON fzSnapshot.fzObject = fzPartOf.fzObject
+    ORDER BY version DESC) AS versions GROUP BY fzObject
+    HAVING alive = 1
+}}}
