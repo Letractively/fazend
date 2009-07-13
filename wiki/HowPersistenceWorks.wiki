@@ -18,14 +18,14 @@ We may also sometimes perform a _garbage collection_, by means of selecting all 
 
 == Creating a New Object ==
 
-You do this in PHP:
+You're doing this in PHP:
 
 {{{
 $root = FaZend_POS::root();
 $root->cars = new FaZend_POS_Array();
 }}}
 
-The database gets this data:
+A database gets this data:
 
 {{{
 fzObject {id: 1, class: 'FaZend_POS_Array'}
@@ -33,20 +33,20 @@ fzObject {id: 2, class: 'FaZend_POS_PartOf'}
 fzPartOf {id: 1, name: 'cars', fzObject: 2, parent: NULL, child: 1}
 }}}
 
-While the object is created we just create a new record in `fzObject` and save no data into `fzSnapshot`. Since the class `FaZend_POS_Array` doesn't have any PHP properties encapsulated. Object id is `1`, object class is `FaZend_POS_Array`.
+When the object is being created we create a new record in `fzObject` and save no data into `fzSnapshot`, since the class `FaZend_POS_Array` doesn't have any PHP properties encapsulated. The object's ID is `1` and the object's class is `FaZend_POS_Array`.
 
-Object `FaZend_POS::root()` has no instance in `fzObject` table, it is just a representative of the entire object storage. That's why `parent` in `NULL` in the relationship record.
+The object `FaZend_POS::root()` has no instance in `fzObject` table, it is just a representative of the entire object storage. That's why the `parent` column equals to `NULL` in the relationship record.
 
 == Building Relations Between Objects ==
 
-Now we need to set a _part-of_ relation between objects, in PHP code:
+Now we need to set a _part-of_ relationship between two objects, in PHP code:
 
 {{{
 $bmw = new Car();
 $root->cars['my car'] = $bmw;
 }}}
 
-In database:
+In a database:
 
 {{{
 fzObject {id: 3, class: 'Car'}
@@ -54,7 +54,7 @@ fzObject {id: 4, class: 'FaZend_POS_PartOf'}
 fzPartOf {id: 1, name: 'my car', fzObject: 4, parent: 2, child: 3}
 }}}
 
-As you see, two new objects are created in `fzObject`: `#3` and `#3`. Object `#4` is a relationship between object `#1` (`FaZend_POS_Array`) and #3 (`Car`). To add this information to the relationship we create a record in `fzPartOf` table, where we give a name to this relationship (`my car`), link it to the relationship-object (`#4`) and set necessary links to the parent (`FaZend_POS_Array`) and child objects (`Car`).
+As you see, two new objects are created in `fzObject` table: `#3` and `#4`. The object `#4` is a relationship between the object `#1` (`FaZend_POS_Array`) and the object `#3` (`Car`). To add this information to the relationship we must create a record in `fzPartOf` table, where we give a name to this relationship (`my car`), we link it to the relationship-object (`#4`) and we configure necessary links to the parent (`FaZend_POS_Array`) and the child (`Car`).
 
 == Setting Static PHP Properties of Objects ==
 
@@ -65,7 +65,7 @@ $bmw->color = 'black';
 $bwm->model = 'bmw';
 }}}
 
-In database:
+In a database:
 
 {{{
 fzSnapshot {id: 1, 
@@ -79,9 +79,9 @@ fzSnapshot {id: 1,
     baselined: NULL}
 }}}
 
-When we change an object in PHP, we should reflect these changes in the database. Every change has a record in `fzSnapshot` table. Every record in this table has information _comparing_ to the previous snapshot. In the example above we didn't have any snapshots before, that's why the first one will have full list of properties (`{color: 'black', model: 'bmw'}`).
+When we change an object in PHP, we should reflect these changes in the database. Every change has a record in `fzSnapshot` table. Every record in this table has information _in comparison_ to the previous snapshot. In the example above we didn't have any snapshots before, that's why the first one has full list of properties (`{color: 'black', model: 'bmw'}`).
 
-The snapshot record has a link to the object (`fzObject: 3`) and the number of version of this snapshot (`version: 1`). Versions are numbered from `1` to infinity. Every next snapshot gets a version one-bigger than the previous one.
+The snapshot record has a link to the object (`fzObject: 3`) and the version unique number of this particular snapshot (`version: 1`). Versions are numbered from `1` to infinity. Every next snapshot gets a version one-bigger than the previous one.
 
 Alive-flag (`alive: 1`) tells that this snapshot has an object which is not deleted yet. If the object has to be deleted we just create a next snapshot where this flag we set to `false`. That's how we _delete_ objects from the storage. If you want to wipe the object out, together with its entire history and all links to it, you should use `ps()->wipe()` method, which will delete a record from `fzObject` table, together with snapshots, links and approval requests - it's a dangerous operation.
 
