@@ -122,7 +122,28 @@ fzSnapshot {id: 3,
 
 = SQL Queries =
 
-In PHP:
+== Getting a Single Object ==
+
+We can get an object only from a parent object, in PHP:
+
+{{{
+$root = FaZend_POS::root()->cars;
+$myCar = $root->cars['my car'];
+}}}
+
+We assume that `$this->cars` object ID is `21234`:
+
+{{{
+SELECT * FROM (SELECT fzSnapshot.* FROM fzObject
+    JOIN fzPartOf ON (parent = 21234 AND name = 'my car')
+    JOIN fzSnapshot ON fzSnapshot.fzObject = fzPartOf.fzObject
+    ORDER BY version DESC) AS versions GROUP BY fzObject
+    HAVING alive = 1
+}}}
+
+== Getting a List of Child Objects ==
+
+We can get a list of all objects linked to the given one, in PHP:
 
 {{{
 $root = FaZend_POS::root();
@@ -130,11 +151,11 @@ foreach ($root->cars as $car)
     // ...
 }}}
 
-In SQL:
+In SQL (we assume that `$root->cars` object ID is `21234`):
 
 {{{
 SELECT * FROM (SELECT fzSnapshot.* FROM fzObject
-    JOIN fzPartOf ON parent IS NULL
+    JOIN fzPartOf ON parent = 21234
     JOIN fzSnapshot ON fzSnapshot.fzObject = fzPartOf.fzObject
     ORDER BY version DESC) AS versions GROUP BY fzObject
     HAVING alive = 1
