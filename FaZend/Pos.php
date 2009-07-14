@@ -130,7 +130,7 @@ class FaZend_Pos
             $Iterator->setId($db->lastInsertId());
         }
         //save info
-        $Iterator->info()->setVersion(self::$_version);
+        $Iterator->ps()->setVersion(self::$_version);
         $db->insert(self::TABLE_OBJECT_INFORMATION, array(
             "object_id" => $Iterator->getId(),
             "version" => self::$_version,
@@ -214,8 +214,8 @@ class FaZend_Pos
             ->limit(1);
         if ($version) $dbSelect->where($db->quoteInto("version=?", $version));
         $row = $db->fetchRow($dbSelect);
-        $Object->info()->setVersion($row["version"]);
-        $Object->info()->setUpdated($row["updated"]);
+        $Object->ps()->setVersion($row["version"]);
+        $Object->ps()->setUpdated($row["updated"]);
         return $Object;
     }
     
@@ -231,7 +231,7 @@ class FaZend_Pos
             ->select()
             ->from(self::TABLE_OBJECT_PROPERTY)
             ->where($db->quoteInto("object_id=?", $Object->getId()))
-            ->where($db->quoteInto("version=?", $Object->info()->version));
+            ->where($db->quoteInto("version=?", $Object->ps()->version));
         $rows = $db->fetchAll($dbSelect);
         foreach ($rows as $row) {
             $property = $row['property'];

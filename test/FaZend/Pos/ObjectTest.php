@@ -189,8 +189,8 @@ class FaZend_Db_Table_ObjectTest extends AbstractTestCase {
         $this->assertTrue($root->bmw328 instanceof FaZend_Pos_Mock_Car);
         $this->assertTrue($root->audi instanceof FaZend_Pos_Mock_Car);
         
-        $this->assertEquals($root->bmw328->info()->version, 2);
-        $this->assertEquals($root->audi->info()->version, 2);
+        $this->assertEquals($root->bmw328->ps()->version, 2);
+        $this->assertEquals($root->audi->ps()->version, 2);
     }
 
     public function testPs()
@@ -207,7 +207,7 @@ class FaZend_Db_Table_ObjectTest extends AbstractTestCase {
         $this->assertEquals(FaZend_Pos::root()->bmw328->color, "green");
         FaZend_Pos::root()->bmw328->ps()->workWithVersion(-1);
         $this->assertEquals(FaZend_Pos::root()->bmw328->color, "white");
-        $this->assertEquals(FaZend_Pos::root()->bmw328->info()->version, 1);
+        $this->assertEquals(FaZend_Pos::root()->bmw328->ps()->version, 1);
         
         $this->assertEquals(FaZend_Pos::root()->bmw328->ps()->getVersions(10), array(2, 1));
     }
