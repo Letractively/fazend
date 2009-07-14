@@ -18,11 +18,19 @@ $adapter = Zend_Db_Table_Abstract::getDefaultAdapter();
 $adapter->query(
     'create table object (
         id integer not null primary key autoincrement, 
-        class varchar(50) not null,
-        version integer default 1,
-        updated datetime
+        class varchar(50) not null
     )'
 );
+
+$adapter->query(
+    'create table object_information (
+        object_id integer not null,
+        version integer	not null default 1,
+        updated datetime,
+        owner	integer	default 0
+    )'
+);
+
 $adapter->query(
     'create table object_property (
         object_id integer not null,

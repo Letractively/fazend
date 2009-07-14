@@ -30,10 +30,18 @@ class FaZend_Pos
     const TABLE_OBJECT_PROPERTY = "object_property";    
     
     /**
+     * Name table in database where store object additional inforamtion
+     * @var unknown_type
+     */
+    const TABLE_OBJECT_INFORMATION = "object_information";
+    
+    /**
      * Default class name for root element the recursive tree
      * @var string
      */
     static protected $_class = "FaZend_Pos_Object";
+    
+    static protected $_version = 0;
     
     /**
      * The recursive tree
@@ -67,7 +75,9 @@ class FaZend_Pos
      */
     static public function save()
     {        
+        self::$_version = self::_getVerstion();
         self::_save(self::$_root);
+        self::reset();
     }
     
     /**
@@ -100,47 +110,34 @@ class FaZend_Pos
     static protected function _saveObject(FaZend_Pos_Abstract $Iterator, FaZend_Pos_Abstract $Parent=null) 
     {
         $db = Zend_Db_Table_Abstract::getDefaultAdapter();
+        if ($Iterator instanceof FaZend_Pos_Null) return $Iterator;
+        if ($Iterator->hasId() && !$Iterator->isChanged()) return $Iterator;
         
-        if ($Iterator instanceof FaZend_Pos_Null) {
-            $parent = ($Parent) ? $Parent->getId() : 0;
-            if (empty($parent)) return $Iterator;
-            $db->insert(self::TABLE_OBJECT_PROPERTY, array(
-              "object_id"    => $parent,
-              "child_object_id" => $Iterator->getId(),
-              "property" => $Iterator->getName(),
-              "value"	 => null,
-              "version"  => 1,
-            ));
-            
-            return $Iterator;
+        if (!$Iterator->hasId()) {
+            $db->insert(self::TABLE_OBJECT, array("class"  => get_class($Iterator)));
+            $Iterator->setId($db->lastInsertId());
         }
+        //save info
+        $Iterator->info()->setVersion(self::$_version);
+        $db->insert(self::TABLE_OBJECT_INFORMATION, array(
+            "object_id" => $Iterator->getId(),
+            "version" => self::$_version,
+            "updated" => date("Y-m-d H:i:s"),
+            "owner"	  => 0,
+        ));
         
-        if ($Iterator->hasId()) {
-            $db->update(self::TABLE_OBJECT, array(
-            	"version"=> 2,
-                "updated"=>date("Y-m-d H:i:s"),
-            ), $db->quoteInto("id=?", $Iterator->getId()));
-            $db->delete(self::TABLE_OBJECT_PROPERTY, $db->quoteInto("object_id=?", $Iterator->getId())." AND object_id>0");
-            $id = $Iterator->getId();
-        } else {
-            $db->insert(self::TABLE_OBJECT, array(
-            	"class"  => get_class($Iterator),
-            	"version"=> 1,
-                "updated"=>date("Y-m-d H:i:s"),
-            ));
-            $id = $db->lastInsertId();
-            $Iterator->setId($id);
-        }
+        //save properties
         foreach ($Iterator as $property=>$value) {
             if (is_object($value)) continue;
             $db->insert(self::TABLE_OBJECT_PROPERTY, array(
-                "object_id"  => $id,
+                "object_id"  => $Iterator->getId(),
                 "property" => $property,
                 "value"	=> $value,
-            	"version"=> 1,
+            	"version"=> self::$_version,
             ));
         }
         
+        //save relations
         $parent = ($Parent) ? $Parent->getId() : 0;
         if (empty($parent)) return $Iterator;
         $db->insert(self::TABLE_OBJECT_PROPERTY, array(
@@ -148,10 +145,17 @@ class FaZend_Pos
           "child_object_id" => $Iterator->getId(),
           "property" => $Iterator->getName(),
           "value"	 => null,
-          "version"  => 1,
+          "version"  => self::$_version,
         ));
         
         return $Iterator;       
+    }
+    
+    protected static function _getVerstion()
+    {
+        $db = Zend_Db_Table_Abstract::getDefaultAdapter();
+        $dbSelect = $db->select()->from(self::TABLE_OBJECT_INFORMATION, 'version')->order("version DESC");
+        return $db->fetchOne($dbSelect)+1;
     }
     
     /**
@@ -176,7 +180,29 @@ class FaZend_Pos
         $Object = new $class;
         $Object->setId($id);
         
+        $Object = self::loadObjectInformation($Object);
+        
         return self::loadProperties($Object);
+    }
+
+    /**
+     * Load Object information
+     * @param FaZend_Pos_Abstract $Object
+     * @return FaZend_Pos_Abstract
+     */
+    public function loadObjectInformation(FaZend_Pos_Abstract $Object)
+    {
+        $db = Zend_Db_Table_Abstract::getDefaultAdapter();
+        //last object version
+        $dbSelect = $db
+            ->select()
+            ->from(self::TABLE_OBJECT_INFORMATION)
+            ->where($db->quoteInto("object_id=?", $Object->getId()))
+            ->order("version")->limit(1);
+        $row = $db->fetchRow($dbSelect);
+        $Object->info()->setVersion($row["version"]);
+        $Object->info()->setUpdated($row["updated"]);
+        return $Object;
     }
     
     /**
@@ -190,19 +216,20 @@ class FaZend_Pos
         $dbSelect = $db
             ->select()
             ->from(self::TABLE_OBJECT_PROPERTY)
-            ->where($db->quoteInto("object_id=?", $Object->getId()));
+            ->where($db->quoteInto("object_id=?", $Object->getId()))
+            ->where($db->quoteInto("version=?", $Object->info()->version));
         $rows = $db->fetchAll($dbSelect);
         foreach ($rows as $row) {
             $property = $row['property'];
             $value = $row['value'];
             $child_object_id = $row['child_object_id'];
             if (!$child_object_id) {
-                $Object->$property = $value;
+                $Object->__setProperty($property, $value);
                 continue;
             }
             $NullObject = new FaZend_Pos_Null();
             $NullObject->setId($child_object_id);
-            $Object->$property = $NullObject;
+            $Object->__setProperty($property, $NullObject);
         }
         
         return $Object;

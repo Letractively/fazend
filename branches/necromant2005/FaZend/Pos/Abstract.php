@@ -25,28 +25,40 @@ abstract class FaZend_Pos_Abstract implements RecursiveIterator
     
     protected $_Parent = null;
     
+    protected $_Info = null;
+    
+    protected $_is_changed = false;
+    
     public function __construct() 
     {
         foreach (get_class_vars(get_class($this)) as $name=>$value) {
             $this->_properties[$name] = &$this->$name;
         }
+        
+        $this->_Info = new FaZend_Pos_Info();
     }
     
     public function __get($name)
     {
         if (!array_key_exists($name, $this->_properties)) return $this->__set($name, new FaZend_Pos_Object());
         if ($this->_properties[$name] instanceof FaZend_Pos_Null) {
-            return $this->__set($name, FaZend_Pos::loadObject($this->_properties[$name]->getId()));
+            return $this->_properties[$name]=FaZend_Pos::loadObject($this->_properties[$name]->getId());
         }
         return $this->_properties[$name];
     }
     
     public function __set($name, $value)
     {
+        return $this->__setProperty($name, $value, true);
+    }
+    
+    public function __setProperty($name, $value, $changed=false)
+    {
         if (is_array($value)) throw FaZend_Pos_Exception('Array dissable only objcets extends FaZend_Pos_Abstract');
         if (is_object($value) && (!$value instanceof FaZend_Pos_Abstract)) throw FaZend_Pos_Exception(get_class($value) . ' dissable only objcets extends FaZend_Pos_Abstract');
         if (is_object($value)) $value->setParent($this);
         
+        $this->_is_changed = $changed;
         return $this->_properties[$name] = $value;
     }
     
@@ -92,6 +104,7 @@ abstract class FaZend_Pos_Abstract implements RecursiveIterator
     public function setId($id)
     {
         if (empty($id)) throw Exception("Empty id object!");
+        $this->_is_changed = true;
         return $this->_id = $id;
     }
     
@@ -128,5 +141,24 @@ abstract class FaZend_Pos_Abstract implements RecursiveIterator
     public function getName()
     {
         return $this->_name;
+    }
+
+    public function isChanged()
+    {
+        return $this->_is_changed;
+    }
+    
+    /**
+     * Return object with information about current object
+     * @return FaZend_Pos_Info
+     */
+    public function info()
+    {
+        return $this->_Info;
+    }
+    
+    public function touch()
+    {
+        return $this->_is_changed=true;
     }
 }

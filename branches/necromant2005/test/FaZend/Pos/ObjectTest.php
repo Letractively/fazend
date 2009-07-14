@@ -68,10 +68,11 @@ class FaZend_Db_Table_ObjectTest extends AbstractTestCase {
     protected function _dumpTables()
     {
         Zend_Debug::dump(Zend_Db_Table_Abstract::getDefaultAdapter()->fetchAll("SELECT * FROM " . FaZend_Pos::TABLE_OBJECT));
-        Zend_Debug::dump(Zend_Db_Table_Abstract::getDefaultAdapter()->fetchAll("SELECT * FROM " . FaZend_Pos::TABLE_OBJECT_PROPERTY));
+        Zend_Debug::dump(Zend_Db_Table_Abstract::getDefaultAdapter()->fetchAll("SELECT * FROM " . FaZend_Pos::TABLE_OBJECT_INFORMATION));
+        Zend_Debug::dump(Zend_Db_Table_Abstract::getDefaultAdapter()->fetchAll("SELECT * FROM " . FaZend_Pos::TABLE_OBJECT_PROPERTY));        
     }
     
-    public function testStoreSimpleObject()
+    public function t_estStoreSimpleObject()
     {
         FaZend_Pos::root()->bmw328 = new FaZend_Pos_Mock_Car();
         FaZend_Pos::save();
@@ -80,7 +81,7 @@ class FaZend_Db_Table_ObjectTest extends AbstractTestCase {
         $this->_assertTableObjectProperty(array("2::color"=>"0::white", "2::model"=>"0::", "1::bmw328"=>"2::"));
     }
     
-    public function testStoreParentOChildsbject()
+    public function t_estStoreParentOChildsbject()
     {
         FaZend_Pos::root()->aboard_cars->bmw->bmw328 = new FaZend_Pos_Mock_Car();
         FaZend_Pos::root()->aboard_cars->opel->astra = new FaZend_Pos_Mock_Car();
@@ -121,7 +122,7 @@ class FaZend_Db_Table_ObjectTest extends AbstractTestCase {
                         '8::volin'=>'9::',));
      }
 
-    public function testLoad()
+    public function t_estLoad()
     {
         FaZend_Pos::root()->bmw328 = new FaZend_Pos_Mock_Car();
         FaZend_Pos::save();
@@ -131,7 +132,7 @@ class FaZend_Db_Table_ObjectTest extends AbstractTestCase {
         $this->assertEquals($root->bmw328->color, 'white');
     }
     
-    public function testLoadAndSave()
+    public function t_estLoadAndSave()
     {
         FaZend_Pos::root()->bmw328 = new FaZend_Pos_Mock_Car();
         FaZend_Pos::save();
@@ -155,7 +156,7 @@ class FaZend_Db_Table_ObjectTest extends AbstractTestCase {
         
     }
     
-    public function testForeach()
+    public function t_estForeach()
     {
         FaZend_Pos::root()->bmw328 = new FaZend_Pos_Mock_Car();
         FaZend_Pos::root()->audi = new FaZend_Pos_Mock_Car();
@@ -170,5 +171,21 @@ class FaZend_Db_Table_ObjectTest extends AbstractTestCase {
             $this->assertTrue($value instanceof FaZend_Pos_Mock_Car);
             next($asserts);
         }
+    }
+
+    public function testVersion()
+    {
+        FaZend_Pos::root()->bmw328 = new FaZend_Pos_Mock_Car();
+        FaZend_Pos::save();
+        FaZend_Pos::reset();
+        
+        $root = FaZend_Pos::root();
+        $root->audi = new FaZend_Pos_Mock_Car();
+        $root->audi->model = "tt";
+        $root->audi->color = "silver";
+        FaZend_Pos::save();
+        
+        $this->assertEquals($root->bmw328->info()->version, 1);
+        $this->assertEquals($root->audi->info()->version, 2);
     }
 }
