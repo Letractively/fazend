@@ -23,11 +23,11 @@ abstract class FaZend_Pos_Abstract implements RecursiveIterator
     
     protected $_name = "";
     
-    protected $_Parent = null;
-    
     protected $_Info = null;
     
     protected $_is_changed = false;
+    
+    protected $_Parent = null;
     
     public function __construct() 
     {
@@ -120,7 +120,7 @@ abstract class FaZend_Pos_Abstract implements RecursiveIterator
     
     public function setParent(FaZend_Pos_Abstract $Parent=null)
     {
-        return $this->_Parent = $Parent;
+        //return $this->_Parent = $Parent;
     }
     
     public function getParent()

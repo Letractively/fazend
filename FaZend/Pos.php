@@ -111,7 +111,19 @@ class FaZend_Pos
     {
         $db = Zend_Db_Table_Abstract::getDefaultAdapter();
         if ($Iterator instanceof FaZend_Pos_Null) return $Iterator;
-        if ($Iterator->hasId() && !$Iterator->isChanged()) return $Iterator;
+        if ($Iterator->hasId() && !$Iterator->isChanged()) {
+            //save relations
+            $parent = ($Parent) ? $Parent->getId() : 0;
+            if (empty($parent)) return $Iterator;
+            $db->insert(self::TABLE_OBJECT_PROPERTY, array(
+              "object_id"    => $parent,
+              "child_object_id" => $Iterator->getId(),
+              "property" => $Iterator->getName(),
+              "value"	 => null,
+              "version"  => self::$_version,
+            ));
+            return $Iterator;
+        }
         
         if (!$Iterator->hasId()) {
             $db->insert(self::TABLE_OBJECT, array("class"  => get_class($Iterator)));
@@ -198,7 +210,8 @@ class FaZend_Pos
             ->select()
             ->from(self::TABLE_OBJECT_INFORMATION)
             ->where($db->quoteInto("object_id=?", $Object->getId()))
-            ->order("version")->limit(1);
+            ->order("version DESC")
+            ->limit(1);
         $row = $db->fetchRow($dbSelect);
         $Object->info()->setVersion($row["version"]);
         $Object->info()->setUpdated($row["updated"]);
