@@ -27,15 +27,19 @@ abstract class FaZend_Pos_Abstract implements RecursiveIterator
     
     protected $_is_changed = false;
     
+    protected $_Ps = null;
+    
     protected $_Parent = null;
+    
+    protected $_hash = "";
     
     public function __construct() 
     {
         foreach (get_class_vars(get_class($this)) as $name=>$value) {
             $this->_properties[$name] = &$this->$name;
         }
-        
         $this->_Info = new FaZend_Pos_Info();
+        $this->_Ps   = new FaZend_Pos_Ps($this);
     }
     
     public function __get($name)
@@ -60,6 +64,41 @@ abstract class FaZend_Pos_Abstract implements RecursiveIterator
         
         $this->_is_changed = $changed;
         return $this->_properties[$name] = $value;
+    }
+    
+    public function setPropertiesFromObject(FaZend_Pos_Abstract $Object)
+    {
+        $this->_properties = array();
+        foreach (get_class_vars(get_class($this)) as $name=>$value) {
+            $this->_properties[$name] = &$this->$name;
+        }
+        foreach ($Object as $name=>$value) {
+            $this->_properties[$name] = $value;
+        }
+        
+        $this->_is_changed = true;
+        
+        $this->_Info = $Object->info();
+        return $this;
+    }
+
+    public function callHash()
+    {
+        $properties = array();
+        foreach ($this->_properties as $name=>$value) {
+            $properties[$name] = $value;
+        }
+        return md5(serialize($properties));
+    }
+    
+    public function setHash($hash)
+    {
+        return $this->_hash = $hash;
+    }
+    
+    public function getHash()
+    {
+        return $this->_hash;
     }
     
     public function rewind() 
@@ -145,7 +184,10 @@ abstract class FaZend_Pos_Abstract implements RecursiveIterator
 
     public function isChanged()
     {
-        return $this->_is_changed;
+        if ($this instanceof FaZend_Pos_Null) return false;
+        if ($this->_is_changed) return true;
+        if ($this->getHash()!=$this->callHash() && !($this instanceof FaZend_Pos_Null)) return true;
+        return false;
     }
     
     /**
@@ -155,6 +197,15 @@ abstract class FaZend_Pos_Abstract implements RecursiveIterator
     public function info()
     {
         return $this->_Info;
+    }
+    
+    /**
+     * Get the Ps object for this object
+     * @return FaZend_Pos_Ps
+     */
+    public function ps()
+    {
+        return $this->_Ps;
     }
     
     public function touch()

@@ -177,7 +177,6 @@ class FaZend_Db_Table_ObjectTest extends AbstractTestCase {
     {
         FaZend_Pos::root()->bmw328 = new FaZend_Pos_Mock_Car();
         FaZend_Pos::save();
-        FaZend_Pos::reset();
         
         $root = FaZend_Pos::root();
         $root->audi = new FaZend_Pos_Mock_Car();
@@ -190,7 +189,37 @@ class FaZend_Db_Table_ObjectTest extends AbstractTestCase {
         $this->assertTrue($root->bmw328 instanceof FaZend_Pos_Mock_Car);
         $this->assertTrue($root->audi instanceof FaZend_Pos_Mock_Car);
         
-        $this->assertEquals($root->bmw328->info()->version, 1);
+        $this->assertEquals($root->bmw328->info()->version, 2);
         $this->assertEquals($root->audi->info()->version, 2);
+    }
+
+    public function testPs()
+    {
+        FaZend_Pos::root()->bmw328 = new FaZend_Pos_Mock_Car();
+        FaZend_Pos::save();
+        
+        FaZend_Pos::root()->bmw328->color="green";
+        FaZend_Pos::root()->audi = new FaZend_Pos_Mock_Car();
+        FaZend_Pos::root()->audi->model = "tt";
+        FaZend_Pos::root()->audi->color = "silver";
+        FaZend_Pos::save();
+        
+        $this->assertEquals(FaZend_Pos::root()->bmw328->color, "green");
+        FaZend_Pos::root()->bmw328->ps()->workWithVersion(-1);
+        $this->assertEquals(FaZend_Pos::root()->bmw328->color, "white");
+        $this->assertEquals(FaZend_Pos::root()->bmw328->info()->version, 1);
+        
+        $this->assertEquals(FaZend_Pos::root()->bmw328->ps()->getVersions(10), array(2, 1));
+    }
+    
+    public function testPsTouch()
+    {
+        FaZend_Pos::root()->bmw328 = new FaZend_Pos_Mock_Car();
+        FaZend_Pos::save();
+        
+        FaZend_Pos::root()->bmw328->ps()->touch();
+        FaZend_Pos::save();
+        
+        $this->assertEquals(FaZend_Pos::root()->bmw328->ps()->getVersions(2), array(2, 1));
     }
 }

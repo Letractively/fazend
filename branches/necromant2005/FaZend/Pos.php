@@ -85,7 +85,7 @@ class FaZend_Pos
      * @param FaZend_Pos_Abstract $Iterator
      * @param FaZend_Pos_Abstract $Parent
      */
-    static protected function _save(FaZend_Pos_Abstract $Iterator, FaZend_Pos_Abstract $Parent = null)
+    static public function _save(FaZend_Pos_Abstract $Iterator, FaZend_Pos_Abstract $Parent = null)
     {     
         self::_saveObject($Iterator, $Parent);
         foreach ($Iterator as $name=>$value) {
@@ -175,7 +175,7 @@ class FaZend_Pos
      * @param int $id; unique object id
      * @return FaZend_Pos_Abstract
      */
-    public function loadObject($id=1)
+    public function loadObject($id=1, $version=0)
     {
         if (empty($id)) throw new Exception();
         $db = Zend_Db_Table_Abstract::getDefaultAdapter();
@@ -192,7 +192,7 @@ class FaZend_Pos
         $Object = new $class;
         $Object->setId($id);
         
-        $Object = self::loadObjectInformation($Object);
+        $Object = self::loadObjectInformation($Object, $version);
         
         return self::loadProperties($Object);
     }
@@ -202,7 +202,7 @@ class FaZend_Pos
      * @param FaZend_Pos_Abstract $Object
      * @return FaZend_Pos_Abstract
      */
-    public function loadObjectInformation(FaZend_Pos_Abstract $Object)
+    public function loadObjectInformation(FaZend_Pos_Abstract $Object, $version=0)
     {
         $db = Zend_Db_Table_Abstract::getDefaultAdapter();
         //last object version
@@ -212,6 +212,7 @@ class FaZend_Pos
             ->where($db->quoteInto("object_id=?", $Object->getId()))
             ->order("version DESC")
             ->limit(1);
+        if ($version) $dbSelect->where($db->quoteInto("version=?", $version));
         $row = $db->fetchRow($dbSelect);
         $Object->info()->setVersion($row["version"]);
         $Object->info()->setUpdated($row["updated"]);
@@ -244,6 +245,8 @@ class FaZend_Pos
             $NullObject->setId($child_object_id);
             $Object->__setProperty($property, $NullObject);
         }
+        
+        $Object->callHash();
         
         return $Object;
     }
