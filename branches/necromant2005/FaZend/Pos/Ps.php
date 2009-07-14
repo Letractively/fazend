@@ -18,12 +18,45 @@
 class FaZend_Pos_Ps
 {
     protected $_Object = null;
-        
+
+    protected $_version = 0;
+    
+    protected $_updated = "";
+    
+    protected $_owner = 0;
+    
     public function __construct(FaZend_Pos_Abstract $Object)
     {
         $this->_Object = $Object;
     }
         
+    public function __get($name)
+    {
+        if ($name=="version") return $this->getVersion();
+        if ($name=="updated") return $this->getUpdated();
+        Zend_Exception::raise('AccessToUnknowField', 'Access to unknow field!', 'FaZend_Pos_Exception');
+    }
+    
+    public function setVersion($version)
+    {
+        return $this->_version = $version;
+    }
+    
+    public function getVersion()
+    {
+        return $this->_version;
+    }
+
+    public function setUpdated($updated)
+    {
+        return $this->_updated = $updated;
+    }
+    
+    public function getUpdated()
+    {
+        return $this->_updated;
+    }
+    
     public function getVersions($count) 
     {
         $db = Zend_Db_Table_Abstract::getDefaultAdapter();
@@ -44,7 +77,7 @@ class FaZend_Pos_Ps
             ->where($db->quoteInto("object_id=?", $this->_Object->getId()))
             ->order('version ASC');
         $created = $db->fetchOne($dbSelect);
-        return strtotime($this->_Object->info()->updated) - strtotime($created);       
+        return strtotime($this->updated) - strtotime($created);       
     }
     
     public function touch() 
@@ -54,7 +87,7 @@ class FaZend_Pos_Ps
     
     public function rollBack($version) 
     {
-        if ($version<0) $version=$this->_Object->info()->getVersion()+$version;
+        if ($version<0) $version=$this->_Object->ps()->getVersion()+$version;
         $db = Zend_Db_Table_Abstract::getDefaultAdapter();
         $dbSelect = $db
             ->select()
@@ -76,7 +109,7 @@ class FaZend_Pos_Ps
     
     public function setTimeBoundary($time) 
     {
-        if ($version<0) $version=$this->_Object->info()->getVersion()+$version;
+        if ($version<0) $version=$this->_Object->ps()->getVersion()+$version;
         $db = Zend_Db_Table_Abstract::getDefaultAdapter();
         $dbSelect = $db
             ->select()

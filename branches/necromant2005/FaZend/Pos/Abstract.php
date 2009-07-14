@@ -38,7 +38,6 @@ abstract class FaZend_Pos_Abstract implements RecursiveIterator
         foreach (get_class_vars(get_class($this)) as $name=>$value) {
             $this->_properties[$name] = &$this->$name;
         }
-        $this->_Info = new FaZend_Pos_Info();
         $this->_Ps   = new FaZend_Pos_Ps($this);
     }
     
@@ -78,7 +77,9 @@ abstract class FaZend_Pos_Abstract implements RecursiveIterator
         
         $this->_is_changed = true;
         
-        $this->_Info = $Object->info();
+        $this->_Ps->setVersion($Object->ps()->getVersion());
+        $this->_Ps->setUpdated($Object->ps()->getUpdated());
+        
         return $this;
     }
 
@@ -188,15 +189,6 @@ abstract class FaZend_Pos_Abstract implements RecursiveIterator
         if ($this->_is_changed) return true;
         if ($this->getHash()!=$this->callHash() && !($this instanceof FaZend_Pos_Null)) return true;
         return false;
-    }
-    
-    /**
-     * Return object with information about current object
-     * @return FaZend_Pos_Info
-     */
-    public function info()
-    {
-        return $this->_Info;
     }
     
     /**
