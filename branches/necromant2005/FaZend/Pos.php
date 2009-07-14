@@ -41,6 +41,10 @@ class FaZend_Pos
      */
     static protected $_class = "FaZend_Pos_Object";
     
+    /**
+     * Version for new inserted objects
+     * @var int
+     */
     static protected $_version = 0;
     
     /**
