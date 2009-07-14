@@ -25,11 +25,21 @@ class FaZend_Pos_Ps
     
     protected $_owner = 0;
     
+    /**
+     * Object builder
+     * @param FaZend_Pos_Abstract $Object
+     * @return FaZend_Pos_Ps
+     */
     public function __construct(FaZend_Pos_Abstract $Object)
     {
         $this->_Object = $Object;
     }
-        
+
+    /**
+     * Magic getter for internal variable version and updated
+     * @param string $name
+     * @return string
+     */
     public function __get($name)
     {
         if ($name=="version") return $this->getVersion();
@@ -37,26 +47,49 @@ class FaZend_Pos_Ps
         Zend_Exception::raise('AccessToUnknowField', 'Access to unknow field!', 'FaZend_Pos_Exception');
     }
     
+    /**
+     * Set current object version
+     * @param int $version
+     * @return int
+     */
     public function setVersion($version)
     {
         return $this->_version = $version;
     }
     
+    /**
+     * Get current object version
+     * @return string
+     */
     public function getVersion()
     {
         return $this->_version;
     }
 
+    /**
+     * Set time when object updated
+     * @param string $updated
+     * @return string
+     */
     public function setUpdated($updated)
     {
         return $this->_updated = $updated;
     }
     
+    /**
+     * Get time when object updated
+     * @return string
+     */
     public function getUpdated()
     {
         return $this->_updated;
     }
     
+    /**
+     * Get array with all version current object
+     * @param int $count
+     * @return array
+     */
     public function getVersions($count) 
     {
         $db = Zend_Db_Table_Abstract::getDefaultAdapter();
@@ -69,6 +102,10 @@ class FaZend_Pos_Ps
         return $db->fetchCol($dbSelect);
     }
     
+    /**
+     * Get Age of object in database in second
+     * @return int
+     */
     public function getAge() 
     {
         $dbSelect = $db
@@ -79,12 +116,19 @@ class FaZend_Pos_Ps
         $created = $db->fetchOne($dbSelect);
         return strtotime($this->updated) - strtotime($created);       
     }
-    
+    /**
+     * Touch object. Create new revision of object withou changes
+     */
     public function touch() 
     {
         $this->_Object->touch();
     }
     
+    /**
+     * Rollback object state to version
+     * @param int $version
+     * @return FaZend_Pos_Abstract
+     */
     public function rollBack($version) 
     {
         if ($version<0) $version=$this->_Object->ps()->getVersion()+$version;
@@ -102,11 +146,21 @@ class FaZend_Pos_Ps
         );
     }
     
+    /**
+     * Set current object to version
+     * @param int $version
+     * @return FaZend_Pos_Abstract
+     */
     public function workWithVersion($version=-1) 
     {
         return $this->rollBack($version);
     }
     
+    /**
+     * Rollback all changes object by time in second
+     * @param int $time
+     * @return FaZend_Pos_Object
+     */
     public function setTimeBoundary($time) 
     {
         if ($version<0) $version=$this->_Object->ps()->getVersion()+$version;
