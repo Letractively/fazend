@@ -79,7 +79,7 @@ fzSnapshot {id: 1,
     baselined: NULL}
 }}}
 
-When we change an object in PHP, we should reflect these changes in the database. Every change has a record in `fzSnapshot` table. Every record in this table has information _in comparison_ to the previous snapshot. In the example above we didn't have any snapshots before, that's why the first one has full list of properties (`{color: 'black', model: 'bmw'}`).
+When we change an object in PHP, we should reflect these changes in the database. Every change has a record in `fzSnapshot` table. `properties' column contains a PHP-serialized associative array of object properties (`{color: 'black', model: 'bmw'}`).
 
 The snapshot record has a link to the object (`fzObject: 3`) and the version unique number of this particular snapshot (`version: 1`). Versions are numbered from `1` to infinity. Every next snapshot gets a version one-bigger than the previous one.
 
@@ -117,7 +117,7 @@ In database:
 fzSnapshot {id: 3, 
     fzObject: 3, 
     version: 2, 
-    properties: {color: 'blue'}, ...}
+    properties: {color: 'blue', model: 'bmw'}, ...}
 }}}
 
 = SQL Queries =
