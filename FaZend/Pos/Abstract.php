@@ -57,8 +57,8 @@ abstract class FaZend_Pos_Abstract implements RecursiveIterator
     
     public function __setProperty($name, $value, $changed=false)
     {
-        if (is_array($value)) throw FaZend_Pos_Exception('Array dissable only objcets extends FaZend_Pos_Abstract');
-        if (is_object($value) && (!$value instanceof FaZend_Pos_Abstract)) throw FaZend_Pos_Exception(get_class($value) . ' dissable only objcets extends FaZend_Pos_Abstract');
+        if (is_array($value)) Zend_Exception::raise("ArrayIllegal", 'Array dissable only objcets extends FaZend_Pos_Abstract', 'FaZend_Pos_Exception');
+        if (is_object($value) && (!$value instanceof FaZend_Pos_Abstract)) Zend_Exception::raise("IllegalObjectClass", get_class($value) . ' dissable only objcets extends FaZend_Pos_Abstract', 'FaZend_Pos_Exception');
         if (is_object($value)) $value->setParent($this);
         
         $this->_is_changed = $changed;
@@ -143,7 +143,6 @@ abstract class FaZend_Pos_Abstract implements RecursiveIterator
     
     public function setId($id)
     {
-        if (empty($id)) throw Exception("Empty id object!");
         $this->_is_changed = true;
         return $this->_id = $id;
     }
