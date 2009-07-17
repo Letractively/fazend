@@ -58,7 +58,7 @@ Also you can run any individual test:
 
 {{{
 cd test
-phpunit FaZend/Cli/CliTest.php
+phpunit FaZend/Cli/CliTest
 }}}
 
 Every time you make any change to the source code you should run `phing test` on your computer to make sure you didn't break the other code. 
