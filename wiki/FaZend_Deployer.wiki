@@ -1,0 +1,18 @@
+#summary Automatic Db schema deployer
+#labels Phase-Design
+
+= Usage sample =
+
+You create a file `application/deploy/database/1 user.sql`:
+
+{{{
+CREATE TABLE IF NOT EXISTS `user` (
+  `id` INT UNSIGNED NOT NULL AUTO_INCREMENT COMMENT "Unique ID of the user",
+  `email` VARBINARY(200) NOT NULL COMMENT "Unique user email",
+  `password` VARBINARY(50) NOT NULL COMMENT "User password",
+  PRIMARY KEY USING BTREE (`id`),
+  UNIQUE (`email`)
+  ) AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 ENGINE=InnoDB;
+}}}
+
+That's it. The database will be deployed automatically during the next continuous integration lifecycle.
