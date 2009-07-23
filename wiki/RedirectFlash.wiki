@@ -23,3 +23,5 @@ In your layout script:
 {{{
 <?=$this->layout()->flashRedirector?>
 }}}
+
+In your CSS you can define `p.flash` style.
