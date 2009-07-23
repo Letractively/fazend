@@ -25,6 +25,14 @@ adminNewUserRegistered.tmpl (user)
 RemindPassword.tmpl (user)
 }}}
 
+Create view scripts in `application/views/scripts/user`:
+
+{{{
+register.phtml (form)
+remind.phtml (form)
+reminded.phtml
+}}}
+
 Create database table: `user (id, email, password)`.
 
 That's it.
