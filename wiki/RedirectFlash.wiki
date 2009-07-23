@@ -21,7 +21,7 @@ class MyController extends FaZend_Controller_Action {
 In your layout script:
 
 {{{
-<?=$this->layout()->flashRedirector?>
+<?=$this->flashMessages()?>
 }}}
 
 In your CSS you can define `p.flash` style.
