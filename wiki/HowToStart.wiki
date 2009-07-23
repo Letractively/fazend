@@ -55,3 +55,12 @@ Key steps for a new project setup:
   # Setup Google Analytics and configure it in `app.ini`
   # Setup Google Webmasters and verify it
   # configure files in your project: `build.properties`, `app.ini`, `backup.ini`
+
+= Local Configuration =
+
+Add this line to your apache `httpd.conf` file:
+
+{{{
+SetEnv APPLICATION_ENV development
+}}}
+}}}
