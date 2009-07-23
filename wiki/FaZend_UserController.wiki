@@ -20,9 +20,9 @@ formRemindPassword.ini (email, submit)
 Create email templates in `application/emails`:
 
 {{{
-AccountRegistered.tmpl
-adminNewUserRegistered.tmpl
-RemindPassword.tmpl
+AccountRegistered.tmpl (user)
+adminNewUserRegistered.tmpl (user)
+RemindPassword.tmpl (user)
 }}}
 
 Create database table: `user (id, email, password)`.
