@@ -1,0 +1,30 @@
+#summary Login, logout, register account, password reminder, etc.
+#labels Phase-Design
+
+= Sample Usage =
+
+In your `layouts/scripts/layout.phtml` add this line:
+
+{{{
+<?=$this->action('login', 'user', 'fazend')?>
+}}}
+
+In your `application/config` directory you should create forms:
+
+{{{
+formLogin.ini (email, pwd, sumbit)
+formRegisterAccount.ini (email, password, submit)
+formRemindPassword.ini (email, submit)
+}}}
+
+Create email templates in `application/emails`:
+
+{{{
+AccountRegistered.tmpl
+adminNewUserRegistered.tmpl
+RemindPassword.tmpl
+}}}
+
+Create database table: `user (id, email, password)`.
+
+That's it.
