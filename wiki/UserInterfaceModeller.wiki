@@ -14,11 +14,9 @@ Inside your view scripts you should use meta-tags to inform FaZend about the fun
     ->addColumn("id")
     ->addColumn("description")
     ->columnFormat("id", "%3d")
-    ->columnFormat("description", "%s")
+    ->columnFormat("description", "%100s")
     ->addOption("disable")
     ->addOption("enable") -->
 
 <!-- @link("Upload new photo", "photos/upload") -->
-
-
 }}}
