@@ -11,16 +11,16 @@ Inside your view scripts you should use meta-tags to inform FaZend about the fun
 <!-- @text("You can edit your photos...") -->
 
 <!-- @table()
-    ->setColumn("id")
-    ->setColumn("description")
+    ->addColumn("id")
+    ->addColumn("description")
     ->setColumnFormat("id", "%3d")
     ->setColumnFormat("description", "%100s")
-    ->setOption("disable")
-    ->setOption("enable") -->
+    ->addOption("disable")
+    ->addOption("enable") -->
 
 <!-- @link("Upload new photo", "photos/upload") -->
 
 <!-- @form()
-    ->setField("text", "Title of your photo:")
-    ->setField("textarea", "Description") -->
+    ->addField("text", "Title of your photo:")
+    ->addField("textarea", "Description") -->
 }}}
