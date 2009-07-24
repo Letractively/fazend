@@ -19,4 +19,8 @@ Inside your view scripts you should use meta-tags to inform FaZend about the fun
     ->addOption("enable") -->
 
 <!-- @link("Upload new photo", "photos/upload") -->
+
+<!-- @form()
+    ->addField("text", "Title of your photo:")
+    ->addField("textarea", "Description") -->
 }}}
