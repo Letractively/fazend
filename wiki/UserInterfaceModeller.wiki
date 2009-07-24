@@ -15,8 +15,10 @@ Inside your view scripts you should use meta-tags to inform FaZend about the fun
     ->addColumn("description")
     ->columnFormat("id", "%3d")
     ->columnFormat("description", "%s")
-    ->addOption("pause")
-    ->addOption("resume") -->
+    ->addOption("disable")
+    ->addOption("enable") -->
 
-<!-- @link("Create new gateway", "gateways/create") -->
+<!-- @link("Upload new photo", "photos/upload") -->
+
+
 }}}
