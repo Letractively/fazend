@@ -1,0 +1,22 @@
+#summary Simple way to build mock-ups
+#labels Phase-Requirements
+
+= Usage Sample =
+
+Inside your view scripts you should use meta-tags to inform FaZend about the functional layout of your pages, e.g.:
+
+{{{
+<!-- @actor("RegisteredUser") -->
+
+<!-- @text("You can edit your photos...") -->
+
+<!-- @table()
+    ->addColumn("id")
+    ->addColumn("description")
+    ->columnFormat("id", "%3d")
+    ->columnFormat("description", "%s")
+    ->addOption("pause")
+    ->addOption("resume") -->
+
+<!-- @link("Create new gateway", "gateways/create") -->
+}}}
