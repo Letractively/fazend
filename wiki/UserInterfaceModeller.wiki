@@ -11,16 +11,34 @@ Inside your view scripts you should use meta-tags to inform FaZend about the fun
 <!-- @text("You can edit your photos...") -->
 
 <!-- @table()
-    ->addColumn("id")
-    ->addColumn("description")
-    ->setColumnFormat("id", "%3d")
-    ->setColumnFormat("description", "%100s")
-    ->addOption("disable")
-    ->addOption("enable") -->
+    ->addColumn('id', '%3d')
+    ->addColumn('description', '%40s')
+    ->addOption(array('disable', 'enable'))
+    -->
 
-<!-- @link("Upload new photo", "photos/upload") -->
+<!-- @link('Upload new photo', 'photos/upload') -->
 
 <!-- @form()
-    ->addField("text", "Title of your photo:")
-    ->addField("textarea", "Description") -->
+    ->addField('title', 'text', 'Title of your photo')
+    ->addField('description', 'textarea', 'Describe your photo') 
+    -->
 }}}
+
+= Full Reference =
+
+ * `@home()` - indicates that this page is a home for the actor
+ * `@actor('Visitor')` - the page is for the actor `Visitor`
+ * `@title('List of Photos')` - sets the title of the page
+ * `@text()` - just a simple static text
+ * `@bar()` - list of links to another pages
+ * `@link()` - one stand-alone link to another page
+ * `@table()` - static table
+ * `@form()` - form
+
+== `bar()` ==
+
+== `link()` ==
+
+== `table()` ==
+
+== `form()` ==
