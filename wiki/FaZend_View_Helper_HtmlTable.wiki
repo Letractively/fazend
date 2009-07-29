@@ -1,0 +1,20 @@
+#summary Simple table renderer
+#labels Phase-Requirements
+
+= Sample usage =
+
+Inside your view script:
+
+{{{
+<?=$this->htmlTable()
+    ->hideColumn('id')
+    ->setColumnTitle('email', 'User email')
+    ->addColumnLink('email', 'email', 'user', array('action'=>'edit'))
+    ->setParser('password', create_function('$p', 'return "***";'))
+    ->addColumnStyle('email', "width: 120px;")
+    ->allowRawHtml('details')
+    ->addOption('del', 'id', 'id', array('action'=>'del'))
+    ->skipOption('del', create_function('$row', 'return !$row->isAdmin();'))
+    ->setPaginator($this->paginator)
+    ?>
+}}}
