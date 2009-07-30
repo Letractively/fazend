@@ -19,6 +19,17 @@ Inside your view script:
     ?>
 }}}
 
+In your CSS you should define classes:
+
+{{{
+tr
+th
+td
+tr.even
+tr.odd
+tr.highlight
+}}}
+
 = Options =
 
 `setPaginator(Zend_Paginator $paginator)` sets data holder to render.
