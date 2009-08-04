@@ -42,6 +42,8 @@ tr.highlight
 
 `addOption($title, $httpVar, $column, array $urlParams)` adds an option to every row. `$title` is a unique option title which will be used later for the reference to this option. `$httpVar` is a name of parameter to be given to the `url()` method when calculating the URL of the option. `$column` is the name of column where to get data for the parameter to be passed to `url()`. `$urlParams` is a list of parameters to be explicitly specified in `url()`.
 
+`addColumn($title, $predecessor)` adds new column, where `$title` is a name of property in the row, `$predecessor` is a name of the column that should precede this one.
+
 `skipOption($title, $callback)` instructs the helper to skip certain option by name `$title` when `$callback` returns `true`. This callback will be executed for every row. It will receive one parameter `$row` and should return boolean.
 
 `addColumnStyle($column, $style)` adds HTML `style` attribute to the given column `$column`.
