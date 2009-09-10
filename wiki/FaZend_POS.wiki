@@ -11,9 +11,11 @@ You create a new object and assign it to the storage (POS):
 
 {{{
 class Car extends FaZend_POS_Abstract {
-    public $color = 'white';
-    public $model;
-
+    public function __construct() {
+        parent::__construct();
+        $this->color = 'white';
+        $this->model = false;
+    }
     public isGermanCar() {
         if ($this->model == 'bmw')
             return true;
