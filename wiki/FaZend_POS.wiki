@@ -16,7 +16,7 @@ class Car extends FaZend_POS_Abstract {
         $this->color = 'white';
         $this->model = false;
     }
-    public isGermanCar() {
+    public function isGermanCar() {
         if ($this->model == 'bmw')
             return true;
         return false;
