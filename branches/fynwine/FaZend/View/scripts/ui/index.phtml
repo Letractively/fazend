@@ -1,0 +1,40 @@
+
+<?
+    $this->headTitle($this->script);
+    $this->includeCSS('ui.css');
+?>
+
+<div class="wrapper">
+
+    <div class="header">
+        <div class="actor">
+            <?=$this->actor?>
+        </div>
+
+        <div class="path">
+            <?=$this->script?>
+        </div>
+
+        <div class="link">
+            <a href="<?=$this->url(array('action'=>'mockup', 'id'=>$this->script), 'ui', true, false)?>" 
+                title="View this mock-up as image (PNG)">PNG</a>
+        </div>
+    </div>
+
+    <div class="page">
+        
+        <div class="nav">
+            <?=$this->navigation()->menu()
+                ->setMaxDepth(2)
+                ->setRenderParents(true)?>
+        </div>
+
+        <div class="actors">
+            <?=$this->actors?>
+        </div>
+
+        <?=$this->page?>
+    </div>
+
+</div>
+
