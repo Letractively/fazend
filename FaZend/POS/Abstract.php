@@ -30,6 +30,21 @@ abstract class FaZend_POS_Abstract implements FaZend_POS_Interface
     /**
      * TODO: description.
      * 
+     * @var mixed
+     */
+    private $_fzObject;
+
+    /**
+     * TODO: description.
+     * 
+     * @var mixed
+     */
+    private $_user;
+
+
+    /**
+     * TODO: description.
+     * 
      * @var mixed  Defaults to array(). 
      */
     private $_properties = array();
@@ -43,11 +58,29 @@ abstract class FaZend_POS_Abstract implements FaZend_POS_Interface
 
     /**
      * TODO: short description.
+     * TODO right now, this will always create a new object.  We need to
+     * refactor to allow existing objects to be loaded as well.
      * 
      */
-    public function __construct()
+    public function __construct( $objectId = null )
     {
-        $this->_loadSnapshot( $this->_version );
+        $class = get_class( &$this ); 
+
+        if( null !== $objectId ) {
+            $this->_fzObject = FaZend_POS_Model_Object::retrieve()
+                ->where( 'id = ?',  $objectId )
+                ->where( 'class = ?', $class )
+                ->setSilenceIfEmpty()
+                ->fetchRow()
+                ;
+        }
+
+        if( $objectId === null || null === $this->_fzObject ) {
+            $this->_fzObject = new FaZend_POS_Model_Object();
+            $this->_fzObject->class = $class;
+            $this->_fzObject->save();
+        }
+        
         $this->init();
     }
 
@@ -115,18 +148,32 @@ abstract class FaZend_POS_Abstract implements FaZend_POS_Interface
      */
     private final function _setProperty( $name, $value )
     {
-        if( isset( $this->_properties[$name] ) ) {
-            if ( $this->_properties[$name]['value'] !== $value ) {
-                $this->_properties[$name]['value'] = $value;
-                $this->_properties[$name]['state'] = self::STATE_DIRTY;
-            }
-        } else {
-            $this->_properties[$name] = array( 'value' => $value,
-                                               'state' => self::STATE_DIRTY
-                                        );
+        $writeChange = false;
+
+        //---------------------------------------
+        // Only write the changes if the property
+        // value is actually changing.
+        //---------------------------------------
+        if( !isset( $this->_properties[$name] ) || $this->_properties[$name] !== $value ) {
+            $writeChange = true;
+        }
+        
+        $this->_properties[$name] = $value;
+
+        //---------------------------------------
+        // Write the change to the database
+        //---------------------------------------
+        if( $writeChange ) {
+            $snapshot = new FaZend_POS_Model_Snapshot();
+            $snapshot->fzObject = $this->_fzObject->id;
+            $snapshot->version = ++$this->_version;
+            $snapshot->properties = serialize( $this->toArray() );
+            $snapshot->alive = 1;
+            $snapshot->user = $this->_user;
+            $snapshot->save();
         }
 
-        return $this->_properties[$name]['value'];
+        return $this->_properties[$name];
     }
 
     /**
