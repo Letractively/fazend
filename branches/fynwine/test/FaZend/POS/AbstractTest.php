@@ -99,6 +99,8 @@ class FaZend_POS_AbstractTest extends AbstractTestCase
     public function testIssetWorksWithProperties()
     {
         $car = new Car();
+        $car = new Car(2);
+
         $car->make = null;
 
         $this->assertFalse( isset( $car->model ), 'Unasigned property reported as set!' );
