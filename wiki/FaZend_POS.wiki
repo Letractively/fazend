@@ -102,6 +102,8 @@ $mary = new FaZend_User(13);
 $car->ps()->baseline(array($mary), 'please, approve my new car', 24);
 }}}
 
+If the list of users is empty - the object becomes baselined AND approved right now.
+
 Later, `Mary` is a current user:
 
 {{{
@@ -128,6 +130,20 @@ And you can get a list of all objects waiting for user's attention:
 {{{
 $objects = FaZend_POS::getWaiting($mary);
 }}}
+
+= Branching =
+
+You (some user) can create a branch of any object and then work with this branch:
+
+{{{
+$car = FaZend_POS::root()->bmw328i;
+$car->ps()->branch(); // create a new branch for current user
+$car->ps()->revert(); // get back to "trunk"
+$car->ps()->commit(); // commit my changes to trunk (overwriting existing version) 
+$car->ps()->respectBranch($respect = true); // during this session we should work with the branch (default option) or "trunk"
+}}}
+
+When the object becomes baselined all branches becomes unavailable.
 
 = Other ideas =
 
