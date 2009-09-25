@@ -67,15 +67,19 @@ abstract class FaZend_POS_Abstract implements FaZend_POS_Interface
         $class = get_class( &$this ); 
 
         if( null !== $objectId ) {
+            require_once 'FaZend/POS/Model/Object.php';
             $this->_fzObject = FaZend_POS_Model_Object::retrieve()
                 ->where( 'id = ?',  $objectId )
                 ->where( 'class = ?', $class )
                 ->setSilenceIfEmpty()
                 ->fetchRow()
                 ;
+
+            $this->_loadSnapshot();
         }
 
         if( $objectId === null || null === $this->_fzObject ) {
+            require_once 'FaZend/POS/Model/Object.php';
             $this->_fzObject = new FaZend_POS_Model_Object();
             $this->_fzObject->class = $class;
             $this->_fzObject->save();
@@ -90,9 +94,7 @@ abstract class FaZend_POS_Abstract implements FaZend_POS_Interface
      * @return TODO
      */
     public function init()
-    {
-
-    }
+    {}
 
     /**
      * TODO: short description.
@@ -126,6 +128,8 @@ abstract class FaZend_POS_Abstract implements FaZend_POS_Interface
     private function _loadSnapshot( $version = null )
     {
         
+        $snapshot
+
     }
 
     /**
@@ -135,7 +139,15 @@ abstract class FaZend_POS_Abstract implements FaZend_POS_Interface
      */
     private function _saveSnapshot()
     {
-        
+        if( $this->_state == self::STATE_DIRTY ) {
+            $snapshot = new FaZend_POS_Model_Snapshot();
+            $snapshot->fzObject = $this->_fzObject->id;
+            $snapshot->version = ++$this->_version;
+            $snapshot->properties = serialize( $this->toArray() );
+            $snapshot->alive = 1;
+            $snapshot->user = $this->_user;
+            $snapshot->save();
+        }
     }
 
     /**
@@ -151,29 +163,15 @@ abstract class FaZend_POS_Abstract implements FaZend_POS_Interface
         $writeChange = false;
 
         //---------------------------------------
-        // Only write the changes if the property
-        // value is actually changing.
+        // Only write the changes if the property value is actually changing.
         //---------------------------------------
         if( !isset( $this->_properties[$name] ) || $this->_properties[$name] !== $value ) {
-            $writeChange = true;
-        }
-        
-        $this->_properties[$name] = $value;
-
-        //---------------------------------------
-        // Write the change to the database
-        //---------------------------------------
-        if( $writeChange ) {
-            $snapshot = new FaZend_POS_Model_Snapshot();
-            $snapshot->fzObject = $this->_fzObject->id;
-            $snapshot->version = ++$this->_version;
-            $snapshot->properties = serialize( $this->toArray() );
-            $snapshot->alive = 1;
-            $snapshot->user = $this->_user;
-            $snapshot->save();
+            $this->_properties[$name]['state'] = self::STATE_DIRTY;
+            $this->_properties[$name]['value'] = $value;
+            $this->_state = self::STATE_DIRTY;
         }
 
-        return $this->_properties[$name];
+        return $this->_properties[$name]['value'];
     }
 
     /**
@@ -188,6 +186,16 @@ abstract class FaZend_POS_Abstract implements FaZend_POS_Interface
         if( isset( $this->_properties[$name] ) ) {
             return $this->_properties[$name]['value'];
         }
+    }
+
+    /**
+     * TODO: short description.
+     * 
+     * @return TODO
+     */
+    public function __destruct()
+    {
+        $this->_saveSnapshot();
     }
 
     /**
