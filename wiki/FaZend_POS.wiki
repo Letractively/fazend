@@ -133,11 +133,11 @@ $objects = FaZend_POS::getWaiting($mary);
 
 = Branching =
 
-You (some user) can create a branch of any object and then work with this branch:
+You (some user) can create a branch of any object and then work with this branch (at most one branch per user):
 
 {{{
 $car = FaZend_POS::root()->bmw328i;
-$car->ps()->branch(); // create a new branch for current user
+$car->ps()->branch(); // create a new branch for current user (overwrite the existing one, if any)
 $car->ps()->revert(); // get back to "trunk"
 $car->ps()->commit(); // commit my changes to trunk (overwriting existing version) 
 $car->ps()->respectBranch($respect = true); // during this session we should work with the branch (default option) or "trunk"
