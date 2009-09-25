@@ -139,8 +139,9 @@ You (some user) can create a branch of any object and then work with this branch
 $car = FaZend_POS::root()->bmw328i;
 $car->ps()->branch(); // create a new branch for current user (overwrite the existing one, if any)
 $car->ps()->revert(); // get back to "trunk"
-$car->ps()->commit(); // commit my changes to trunk (overwriting existing version) 
-$car->ps()->respectBranch($respect = true); // during this session we should work with the branch (default option) or "trunk"
+$car->ps()->commit($user); // commit user's changes to trunk (overwriting existing version) 
+$car->ps()->respectBranch(true); // during this session we should work with the branch (default option) or "trunk"
+$car->ps()->respectBranch($user); // during this session we should work with this branch (by this user)
 }}}
 
 When the object becomes baselined all branches becomes unavailable.
