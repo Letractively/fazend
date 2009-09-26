@@ -41,7 +41,6 @@ abstract class FaZend_POS_Abstract implements FaZend_POS_Interface
      */
     private $_user;
 
-
     /**
      * TODO: description.
      * 
@@ -127,9 +126,31 @@ abstract class FaZend_POS_Abstract implements FaZend_POS_Interface
      */
     private function _loadSnapshot( $version = null )
     {
+        $this->_properties = array();
         
-        $snapshot
+        $query = FaZend_POS_Model_Snapshot::retrieve()
+            ->where( 'fzObject = ?', $this->_fzObject )
+            ->where( 'alive = 1' )
+            ->order( 'version DESC' )
+            ;
+            
+        if( null !== $version ) {
+            $query->where( $version );
+        }
 
+        $snapshot = $query->setSilenceIfEmpty()->fetchRow();
+
+        if( empty( $snapshot ) && $version !== null ) {
+            //TODO throw an exception here?
+        }
+        
+        if( !empty( $snapshot ) ) {
+            $props = unserialize( $snapshot->properties );
+            foreach( $props as $name => $value ) {
+                $this->_properties[ $name ]['value'] = $value;
+                $this->_properties[ $name ]['state'] = self::STATE_CLEAN;
+            }
+        }
     }
 
     /**
@@ -137,16 +158,22 @@ abstract class FaZend_POS_Abstract implements FaZend_POS_Interface
      * 
      * @return TODO
      */
-    private function _saveSnapshot()
     {
+        // TODO this is not very 'thread safe'.  If two objects
+        // are open with the same version number, changes to 
+        // one will overwrite the changes to the next.
         if( $this->_state == self::STATE_DIRTY ) {
             $snapshot = new FaZend_POS_Model_Snapshot();
-            $snapshot->fzObject = $this->_fzObject->id;
+            $snapshot->fzObject = $this->_fzObject;
             $snapshot->version = ++$this->_version;
             $snapshot->properties = serialize( $this->toArray() );
             $snapshot->alive = 1;
             $snapshot->user = $this->_user;
             $snapshot->save();
+            $this->_state = self::STATE_CLEAN;
+            foreach( $this->_properties as $name => $prop ) {
+                $this->_properties[ $name ][ 'state' ] = self::STATE_CLEAN;
+            }
         }
     }
 
@@ -160,8 +187,6 @@ abstract class FaZend_POS_Abstract implements FaZend_POS_Interface
      */
     private final function _setProperty( $name, $value )
     {
-        $writeChange = false;
-
         //---------------------------------------
         // Only write the changes if the property value is actually changing.
         //---------------------------------------

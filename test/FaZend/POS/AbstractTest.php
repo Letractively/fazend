@@ -87,7 +87,6 @@ class FaZend_POS_AbstractTest extends AbstractTestCase
     {
         $car = new Car();
         $car->make  = null;
-
         $this->assertNull( $car->make, 'Property value was not null!' );
     }
 
@@ -99,10 +98,7 @@ class FaZend_POS_AbstractTest extends AbstractTestCase
     public function testIssetWorksWithProperties()
     {
         $car = new Car();
-        $car = new Car(2);
-
         $car->make = null;
-
         $this->assertFalse( isset( $car->model ), 'Unasigned property reported as set!' );
         $this->assertFalse( isset( $car->make ), 'Nulled property reported as set!' );
     }
@@ -117,7 +113,6 @@ class FaZend_POS_AbstractTest extends AbstractTestCase
         $car = new Car();
         $car->make = 'Nissan';
         unset( $car->make );
-        
         $this->assertFalse( isset( $car->make ), 'Property value was still set!');
     }
 
@@ -147,11 +142,9 @@ class FaZend_POS_AbstractTest extends AbstractTestCase
         $serialized = serialize( $car );
 
         $car->active = true;
-        unset( $car );
+        $car2 = unserialize( $serialized );
 
-        $car = unserialize( $serialized );
-
-        $this->assertTrue( $car->active, 'Unserialized object did not recieve updated property values' );
+        $this->assertTrue( $car2->active, 'Unserialized object did not recieve updated property values' );
     }
 
 }
