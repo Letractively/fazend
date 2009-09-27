@@ -75,6 +75,7 @@ abstract class FaZend_POS_Abstract implements FaZend_POS_Interface
                 ;
 
             $this->_loadSnapshot();
+            $this->_sysProperties = new FaZend_POS_Properties( $this );
         }
 
         if( $objectId === null || null === $this->_fzObject ) {
@@ -100,9 +101,9 @@ abstract class FaZend_POS_Abstract implements FaZend_POS_Interface
      * 
      * @return TODO
      */
-    public final function ps()
+    public final function & ps()
     {
-        
+        return $this->_sysProperties;
     }
 
     /**
