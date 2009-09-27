@@ -147,6 +147,15 @@ class FaZend_POS_AbstractTest extends AbstractTestCase
         $this->assertTrue( $car2->active, 'Unserialized object did not recieve updated property values' );
     }
 
+    /**
+     * TODO: short description.
+     * 
+     * @return TODO
+     */
+    public function testExtendedObjectCanHavePublicMethods()
+    {
+        
+    }
 }
 
 
