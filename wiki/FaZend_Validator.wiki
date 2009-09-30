@@ -15,4 +15,4 @@ validate()
 
 When validation fails the exception `FaZend_Validator_Failure` will be thrown.
 
-You can use FaZend validators of Zend validators.
+You can use FaZend validators, Zend validators or your own validators (from `application/validators`).
