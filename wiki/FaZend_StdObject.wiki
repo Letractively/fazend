@@ -32,6 +32,7 @@ class Garage extends FaZend_StdObject
 
 Now you can use this object:
 
+{{{
 $garage = Garage::create()
     ->setTotalSpace(40);
 $space = $garage->space;
