@@ -56,6 +56,16 @@ $car->ps()->wipe(); // wipe it out, no more information in storage about it
 
 Objects can include objects, and FaZend_POS will understand such links. Objects won't be copied, but symbolic links will be created.
 
+You can create an object of class `FaZend_POS_Bag` and add it to any `FaZend_POS_Abstract` object as a child. In this case any properties you set in the child won't be managed as individual objects, e.g.:
+
+{{{
+$car = FaZend_POS::root()->bmw328i;
+$car->images = new FaZend_POS_Bag();
+$car->images[1] = new BigImage();
+// sometime later in another script
+$image = $car->images[1]; // no matter what's inside the object
+}}}
+
 = Version Control =
 
 Changes are under control, like in Subversion repository:
