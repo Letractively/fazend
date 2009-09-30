@@ -1,0 +1,15 @@
+#summary Simplified validation of input parameters
+#labels Phase-Design
+
+= Usage example =
+
+Use it in any place where you want to validate your input:
+
+{{{
+validate()
+    ->true($a > 10, 'Input should be bigger than 10!')
+    ->regexp('/^\w+$/', $b, 'Only letters please')
+    ->type('string', $c, 'Only string values please');
+}}}
+
+When validation fails the exception `FaZend_Validator_Failure` will be thrown.
