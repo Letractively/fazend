@@ -9,7 +9,10 @@ Use it in any place where you want to validate your input:
 validate()
     ->true($a > 10, 'Input should be bigger than 10!')
     ->regexp('/^\w+$/', $b, 'Only letters please')
+    ->alnum($d, 'Alpha-numeric only') // Zend validator
     ->type('string', $c, 'Only string values please');
 }}}
 
 When validation fails the exception `FaZend_Validator_Failure` will be thrown.
+
+You can use FaZend validators of Zend validators.
