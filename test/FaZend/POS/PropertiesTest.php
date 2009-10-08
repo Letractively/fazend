@@ -33,7 +33,12 @@ class FaZend_POS_Properties extends AbstractTestCase
      */
     public function testCanRetreiveLastEditor()
     {
+        FaZend_POS::setUser( 'testUser' );
+        $car = new Car();
+        $car->save();
 
+        FaZend_POS::setuser( 'testUser2' );
+        $this->assertEquals( $user, $car->ps()->editor )
     }
 
     /**
@@ -43,7 +48,11 @@ class FaZend_POS_Properties extends AbstractTestCase
      */
     public function testCannotSetLastEditor()
     {
+        $car = new Car();
+        $car->save();
 
+        $this->setExpectedException( 'FaZend_POS_Exception' );
+        $car->pa()->editor = new FaZend_POS_User( 'testUser' );
     }
 
     /**
@@ -312,6 +321,26 @@ class FaZend_POS_Properties extends AbstractTestCase
      * @return TODO
      */
     public function testIsRejectedIsFalseWhenApproved()
+    {
+
+    }
+
+    /**
+     * TODO: short description.
+     * 
+     * @return TODO
+     */
+    public function testCannotTouchNonCurrentVersion()
+    {
+
+    }
+
+    /**
+     * TODO: short description.
+     * 
+     * @return TODO
+     */
+    public function testCannotDeleteNotCurrentVersion()
     {
 
     }
