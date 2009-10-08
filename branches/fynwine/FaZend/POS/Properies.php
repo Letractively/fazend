@@ -13,7 +13,7 @@ class FaZend_POS_Properties
      * 
      * @var object
      */
-    protected $_object;
+    protected $_fzSnapshot;
 
     /**
      * TODO: description.
@@ -28,10 +28,16 @@ class FaZend_POS_Properties
      * @param mixed $posObject 
      * 
      */
-    public function __construct( FaZend_POS_Abstract &$posObject )
+    public function __construct( 
+            FaZend_POS_Abstract &$pos,
+            FaZend_POS_Model_Object &$object, 
+            FaZend_POS_Model_Snapshot &$snapshot 
+    )
     {
-        $this->_object = $posObject;
+        $this->_fzObject   = $object;
+        $this->_fzSnapshot = $snapshot;
     }
+
     
     /**
      * TODO: short description.
@@ -40,7 +46,7 @@ class FaZend_POS_Properties
      */
     public function delete()
     {
-        
+         
     }
 
     /**
@@ -50,17 +56,21 @@ class FaZend_POS_Properties
      */
     public function wipe()
     {
-
+        $this->_fzObject->alive = 1;
+        $this->_fzObject->save();
+        
     }
 
     /**
      * TODO: short description.
      * 
-     * @return TODO
+     * @return FaZend_POS_User 
      */
     public function getEditor()
     {
-
+        require_once 'FaZend/POS/User.php';
+        $user = new FaZend_POS_User( $this->_fzSnapshot->user );
+        return $user;
     }
 
     /**
@@ -70,7 +80,7 @@ class FaZend_POS_Properties
      */
     public function getVersion()
     {
-
+        return intval( $this->_fzSnpashot->version );
     }
 
     /**
@@ -80,7 +90,7 @@ class FaZend_POS_Properties
      */
     public function getUpdated()
     {
-
+        return strtotime( $this->_fzSnapshot->updated );
     }
 
     /**
@@ -90,7 +100,7 @@ class FaZend_POS_Properties
      */
     public function getId()
     {
-
+        return intval( $this->_fzSnapshot->fzObject );
     }
 
     /**
@@ -100,7 +110,7 @@ class FaZend_POS_Properties
      */
     public function getType()
     {
-        return get_class( &$this );
+        return $this->_fzObject->class;
     }
 
     /**
@@ -122,7 +132,7 @@ class FaZend_POS_Properties
      */
     public function workWithVersion( $versionNumber )
     {
-
+        
     }
 
     /**
@@ -144,8 +154,15 @@ class FaZend_POS_Properties
      */
     public function touch()
     {
-
+        if( !$this->posObj->isCurrent() ) {
+            throw new FaZend_POS_Exception(
+                'Cannot touch non-current version of object.'
+            );
+        }
+        
+        $this->_fzSnapshot->version++;
     }
+
 
     /**
      * TODO: short description.
@@ -159,7 +176,7 @@ class FaZend_POS_Properties
 
     }
 
-    /**
+    /**d
      * TODO: short description.
      * 
      * @param mixed     
@@ -172,13 +189,14 @@ class FaZend_POS_Properties
     }
 
     /**
-     * TODO: short description.
+     * Returns the 
      * 
      * @return TODO
      */
     public function getAge()
     {
-
+        $updated = $this->getUpated();
+        return time() - $updated;
     }
 
     /**
