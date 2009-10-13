@@ -58,9 +58,19 @@ Key steps for a new project setup:
 
 = Local Configuration =
 
-Add this line to your apache `httpd.conf` file:
+Add this line to your apache `httpd.conf` file and restart apache:
 
 {{{
-SetEnv APPLICATION_ENV development
-}}}
+<Directory /code/project/php/src/public>
+    Options Indexes FollowSymLinks Includes
+    SetEnv APPLICATION_ENV development
+    Allow from all
+    AllowOverride None
+    RewriteEngine On
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteRule ^(.*) index.php [L]
+    RewriteBase /project
+</Directory>
+
+Alias /project "/code/project/php/src/public"
 }}}
