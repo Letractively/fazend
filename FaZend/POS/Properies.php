@@ -23,6 +23,13 @@ class FaZend_POS_Properties
     protected $_acl;
 
     /**
+     * TODO: description.
+     * 
+     * @var mixed
+     */
+    protected $_pos;
+
+    /**
      * TODO: short description.
      * 
      * @param mixed $posObject 
@@ -36,6 +43,7 @@ class FaZend_POS_Properties
     {
         $this->_fzObject   = $object;
         $this->_fzSnapshot = $snapshot;
+        $this->_pos        = $pos;
     }
 
     
@@ -44,9 +52,19 @@ class FaZend_POS_Properties
      * 
      * @return TODO
      */
-    public function delete()
+    public function wipe()
     {
-         
+        //delete snapshots
+        $where = $this->_fzSnapshot
+            ->getAdapter()->quoteInto( 'fzObject = ?', $this->_fzObject );
+        $this->delete( $where );
+
+        //delete object
+        $where = $this->_fzObject
+            ->getAdapter()->quoteInto( 'id = ?', $this->_fzObject );
+        $this->delete( $where );
+
+        unset( $this->_pos );
     }
 
     /**
@@ -54,11 +72,10 @@ class FaZend_POS_Properties
      * 
      * @return TODO
      */
-    public function wipe()
+    public function delete()
     {
         $this->_fzObject->alive = 1;
         $this->_fzObject->save();
-        
     }
 
     /**
@@ -159,21 +176,29 @@ class FaZend_POS_Properties
                 'Cannot touch non-current version of object.'
             );
         }
+
+        if( !$this->_fzSnapshot->alive ) {
+            throw new FaZend_POS_Exception(
+                'Cannot touch deleted object.';
+            );
+        }
         
         $this->_fzSnapshot->version++;
+        $this->_fzSnapshot->save();
     }
 
 
     /**
-     * TODO: short description.
+     * Reset all property changes to an object.  If a version is specified,
+     * Properties will be reset to match the version.
      * 
      * @param mixed $version 
      * 
      * @return TODO
      */
-    public function rollBack( $version )
+    public function rollBack( $version = null )
     {
-
+        
     }
 
     /**d
@@ -185,17 +210,21 @@ class FaZend_POS_Properties
      */
     public function getVersions( $numVersions )
     {
+
+        //load the last x versions prior to this one
+        $where = $this->_fzSnapshot->getAdapter()->quoteInto( 'version < ?', $this->_fzSnapshot->version );
+
         
     }
 
     /**
-     * Returns the 
+     * Returns the age of the current snapshot, in seconds 
      * 
      * @return TODO
      */
     public function getAge()
     {
-        $updated = $this->getUpated();
+        $updated = $this->getUpdated();
         return time() - $updated;
     }
 
