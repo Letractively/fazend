@@ -19,7 +19,8 @@ require_once 'FaZend/View/Helper.php';
 /**
  * Show the time in seconds of the page loading
  *
- * @package FaZend
+ * @package View
+ * @subpackage Helper
  */
 class FaZend_View_Helper_PageLoadTime extends FaZend_View_Helper {
 
@@ -69,9 +70,13 @@ class FaZend_View_Helper_PageLoadTime extends FaZend_View_Helper {
          // add information from system log
          if ((APPLICATION_ENV == 'development') && !FaZend_Log::getInstance()->getWriter('FaZendDebug')->isEmpty()) {
 
+             // jQuery is necessary
+             $this->getView()->includeJQuery();
              $log = FaZend_Log::getInstance()->getWriter('FaZendDebug')->getLog();
 
-             $html .= "&#32;<span style='cursor:pointer;color:red;' title='Log messages from the script' onclick='$(\"#syslog\").toggle();'>syslog</span>".
+             $html .= "&#32;<span style='cursor:pointer;color:red;' " . 
+                "title='Log messages from the script' ".
+                "onclick='$(\"#syslog\").toggle();'>syslog(" . substr_count($log, "\n"). ")</span>".
                  "<pre id='syslog' style='display:none;'>{$log}</pre>";
          }
 

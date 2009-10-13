@@ -93,7 +93,7 @@ class FaZend_Controller_Action extends Zend_Controller_Action {
      * @param boolean This image is dynamic (TRUE) or static (FALSE).
      * @return void
      */
-    protected function _returnPNG ($png, $dynamic = true) {
+    protected function _returnPNG($png, $dynamic = true) {
     
         $this->_helper->layout->disableLayout();
         $this->_helper->viewRenderer->setNoRender();
@@ -110,10 +110,28 @@ class FaZend_Controller_Action extends Zend_Controller_Action {
     }    
 
     /**
-    * Return JSON reply
-    *
-    * @return void
-    */
+     * Show PDF instead of page
+     *
+     * @param string PDF binary content
+     * @return void
+     */
+    protected function _returnPDF($pdf) {
+    
+        $this->_helper->layout->disableLayout();
+        $this->_helper->viewRenderer->setNoRender();
+
+        $this->getResponse()
+            ->setHeader('Content-Type', 'application/pdf')
+            ->setHeader('Content-Length', strlen($pdf))
+            ->setBody($pdf);
+
+    }    
+
+    /**
+     * Return JSON reply
+     *
+     * @return void
+     */
     protected function _returnJSON ($var) {
     
         $this->_helper->layout->disableLayout();
@@ -178,6 +196,8 @@ class FaZend_Controller_Action extends Zend_Controller_Action {
     
             ->setHeader('Date', $this->_formatHeaderTime(time()))
 
+            ->setHeader('Pragma', '')
+            
             // in 30 days to reload!
             ->setHeader('Expires', $this->_formatHeaderTime($modifiedTime + 60 * 60 * 24 * 30))
             

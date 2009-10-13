@@ -18,12 +18,9 @@
  * Router of CLI (command line interface) calls
  *
  * @see http://code.google.com/p/fazend/wiki/FaZend_Cli
- * @package FaZend 
+ * @package Cli
  */
 class FaZend_Cli_Router {
-
-    // to be returned in case of error
-    const ERROR_CODE = -1;
 
     /**
      * Dispatch command line call
@@ -65,7 +62,7 @@ class FaZend_Cli_Router {
     protected static function _error($msg) {
 
         echo 'FaZend_Cli_Router::dispatch() raises error in dispatching: ' . $msg . "\n";
-        return self::ERROR_CODE;
+        return FaZend_Cli_Abstract::RETURNCODE_ERROR;
 
     }
 

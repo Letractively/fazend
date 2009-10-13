@@ -20,7 +20,8 @@ require_once 'FaZend/View/Helper.php';
  * Nice and configurable html table
  *
  * @see http://naneau.nl/2007/07/08/use-the-url-view-helper-please/
- * @package FaZend 
+ * @package View
+ * @subpackage Helper
  */
 class FaZend_View_Helper_HtmlTable extends FaZend_View_Helper {
 
@@ -329,14 +330,19 @@ class FaZend_View_Helper_HtmlTable extends FaZend_View_Helper {
 
         foreach ($this->_paginator as $key=>$rowOriginal) {
 
-            if (!is_array($rowOriginal))
-                $row = $rowOriginal->toArray();
-            else
+            // prepare one row for rendering
+            if (is_array($rowOriginal)) {
                 $row = $rowOriginal;
+            } elseif (is_object($rowOriginal)) {
+                if (method_exists($rowOriginal, 'toArray'))
+                    $row = $rowOriginal->toArray();
+                else
+                    $row = array();
+            } else {
+                $row = array('column'=>$rowOriginal);
+            }
 
             // inject columns
-            // predecessor is ignored so far
-            // @todo implement it properly
             foreach ($this->_injections as $injectedColumn=>$predecessor) {
                 // sanity check
                 if (!is_object($rowOriginal))
@@ -345,7 +351,7 @@ class FaZend_View_Helper_HtmlTable extends FaZend_View_Helper {
                 // if it's a method - call it
                 if ($injectedColumn == '__key')
                     $injectedValue = $key;
-                else if (method_exists($rowOriginal, $injectedColumn))
+                elseif (method_exists($rowOriginal, $injectedColumn))
                     $injectedValue = $rowOriginal->$injectedColumn();
                 else
                     $injectedValue = $rowOriginal->$injectedColumn;
@@ -390,7 +396,7 @@ class FaZend_View_Helper_HtmlTable extends FaZend_View_Helper {
 
                 // attach link to the TD
                 if ($this->_column($title)->link)
-                    $value = $this->_resolveLink($this->_column($title)->link, $value, $row);
+                    $value = $this->_resolveLink($this->_column($title)->link, $value, $rowOriginal, $key);
 
                 // append CSS style
                 $tds[$title] = '<td' . ($this->_column($title)->style ? " style='{$this->_column($title)->style}'" : false) .
@@ -409,7 +415,7 @@ class FaZend_View_Helper_HtmlTable extends FaZend_View_Helper {
                     }    
 
                     // build the <A HREF> link for this option
-                    $optLink = '&#32;' . $this->_resolveLink($option->link, $option->title, $row, $key);
+                    $optLink = '&#32;' . $this->_resolveLink($option->link, $option->title, $rowOriginal, $key);
 
                     // attach this option to the particular column    
                     if ($option->toColumn)    
@@ -521,11 +527,11 @@ class FaZend_View_Helper_HtmlTable extends FaZend_View_Helper {
      *
      * @param FaZend_StdObject Link object
      * @param string Text to show, previously escaped, if necessary
-     * @param array Row data
+     * @param array|object Row data
      * @param string Key of the row
      * @return string HTML
      */
-    protected function _resolveLink(FaZend_StdObject $link, $title, array $row, $key) {
+    protected function _resolveLink(FaZend_StdObject $link, $title, $row, $key) {
         $params = $link->urlParams;
 
         // you can specify params as callbacks
@@ -563,11 +569,10 @@ class FaZend_View_Helper_HtmlTable extends FaZend_View_Helper {
         if (!$predecessor)
             $result = array_merge(array($column=>$value), $row);
         else {
-            while (current($row)) {
-                $result[key($row)] = current($row);
-                if (key($row) == $predecessor)
+            foreach ($row as $key=>$val) {
+                $result[$key] = $val;
+                if ($key == $predecessor)
                     $result[$column] = $value;
-                next($row);
             }
         }
 

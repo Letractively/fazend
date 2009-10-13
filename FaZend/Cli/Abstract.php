@@ -19,9 +19,12 @@ require_once 'FaZend/Cli/Interface.php';
 /**
  * Class for a CLI executor
  *
- * @package FaZend 
+ * @package Cli
  */
 abstract class FaZend_Cli_Abstract implements FaZend_Cli_Interface {
+
+    const RETURNCODE_ERROR = -1;
+    const RETURNCODE_OK = 0;
 
     /**
      * The router

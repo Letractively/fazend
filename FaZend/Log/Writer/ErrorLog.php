@@ -20,11 +20,12 @@
  * Writes messages to error_log and send this file to admin, if it's
  * too long or too old.
  *
- * @package FaZend_Log
+ * @package Log
  */
 class FaZend_Log_Writer_ErrorLog extends Zend_Log_Writer_Stream {
 
     const MAX_LENGTH = 20000; // maximum length of the log file, in bytes
+    const MAX_AGE_DAYS = 5; // maximum age of the error_log file in days
 
     /**
      * Constructs the writer
@@ -55,11 +56,14 @@ class FaZend_Log_Writer_ErrorLog extends Zend_Log_Writer_Stream {
         }
 
         // if we can't write to project log file, let's write to syslog
-        if (!is_writable($stream))
+        if (is_file($stream) && !is_writable($stream))
             $stream = 'php://temp';
 
+        // call parent constructor
         parent::__construct($stream);
 
+        // remove extra file content and send it by email to the site
+        // administrator
         $this->_cutFile($stream);
 
     }
@@ -75,8 +79,13 @@ class FaZend_Log_Writer_ErrorLog extends Zend_Log_Writer_Stream {
         if (APPLICATION_ENV !== 'production')
             return;
 
+        // if it's not a regular file - skip the process
+        if (!@is_file($file))
+            return;
+
         // if it's still small, skip the rest
-        if (@filesize($file) < self::MAX_LENGTH)
+        // and if it's still very small
+        if ((@filesize($file) < self::MAX_LENGTH) && (@filectime($file) > time() - self::MAX_AGE_DAYS * 24 * 60 * 60))
             return;
 
         // if the file is not writable - skip the process
@@ -107,7 +116,7 @@ class FaZend_Log_Writer_ErrorLog extends Zend_Log_Writer_Stream {
         if (@ftruncate($handle, 0) === false)
             return;
         @fwrite($handle, date('m/d/Y h:i') . ": file content (" . strlen($content) .
-            " bytes) sent by email ({$email}) to admin.\n\n");
+            " bytes) was sent by email ({$email}) to admin.\n\n");
         @fclose($handle);
 
     }
