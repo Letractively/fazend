@@ -15,20 +15,11 @@
  */
 
 /**
- * Validate if the subject is instance of certain class/interface
+ * Category
  *
- * @package FaZend
+ * @package AnalysisModeller
+ * @subpackage Component
  */
-class FaZend_Validator_InstanceOf extends FaZend_Validator_Abstract {
-
-    /**
-     * Validator
-     *
-     * @param string Class/interface name
-     * @return boolean
-     */
-    public function validate($type) {
-        return $this->_subject instanceof $type;
-    }
+class FaZend_AnalysisModeller_Component_Category extends FaZend_AnalysisModeller_Component_Package {
 
 }

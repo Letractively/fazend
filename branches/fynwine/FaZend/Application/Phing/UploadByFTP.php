@@ -17,10 +17,12 @@
 require_once 'phing/Task.php';
 
 /**
-* This is Phing Task for uploading all files to FTP
-*
-* @see http://phing.info/docs/guide/current/chapters/ExtendingPhing.html#WritingTasks
-*/
+ * This is Phing Task for uploading all files to FTP
+ *
+ * @see http://phing.info/docs/guide/current/chapters/ExtendingPhing.html#WritingTasks
+ * @package Application
+ * @subpackage Phing
+ */
 class UploadByFTP extends Task {
 
     // these directories/files won't be uploaded
@@ -145,7 +147,10 @@ class UploadByFTP extends Task {
         $this->Log("Current directory in FTP: ".ftp_pwd($this->ftp));    
 
         $start = time();
+        $currentDir = getcwd();
         $uploaded = $this->_uploadFiles($this->_srcDir);
+        chdir($currentDir);
+
         $this->Log("Uploaded {$uploaded} files, " . sprintf('%0.2f', (time() - $start)/60) . 'mins');    
 
         if (@ftp_close($this->ftp) === false)

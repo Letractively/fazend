@@ -31,6 +31,8 @@
 
     <property name="serverDocs" value="/home/continuum/public_html" />
 
+    <target name="main" depends="lint, test, deploy, ping, doc" />
+
     <target name="lint" description="Run syntax check for all classes" >
         <phplint haltonfailure="yes">
             <fileset dir="${project.basedir}/src/application">
@@ -43,7 +45,7 @@
     </target>
 
     <target name="dbdeploy" description="Deploy db changes" >
-            <taskdef name="dbdeploy" classname="phing.tasks.ext.dbdeploy.DbDeployTask"/>
+        <taskdef name="dbdeploy" classname="phing.tasks.ext.dbdeploy.DbDeployTask"/>
         <property name="deployScript" value="${project.basedir}/src/application/deploy/scripts/deploy.sql" />
 
         <dbdeploy
@@ -62,7 +64,7 @@
     </target>    
             
     <target name="test" description="Run all existing unit-tests" >
-               <phpunit printsummary="yes" haltonerror="yes" haltonfailure="yes">
+            <phpunit printsummary="yes" haltonerror="yes" haltonfailure="yes">
             <formatter type="plain" usefile="no" />
             <formatter todir="${project.basedir}/reports" type="xml" usefile="yes" />
             <batchtest>
@@ -79,8 +81,7 @@
     <target name="deploy" description="Copy working files to FTP">
         <svnlastrevision
             workingcopy="${project.basedir}"
-            propertyname="svn.revision" />
-        
+            propertyname="svn.revision" />    
 
         <echo msg="${svn.revision}" file="${project.basedir}/src/application/deploy/subversion/revision.txt" />    
 
@@ -88,6 +89,14 @@
         <echo msg="${svn.revision}" file="${project.basedir}/src/application/deploy/flag.txt" />
             
         <echo msg="Uploading revision: ${svn.revision}" />    
+        
+        <!-- build system access file -->
+        <property name="access.file" value="${project.basedir}/src/application/deploy/access.txt" />
+        <exec command="php index.php Access --project=${phing.project.name} > ${access.file}"
+            dir="/home/continuum/continuumFacade/public"
+            escape="false"
+            checkreturn="true" />
+        <echo msg="Access config for /__fz URL saved into ${access.file}" />    
 
         <!-- the Task is defined as PHP class, see phings/UploadByFTP.php -->
         <uploadByFTP server="${ftp.server}"
@@ -102,7 +111,12 @@
         <!-- the Task is defined as PHP class, see phings/UploadByFTP.php -->
         <taskdef name="pingFaZend" classname="src.library.FaZend.Application.Phing.PingFaZend" />
 
-        <pingFaZend url="${live.home}/__ping/backup" />
+        <if>
+            <isset property="${live.home}"/>
+            <then>
+                <pingFaZend url="${live.home}/__ping/backup" />
+            </then>
+        </if>
     </target>
 
     <target name="doc" description="Create phpDoc documentation" >

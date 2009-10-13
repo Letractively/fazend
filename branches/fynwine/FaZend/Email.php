@@ -17,7 +17,7 @@
 /**
  * Send email using template
  *
- * @package FaZend 
+ * @package Email 
  */
 class FaZend_Email {
 
@@ -53,6 +53,7 @@ class FaZend_Email {
         // to allow further modifications
         self::$_config = new Zend_Config($config->toArray(), true);
         self::$_config->view = clone $view;
+        self::$_config->view->setFilter(null);        
     }
 
     /**
@@ -143,11 +144,8 @@ class FaZend_Email {
      * @return FaZend_Email
      */
     public function logError() {
-
-        FaZend_Log::err($this->_getFilledMailer()->getBodyText());
-
+        FaZend_Log::err($this->_getFilledMailer()->getBodyText()->getContent());
         return $this;
-
     }
 
     /**
@@ -191,25 +189,23 @@ class FaZend_Email {
         foreach ($this->_variables as $key=>$value)
             $view->assign($key, $value);
 
-        // render the body and kill all \r signs    
-        $body = str_replace ("\r", '', $view->render($template));    
-
+        $body = $view->render($template);
+        
+        // replace old-styled new lines with \n
+        $body = preg_replace("/\r\n|\n\r|\r/", "\n", $body);
+        
         // parse body for extra variables
-        $lines = explode ("\n", $body);
+        $lines = explode("\n", $body);
         foreach ($lines as $id=>$line) {
+            $matches = array();
             // format is simple: "variable: value"    
-            if (strpos ($line, ':')) {
-                list($key, $value) = explode (':', $line);    
-                $value = trim($value);
-                $key = trim($key);
-
-                $this->set($key, $value);
+            if (preg_match('/^([\w\d]+)\:(.*)$/', $line, $matches)) {
+                $this->set($matches[1], $matches[2]);
             }    
 
             // empty line stops parsing
             if ($line == '--')
                 break;
-
         }    
 
         $body = trim(implode("\n", array_slice ($lines, $id+1)), " \n\r");

@@ -15,8 +15,12 @@
  */
 
 /**
+ * Index controller
  *
+ * Dispatcher of all pages/actions
  *
+ * @package application
+ * @subpackage controllers
  */
 class IndexController extends FaZend_Controller_Action {
 
@@ -29,6 +33,11 @@ class IndexController extends FaZend_Controller_Action {
 
     }
 
+    /**
+     * Test _redirectFlash() method
+     *
+     * @return void
+     */
     public function flashAction() {
         $this->_redirectFlash('That works');
     }    
