@@ -85,7 +85,6 @@ class FaZend_Test_TestCase extends Zend_Test_PHPUnit_ControllerTestCase {
         $this->resetResponse();
 
         parent::tearDown();
-
     }
     
     /**
@@ -110,5 +109,4 @@ class FaZend_Test_TestCase extends Zend_Test_PHPUnit_ControllerTestCase {
             return self::$_variables[$name];
         return parent::__get($name);
     }
-
 }

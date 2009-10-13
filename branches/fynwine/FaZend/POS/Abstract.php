@@ -61,29 +61,29 @@ abstract class FaZend_POS_Abstract implements FaZend_POS_Interface
      * refactor to allow existing objects to be loaded as well.
      * 
      */
-    public function __construct( $objectId = null )
+    public function __construct( $version = null )
     {
         $class = get_class( &$this ); 
 
-        if( null !== $objectId ) {
             require_once 'FaZend/POS/Model/Object.php';
             $this->_fzObject = FaZend_POS_Model_Object::retrieve()
-                ->where( 'id = ?',  $objectId )
                 ->where( 'class = ?', $class )
                 ->setSilenceIfEmpty()
                 ->fetchRow()
                 ;
 
-            $this->_loadSnapshot();
-            $this->_sysProperties = new FaZend_POS_Properties( $this );
-        }
-
-        if( $objectId === null || null === $this->_fzObject ) {
+        if( null === $this->_fzObject ) {
             require_once 'FaZend/POS/Model/Object.php';
             $this->_fzObject = new FaZend_POS_Model_Object();
             $this->_fzObject->class = $class;
             $this->_fzObject->save();
         }
+
+        $this->_loadSnapshot( $version );
+
+        $this->_sysProperties = new FaZend_POS_Properties( 
+            $this, $this->_fzObject, $this->_fzSnapshot 
+        );
         
         $this->init();
     }

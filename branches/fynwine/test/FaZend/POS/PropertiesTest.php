@@ -33,11 +33,10 @@ class FaZend_POS_Properties extends AbstractTestCase
      */
     public function testCanRetreiveLastEditor()
     {
-        FaZend_POS::setUser( 'testUser' );
-        $car = new Car();
+        $car = new Model_Car();
         $car->save();
 
-        FaZend_POS::setuser( 'testUser2' );
+        $user =  FaZend::getUser();
         $this->assertEquals( $user, $car->ps()->editor )
     }
 
@@ -48,11 +47,11 @@ class FaZend_POS_Properties extends AbstractTestCase
      */
     public function testCannotSetLastEditor()
     {
-        $car = new Car();
+        $car = new Model_Car();
         $car->save();
 
         $this->setExpectedException( 'FaZend_POS_Exception' );
-        $car->pa()->editor = new FaZend_POS_User( 'testUser' );
+        $car->pa()->editor = 'test';
     }
 
     /**
@@ -62,7 +61,10 @@ class FaZend_POS_Properties extends AbstractTestCase
      */
     public function testCanRetrieveLatestVersionNumber()
     {
+        $car = new Model_Car();
+        $car->save();
 
+        $tthis->assertEquals( $car->ps()->version, 1 );
     }
 
     /**
@@ -72,7 +74,9 @@ class FaZend_POS_Properties extends AbstractTestCase
      */
     public function testCannotSetLastVersionNumber()
     {
-
+        $car = new Model_Car();
+        $this->setExpectedException( 'FaZend_POS_Exception' );
+        $car->ps()->version = 1;
     }
 
     /**
@@ -82,7 +86,18 @@ class FaZend_POS_Properties extends AbstractTestCase
      */
     public function testCanRetrieveLastUpdatedTimestamp()
     {
-
+        $start = time();
+        $car = new Model_Car();
+        $car->save();
+        
+        $timestamp = $car->ps()->updated;
+        //TODO we can't actually test that the time is accurate without
+        //architectural changes.
+        
+        $this->assertTrue( 
+            $time < $timestamp, 
+            'Start time was not earlier than last updated time' 
+        );
     }
 
     /**
@@ -92,7 +107,9 @@ class FaZend_POS_Properties extends AbstractTestCase
      */
     public function testCannotSetLastUpdatedTimestamp()
     {
-
+        $car = new Model_Car();
+        $this->setExpectedException( 'FaZend_POS_Exception' );
+        $car->ps()->updated = time();
     }
 
     /**
@@ -102,7 +119,22 @@ class FaZend_POS_Properties extends AbstractTestCase
      */
     public function testCanGetIdOfObject()
     {
+        $car = new Model_Car();
+        $car->save();
 
+        $bike = new Model_Bike();
+        $bike->save();
+        
+        $this->assertGreaterThan( 
+            $car->ps()->id, 
+            0, 
+            'Id returned was not greater than 0'
+        );
+        $this->assertGreaterThan( 
+            $bike->ps()->id, 
+            $car->ps()->id, 
+            'Second object\s id was not greater than first object\'s'
+        );
     }
 
     /**
@@ -112,7 +144,9 @@ class FaZend_POS_Properties extends AbstractTestCase
      */
     public function testCannotSsetIdOfObject()
     {
-
+        $car = new Model_Car();
+        $this->setExpectedException( 'FaZend_POS_Exception' );
+        $this->ps()->id = 3;
     }
 
     /**
@@ -122,7 +156,14 @@ class FaZend_POS_Properties extends AbstractTestCase
      */
     public function testCanGetTypeOfObject()
     {
+        $car = new Model_Car();
+        $car->save();
 
+        $this->assertEquals(
+            $car->ps()->type,
+            'Car',
+            'Returned type for Car object was not "Car"'
+        );
     }
 
     /**
@@ -132,7 +173,9 @@ class FaZend_POS_Properties extends AbstractTestCase
      */
     public function testCannotSetTypeOfObject()
     {
-
+        $car = new Model_Car(); 
+        $this->setExpectedException( 'FaZend_POS_Exception' );
+        $car->ps()->type = 'Bike';
     }
 
     /**
@@ -143,6 +186,7 @@ class FaZend_POS_Properties extends AbstractTestCase
     public function testCanGetParent()
     {
 
+
     }
 
     /**
@@ -151,6 +195,18 @@ class FaZend_POS_Properties extends AbstractTestCase
      * @return TODO
      */
     public function testCannotSetParent()
+    {
+        $car = new Model_Car();
+        $this->setExpectedException( 'FaZend_POS_Exception' );
+        $this->ps()->parent = new Model_Bike();
+    }
+
+    /**
+     * TODO: short description.
+     * 
+     * @return TODO
+     */
+    public function testTouchOnlyUpdatesVersion()
     {
 
     }
@@ -162,6 +218,34 @@ class FaZend_POS_Properties extends AbstractTestCase
      */
     public function testWorkWithVersionReturnsCorrectVersion()
     {
+        $make  = 'Lotus';
+        $model = 'Elise 112 R';
+        $status = 'inactive';
+
+        $car = new Model_Car();
+        $car->make      = $make;
+        $car->model     = $model;
+        $car->status    = $status;
+        $car->save();
+
+        $version = $car->ps()->version;
+
+        $car->touch();
+        $car->touch();
+
+        $car->status = 'active';
+        $car->driver = 'John';
+
+        $car = $car->ps()->workWithVersion( $version );
+
+        $this->assertEquals( $version, $car->ps()->version );
+        
+        $params = $car->toArray();
+        $this->assertEquals( $params['make'], $make );
+        $this->assertEquals( $params['model'], $model );
+        $this->assertEquals( $params['status'], $status );
+        $this->assertNotInArray( 'driver', array_keys( $params ), 
+                'Property driver was not in expected version' );
 
     }
 
@@ -173,6 +257,12 @@ class FaZend_POS_Properties extends AbstractTestCase
     public function testWorkWithVersionInvalidVersionThrowsException()
     {
 
+        $car = new Model_Car();
+        $car->save();
+        $car->touch();
+
+        $this->setExcpectedException( 'FaZend_POS_Exception' );
+        $newCar = $car->ps()->workWithVersion( 9999 );
     }
 
     /**
@@ -182,7 +272,32 @@ class FaZend_POS_Properties extends AbstractTestCase
      */
     public function testRollBackResetsVersion()
     {
+        $car = new Model_Car();
+        $car->make  = 'Nissan';
+        $car->model = '350z';
+        $car->owner = 'John';
+        $car->save();
 
+        $car->owner = 'Jane';
+        
+        $prevCar = $car->ps()->rollBack();
+
+        $this->assertEquals( $prevCar->owner, 'John', 'rollbacked property was not as expected' );
+    }
+
+    /**
+     * TODO: short description.
+     * 
+     * @return TODO
+     */
+    public function testRollBackThrowsExceptionIfNoPrevousVersion()
+    {
+        $car = new car();
+        $car->make  = 'Lexus';
+        $car->model = 'IS300';
+
+        $this->setExcpectedException( 'FaZend_POS_Exception' );
+        $car->ps()->rollback();
     }
 
     /**

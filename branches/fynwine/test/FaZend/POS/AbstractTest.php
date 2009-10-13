@@ -35,7 +35,7 @@ class FaZend_POS_AbstractTest extends AbstractTestCase
     {
         $trims = array( 'Coupe', 'Sedan' );
         
-        $car = new Car();
+        $car = new Model_Car();
         $car->make  = 'BMW';
         $car->model = '330xi';
         $car->year  = 2009;
@@ -55,11 +55,11 @@ class FaZend_POS_AbstractTest extends AbstractTestCase
      */
     public function testPropertiesAreUniquePerObject()
     {
-        $car = new Car();
+        $car = new Model_Car();
         $car->make  = 'BMW';
         $car->year  = 2009;
         
-        $car2 = new Car();
+        $car2 = new Model_Car();
         $car2->make  = 'Honda';
         $car2->year  = 2003;
 
@@ -85,7 +85,7 @@ class FaZend_POS_AbstractTest extends AbstractTestCase
      */
     public function testPropertyValueCanBeNull()
     {
-        $car = new Car();
+        $car = new Model_Car();
         $car->make  = null;
         $this->assertNull( $car->make, 'Property value was not null!' );
     }
@@ -97,7 +97,7 @@ class FaZend_POS_AbstractTest extends AbstractTestCase
      */
     public function testIssetWorksWithProperties()
     {
-        $car = new Car();
+        $car = new Model_Car();
         $car->make = null;
         $this->assertFalse( isset( $car->model ), 'Unasigned property reported as set!' );
         $this->assertFalse( isset( $car->make ), 'Nulled property reported as set!' );
@@ -110,7 +110,7 @@ class FaZend_POS_AbstractTest extends AbstractTestCase
      */
     public function testUnsetWorksWithProperties()
     {
-        $car = new Car();
+        $car = new Model_Car();
         $car->make = 'Nissan';
         unset( $car->make );
         $this->assertFalse( isset( $car->make ), 'Property value was still set!');
@@ -123,7 +123,7 @@ class FaZend_POS_AbstractTest extends AbstractTestCase
      */
     public function testUnassignedPropertyReturnsNull()
     {
-        $car = new Car();
+        $car = new Model_Car();
         $this->assertNull( $car->something, 'Unassigned property was not null!');
     }
 
@@ -134,7 +134,7 @@ class FaZend_POS_AbstractTest extends AbstractTestCase
      */
     public function testSerializedObjectReceivesUpdatesOnUnserialize()
     {
-        $car = new Car();
+        $car = new Model_Car();
         $car->make  = 'Nissan';
         $car->model = 'Maxima';
         $car->active = false;
@@ -156,27 +156,4 @@ class FaZend_POS_AbstractTest extends AbstractTestCase
     {
         
     }
-}
-
-
-/**
- * TODO: short description.
- * 
- * TODO: long description.
- * 
- */
-class Car extends FaZend_POS_Abstract 
-{
-
-}
-
-/**
- * TODO: short description.
- * 
- * TODO: long description.
- * 
- */
-class Bike extends FaZend_POS_Abstract
-{
-
 }
