@@ -31,8 +31,24 @@ class FaZend_POS_AbstractTest extends AbstractTestCase
      * 
      * @return TODO
      */
+    public function setUp()
+    {
+        parent::setUp();
+
+        require_once 'FaZend/User.php';
+        $user = FaZend_User::register( 'test', 'test' );
+        $user->login();
+    }
+
+
+    /**
+     * TODO: short description.
+     * 
+     * @return TODO
+     */
     public function testCanAssignValuesToProperties()
     {
+
         $trims = array( 'Coupe', 'Sedan' );
         
         $car = new Model_Car();

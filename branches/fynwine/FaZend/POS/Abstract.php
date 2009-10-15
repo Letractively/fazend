@@ -28,23 +28,31 @@ abstract class FaZend_POS_Abstract implements FaZend_POS_Interface
     private $_version = null;
 
     /**
-     * TODO: description.
+     * The table row for the object data
      * 
-     * @var mixed
+     * @var FaZend_POS_Model_Object
      */
     private $_fzObject;
 
     /**
-     * TODO: description.
+     * The table row for the snapshot data
      * 
-     * @var mixed
+     * @var FaZend_POS_Model_Snapshot
+     */
+    private $_fzSnapshot;
+
+    /**
+     * Contains the current FaZend_User to save as the editor.
+     * 
+     * @var FaZend_User
      */
     private $_user;
 
     /**
-     * TODO: description.
+     * A multi-dimensional array containing this object's values and their
+     * current states
      * 
-     * @var mixed  Defaults to array(). 
+     * @var array Defaults to array(). 
      */
     private $_properties = array();
 
@@ -56,28 +64,29 @@ abstract class FaZend_POS_Abstract implements FaZend_POS_Interface
     private $_sysProperties;
 
     /**
-     * TODO: short description.
-     * TODO right now, this will always create a new object.  We need to
-     * refactor to allow existing objects to be loaded as well.
-     * 
+     * Constructor.
+     * @return void
      */
     public function __construct( $version = null )
     {
         $class = get_class( &$this ); 
 
-            require_once 'FaZend/POS/Model/Object.php';
-            $this->_fzObject = FaZend_POS_Model_Object::retrieve()
+        require_once 'FaZend/User.php';
+        $this->_user = FaZend_User::getCurrentUser();
+
+        require_once 'FaZend/POS/Model/Object.php';
+        $this->_fzObject = FaZend_POS_Model_Object::retrieve()
                 ->where( 'class = ?', $class )
                 ->setSilenceIfEmpty()
                 ->fetchRow()
                 ;
 
-        if( null === $this->_fzObject ) {
-            require_once 'FaZend/POS/Model/Object.php';
+        if( empty( $this->_fzObject ) ) {
             $this->_fzObject = new FaZend_POS_Model_Object();
             $this->_fzObject->class = $class;
             $this->_fzObject->save();
         }
+        
 
         $this->_loadSnapshot( $version );
 
@@ -89,17 +98,18 @@ abstract class FaZend_POS_Abstract implements FaZend_POS_Interface
     }
 
     /**
-     * User setup code
+     * User setup code.  This should be implemented by the user to initialize
+     * any variables for this object.
      * 
-     * @return TODO
+     * @return void
      */
     public function init()
     {}
 
     /**
-     * TODO: short description.
+     * Accesses the system properties for this object.
      * 
-     * @return TODO
+     * @return FaZend_POS_Properties
      */
     public final function & ps()
     {
@@ -121,14 +131,17 @@ abstract class FaZend_POS_Abstract implements FaZend_POS_Interface
     }
 
     /**
-     * TODO: short description.
+     * Loads a snapshot for the specified version
+     * @throws FaZend_POS_InvalidVersionException if the specified version is
+     * non-existant.
      * 
-     * @return TODO
+     * @return void
      */
     private function _loadSnapshot( $version = null )
     {
         $this->_properties = array();
         
+        require_once 'FaZend/POS/Model/Snapshot.php';
         $query = FaZend_POS_Model_Snapshot::retrieve()
             ->where( 'fzObject = ?', $this->_fzObject )
             ->where( 'alive = 1' )
@@ -136,17 +149,26 @@ abstract class FaZend_POS_Abstract implements FaZend_POS_Interface
             ;
             
         if( null !== $version ) {
-            $query->where( $version );
+            $query->where( 'version = ?', $version );
         }
 
-        $snapshot = $query->setSilenceIfEmpty()->fetchRow();
+        $this->_fzSnapshot = $query->setSilenceIfEmpty()->fetchRow();
 
-        if( empty( $snapshot ) && $version !== null ) {
-            //TODO throw an exception here?
-        }
-        
-        if( !empty( $snapshot ) ) {
-            $props = unserialize( $snapshot->properties );
+        if( empty( $this->_fzSnapshot ) ) {
+            
+            if( $version !== null ) {
+                require_once 'FaZend/POS/InvalidVersionException.php';
+                throw new FaZend_POS_InvalidVersionException();
+            }
+
+            $this->_fzSnapshot = new FaZend_POS_Model_Snapshot();
+            $this->_fzSnapshot->fzObject = $this->_fzObject;
+            $this->_fzSnapshot->version = 0;
+            $this->_fzSnapshot->save();
+
+        } else {
+
+            $props = unserialize( $this->_fzSnapshot->properties );
             foreach( $props as $name => $value ) {
                 $this->_properties[ $name ]['value'] = $value;
                 $this->_properties[ $name ]['state'] = self::STATE_CLEAN;
@@ -155,36 +177,37 @@ abstract class FaZend_POS_Abstract implements FaZend_POS_Interface
     }
 
     /**
-     * TODO: short description.
+     * Write a new snapshot to the database.
      * 
-     * @return TODO
+     * @return void 
      */
+    private function _saveSnapshot()
     {
         // TODO this is not very 'thread safe'.  If two objects
         // are open with the same version number, changes to 
         // one will overwrite the changes to the next.
         if( $this->_state == self::STATE_DIRTY ) {
-            $snapshot = new FaZend_POS_Model_Snapshot();
-            $snapshot->fzObject = $this->_fzObject;
-            $snapshot->version = ++$this->_version;
-            $snapshot->properties = serialize( $this->toArray() );
-            $snapshot->alive = 1;
-            $snapshot->user = $this->_user;
-            $snapshot->save();
-            $this->_state = self::STATE_CLEAN;
+            $this->_fzSnapshot->id = null;
+            $this->_fzSnapshot->fzObject = $this->_fzObject;
+            $this->_fzSnapshot->version++;
+            $this->_fzSnapshot->properties = serialize( $this->toArray() );
+            $this->_fzSnapshot->alive = 1;
+            $this->_fzSnapshot->user = $this->_user;
+            $this->_fzSnapshot->save();
             foreach( $this->_properties as $name => $prop ) {
                 $this->_properties[ $name ][ 'state' ] = self::STATE_CLEAN;
             }
+            $this->_state = self::STATE_CLEAN;
         }
     }
 
     /**
-     * TODO: short description.
+     * Magic method implementation for setting public properties on the object
      * 
-     * @param mixed $name  
-     * @param mixed $value 
+     * @param string $name  
+     * @param mixed  $value 
      * 
-     * @return TODO
+     * @return mixed the saved value of the property
      */
     private final function _setProperty( $name, $value )
     {
