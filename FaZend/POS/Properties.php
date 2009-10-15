@@ -179,7 +179,7 @@ class FaZend_POS_Properties
 
         if( !$this->_fzSnapshot->alive ) {
             throw new FaZend_POS_Exception(
-                'Cannot touch deleted object.';
+                'Cannot touch deleted object.'
             );
         }
         
@@ -238,5 +238,18 @@ class FaZend_POS_Properties
     public function setACL( Zend_ACL $acl )
     {
         $this->_acl = $acl;
+    }
+
+
+    /**
+     * TODO: short description.
+     * 
+     * @param mixed $name 
+     * 
+     * @return TODO
+     */
+    public function __get( $name ) 
+    {
+        $method = 'get' . ucwords( $name );            
     }
 }

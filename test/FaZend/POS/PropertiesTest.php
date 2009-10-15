@@ -23,7 +23,7 @@ require_once 'FaZend/POS/Properties.php';
  * TODO: long description.
  * 
  */
-class FaZend_POS_Properties extends AbstractTestCase 
+class FaZend_POS_PropertiesTest extends AbstractTestCase 
 {
     
     /**
@@ -37,7 +37,7 @@ class FaZend_POS_Properties extends AbstractTestCase
         $car->save();
 
         $user =  FaZend::getUser();
-        $this->assertEquals( $user, $car->ps()->editor )
+        $this->assertEquals( $user, $car->ps()->editor );
     }
 
     /**
@@ -292,7 +292,7 @@ class FaZend_POS_Properties extends AbstractTestCase
      */
     public function testRollBackThrowsExceptionIfNoPrevousVersion()
     {
-        $car = new car();
+        $car = new Model_Car();
         $car->make  = 'Lexus';
         $car->model = 'IS300';
 
