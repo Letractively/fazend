@@ -52,6 +52,16 @@ $product = new Product(10);
 $name = $product->owner->name;
 }}}
 
+Or you can find it there:
+
+{{{
+$product = Product::retrieve()
+    ->where('owner = ?', $owner)
+    ->setSilenceIfEmpty() // don't throw exception if not found, just return FALSE
+    ->setRowClass('Product') // returned rows will be instances of this class
+    ->fetchRow();
+}}}
+
 = List of Active Records =
 
 You can get a row set in a convenient way:
