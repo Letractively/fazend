@@ -13,24 +13,24 @@ We assume that:
 For example, you have two tables in the DB:
 
 {{{
-// create table Owner (
-//   id integer not null primary key autoincrement, 
-//   name varchar(50) not null)
+create table Owner (
+  id integer not null primary key autoincrement, 
+  name varchar(50) not null)
 
-// create table Product (
-//   id integer not null primary key autoincrement, 
-//   text varchar(1024) not null, 
-//   owner integer not null constraint fk_product_owner references owner(id))
+create table Product (
+  id integer not null primary key autoincrement, 
+  text varchar(1024) not null, 
+  owner integer not null constraint fk_product_owner references owner(id))
 }}}
 
-You declare two classes:
+You declare two PHP classes (text after `FaZend_Db_Table_ActiveRow_` is the name of your table):
 
 {{{
 class Owner extends FaZend_Db_Table_ActiveRow_Owner {}
 class Product extends FaZend_Db_Table_ActiveRow_Product {}
 }}}
 
-Now, in order to get the active row from the table:
+Now, in order to get an active row from the table:
 
 {{{
 $owner = new Owner(13);
@@ -52,7 +52,7 @@ $product = new Product(10);
 $name = $product->owner->name;
 }}}
 
-Or you can find it there:
+Or you can find a new row with `retrieve()` method:
 
 {{{
 $product = Product::retrieve()
@@ -79,6 +79,16 @@ Or, for example:
 FaZend_Db_ActiveTable_OtherTable::retrieve()
   ->table()
   ->update('time = NOW()');
+}}}
+
+More extended example:
+
+{{{
+$list = Owner::retrieve(false) // don't use default FROM clause
+    ->from('owner', array('name')) // specify where to select FROM
+    ->where('name > ?', new Zend_Db_Expr('NOW()')) // use Zend syntax
+    ->setRowClass('OwnerName') // set class name of each returned row
+    ->fetchAll();
 }}}
 
 == Delayed `fetchAll()` ==
