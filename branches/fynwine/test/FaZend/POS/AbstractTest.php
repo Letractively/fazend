@@ -150,6 +150,8 @@ class FaZend_POS_AbstractTest extends AbstractTestCase
      */
     public function testSerializedObjectReceivesUpdatesOnUnserialize()
     {
+        $this->markTestIncomplete( 'Serialization not yet implemented' );
+
         $car = new Model_Car();
         $car->make  = 'Nissan';
         $car->model = 'Maxima';
