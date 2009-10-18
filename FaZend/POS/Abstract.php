@@ -75,18 +75,7 @@ abstract class FaZend_POS_Abstract implements FaZend_POS_Interface
         $this->_user = FaZend_User::getCurrentUser();
 
         require_once 'FaZend/POS/Model/Object.php';
-        $this->_fzObject = FaZend_POS_Model_Object::retrieve()
-                ->where( 'class = ?', $class )
-                ->setSilenceIfEmpty()
-                ->fetchRow()
-                ;
-
-        if( empty( $this->_fzObject ) ) {
-            $this->_fzObject = new FaZend_POS_Model_Object();
-            $this->_fzObject->class = $class;
-            $this->_fzObject->save();
-        }
-        
+        $this->_fzObject = FaZend_POS_Model_Object::forClass( $class );
 
         $this->_loadSnapshot( $version );
 
@@ -124,7 +113,7 @@ abstract class FaZend_POS_Abstract implements FaZend_POS_Interface
     public function toArray()
     {
         $return = array();
-        foreach( $this->_properties as  $name => $prop ) {
+        foreach( $this->_properties as $name => $prop ) {
             $return[ $name ] = $prop['value'];
         }
         return $return;
@@ -142,33 +131,12 @@ abstract class FaZend_POS_Abstract implements FaZend_POS_Interface
         $this->_properties = array();
         
         require_once 'FaZend/POS/Model/Snapshot.php';
-        $query = FaZend_POS_Model_Snapshot::retrieve()
-            ->where( 'fzObject = ?', $this->_fzObject )
-            ->where( 'alive = 1' )
-            ->order( 'version DESC' )
-            ;
-            
-        if( null !== $version ) {
-            $query->where( 'version = ?', $version );
-        }
+        $this->_fzSnapshot = FaZend_POS_Model_Snapshot::load(
+            $this->_fzObject, $version
+        );
 
-        $this->_fzSnapshot = $query->setSilenceIfEmpty()->fetchRow();
-
-        if( empty( $this->_fzSnapshot ) ) {
-            
-            if( $version !== null ) {
-                require_once 'FaZend/POS/InvalidVersionException.php';
-                throw new FaZend_POS_InvalidVersionException();
-            }
-
-            $this->_fzSnapshot = new FaZend_POS_Model_Snapshot();
-            $this->_fzSnapshot->fzObject = $this->_fzObject;
-            $this->_fzSnapshot->version = 0;
-            $this->_fzSnapshot->save();
-
-        } else {
-
-            $props = unserialize( $this->_fzSnapshot->properties );
+        $props = unserialize( $this->_fzSnapshot->properties );
+        if( is_array( $props ) ) {
             foreach( $props as $name => $value ) {
                 $this->_properties[ $name ]['value'] = $value;
                 $this->_properties[ $name ]['state'] = self::STATE_CLEAN;
@@ -183,14 +151,14 @@ abstract class FaZend_POS_Abstract implements FaZend_POS_Interface
      */
     private function _saveSnapshot()
     {
+        //---------------------------------------------------------
         // TODO this is not very 'thread safe'.  If two objects
         // are open with the same version number, changes to 
         // one will overwrite the changes to the next.
+        //---------------------------------------------------------
         if( $this->_state == self::STATE_DIRTY ) {
-            $this->_fzSnapshot->id = null;
-            $this->_fzSnapshot->fzObject = $this->_fzObject;
             $this->_fzSnapshot->version++;
-            $this->_fzSnapshot->properties = serialize( $this->toArray() );
+            $this->_fzSnapshot->setProperties( $this->toArray() );
             $this->_fzSnapshot->alive = 1;
             $this->_fzSnapshot->user = $this->_user;
             $this->_fzSnapshot->save();
@@ -198,6 +166,7 @@ abstract class FaZend_POS_Abstract implements FaZend_POS_Interface
                 $this->_properties[ $name ][ 'state' ] = self::STATE_CLEAN;
             }
             $this->_state = self::STATE_CLEAN;
+            $this->_version = $this->_fzSnapshot->version;
         }
     }
 
@@ -297,26 +266,5 @@ abstract class FaZend_POS_Abstract implements FaZend_POS_Interface
         if( isset( $this->_properties[$name] ) ) {
             $this->_setProperty( $name, null );
         }
-    }
-
-    /**
-     * TODO: short description.
-     * 
-     * @return TODO
-     */
-    public function __sleep()
-    {
-        $this->_saveSnapshot();
-        return $this->toArray();
-    }
-
-    /**
-     * TODO: short description.
-     * 
-     * @return TODO
-     */
-    public function __wakeup()
-    {
-        $this->_loadSnapshot();
     }
 }
