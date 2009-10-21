@@ -13,7 +13,15 @@ class FaZend_POS_Properties
      * 
      * @var object
      */
-    protected $_fzSnapshot;
+    private $_fzSnapshot;
+
+
+    /**
+     * TODO: description.
+     * 
+     * @var mixed
+     */
+    private $_fzObject;
 
     /**
      * TODO: description.
@@ -85,9 +93,8 @@ class FaZend_POS_Properties
      */
     public function getEditor()
     {
-        require_once 'FaZend/POS/User.php';
-        $user = new FaZend_POS_User( $this->_fzSnapshot->user );
-        return $user;
+        require_once 'FaZend/User.php';
+        return FaZend_User::findById( $this->_fzSnapshot->user );
     }
 
     /**
@@ -143,13 +150,14 @@ class FaZend_POS_Properties
     /**
      * TODO: short description.
      * 
-     * @param mixed $versionNumber 
+     * @param mixed int 
      * 
-     * @return TODO
+     * @return FaZend_POS_Abstract 
      */
     public function workWithVersion( $versionNumber )
     {
-        
+        $class = get_class( $this->_pos );
+        return new $class( $versionNumber );
     }
 
     /**
@@ -171,22 +179,31 @@ class FaZend_POS_Properties
      */
     public function touch()
     {
-        if( !$this->posObj->isCurrent() ) {
+        if( !$this->_pos->isCurrent() ) {
             throw new FaZend_POS_Exception(
                 'Cannot touch non-current version of object.'
             );
         }
 
-        if( !$this->_fzSnapshot->alive ) {
+        if( !$this->isAlive() ) {
             throw new FaZend_POS_Exception(
                 'Cannot touch deleted object.'
             );
         }
-        
-        $this->_fzSnapshot->version++;
-        $this->_fzSnapshot->save();
+
+        $this->_fzSnapshot->save( $this->_user );
     }
 
+
+    /**
+     * TODO: short description.
+     * 
+     * @return boolean
+     */
+    public function isAlive()
+    {
+        return $this->_fzSnapshot->alive !== 0;
+    }
 
     /**
      * Reset all property changes to an object.  If a version is specified,
@@ -211,8 +228,6 @@ class FaZend_POS_Properties
     public function getVersions( $numVersions )
     {
 
-        //load the last x versions prior to this one
-        $where = $this->_fzSnapshot->getAdapter()->quoteInto( 'version < ?', $this->_fzSnapshot->version );
 
         
     }
@@ -250,6 +265,22 @@ class FaZend_POS_Properties
      */
     public function __get( $name ) 
     {
-        $method = 'get' . ucwords( $name );            
+        $method = 'get' . ucfirst( $name );            
+        if( method_exists( &$this, $method ) ) {
+            return call_user_func( array( &$this, $method  ) );
+        }
+    }
+
+    /**
+     * TODO: short description.
+     * 
+     * @param mixed $name  
+     * @param mixed $value 
+     * 
+     * @return TODO
+     */
+    public function __set( $name, $value )
+    {
+        throw new FaZend_POS_Exception( 'Cannot set property ' . $name );
     }
 }

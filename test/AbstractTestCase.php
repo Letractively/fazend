@@ -60,9 +60,6 @@ class AbstractTestCase extends FaZend_Test_TestCase {
 
         $this->_dbAdapter = Zend_Db_Table_Abstract::getDefaultAdapter();
         
-        require_once 'FaZend/User.php';
-        $this->_user = FaZend_User::register( 'test', 'test' );
-        $this->_user->logIn();
     }    
 
 }

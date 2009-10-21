@@ -18,33 +18,26 @@ class FaZend_POS_Model_Object extends FaZend_Db_Table_ActiveRow_fzObject
      */
     public static function create( $className )
     {
-        $object = new FaZend_POS_Model_Object();
+        $object = new self;
         $object->class = $className;
         $object->save();
         return $object;
     }
 
     /**
-     * Retrieves a model for the given POS class name.  If one does not exist,
-     * it will be created
+     * Retrieive's a Model object by Id
      * 
-     * @param string $className 
+     * @param object $objectId 
      * 
-     * @return FaZend_POS_Model_Object
+     * @return TODO
      */
-    public static function forClass( $className )
+    public static function findByObjectId( $objectId )
     {
-        $fzObject = self::retrieve()
-                ->where( 'class = ?', $className )
-                ->setSilenceIfEmpty()
-                ->setRowClass( 'FaZend_POS_Model_Object' )
-                ->fetchRow()
-                ;
-        if( empty( $fzObject ) ) {
-            $fzObject = self::create( $className );
-        }
-
-        return $fzObject;
+        return self::retrieve()
+            ->where( 'id = ?', $objectId )
+            ->setRowClass( 'FaZend_POS_Model_Object' )
+            ->fetchRow()
+            ;
     }
 
 }

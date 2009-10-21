@@ -104,24 +104,34 @@ class FaZend_User extends FaZend_Db_Table_ActiveRow_user {
      */
     public function logIn () {
 
+        require_once 'Zend/Db/Table.php';
+        require_once 'Zend/Auth/Adapter/DbTable.php';
+
         $authAdapter = new Zend_Auth_Adapter_DbTable(Zend_Db_Table::getDefaultAdapter());
+
+
+
         $authAdapter->setTableName('user')
             ->setIdentityColumn('email')
             ->setCredentialColumn('password')
             ->setIdentity(strtolower($this->email))
             ->setCredential($this->password);
 
-        $result = self::_auth()->authenticate($authAdapter);
 
-        if (!$result->isValid())
+        $result = $this->_auth()->authenticate($authAdapter);
+
+        if (!$result->isValid()) {
+
+
+
             FaZend_Exception::raise('FaZend_User_LoginFailed', implode('; ', $result->getMessages()).' (code: #'.(-$result->getCode()).')');
-
+        }
         $data = $authAdapter->getResultRowObject(); 
-        self::_auth()->getStorage()->write($data);
+        $this->_auth()->getStorage()->write($data);
+
 
         // forget previous status
         self::$_loggedIn = true;
-
     }
 
     /**
@@ -223,6 +233,21 @@ class FaZend_User extends FaZend_Db_Table_ActiveRow_user {
             ->setRowClass(self::$_rowClass)
             ->fetchRow();
 
+    }
+
+    /**
+     * Retrieve a user by id
+     * 
+     * @param int $id 
+     * 
+     * @return FaZend_User
+     */
+    public static function findById( $id ) 
+    {   
+        return self::retrieve()
+            ->where('id = ?', $id)
+            ->setRowClass(self::$_rowClass)
+            ->fetchRow();
     }
 
     /**

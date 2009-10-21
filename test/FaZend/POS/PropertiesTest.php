@@ -25,18 +25,25 @@ require_once 'FaZend/POS/Properties.php';
  */
 class FaZend_POS_PropertiesTest extends AbstractTestCase 
 {   
+
+    /**
+     * TODO: description.
+     * 
+     * @var mixed
+     */
+    protected $_user = null;
+
     /**
      * TODO: short description.
      * 
      * @return TODO
      */
-    public function testCanRetreiveLastEditor()
+    public function setUp()
     {
-        $car = new Model_Car();
-        $car->save();
+        parent::setUp();
 
-        $user =  FaZend::getUser();
-        $this->assertEquals( $user, $car->ps()->editor );
+        $this->_user = FaZend_User::register( 'test2', 'test2' );
+        $this->_user->logIn();
     }
 
     /**
@@ -44,13 +51,29 @@ class FaZend_POS_PropertiesTest extends AbstractTestCase
      * 
      * @return TODO
      */
+    public function testCanRetreiveLastEditor()
+    {
+
+        $car = new Model_Car();
+        $car->save();
+
+        $actual   = (string) $car->ps()->editor->email;
+        $expected = (string) $this->_user->email;
+
+        $this->assertEquals( $expected, $actual );
+    }
+
+    /**
+     * TODO: short description.
+     * 
+     * @expectedException FaZend_POS_Exception
+     */
     public function testCannotSetLastEditor()
     {
         $car = new Model_Car();
         $car->save();
 
-        $this->setExpectedException( 'FaZend_POS_Exception' );
-        $car->pa()->editor = 'test';
+        $car->ps()->editor = 'test';
     }
 
     /**
@@ -63,18 +86,18 @@ class FaZend_POS_PropertiesTest extends AbstractTestCase
         $car = new Model_Car();
         $car->save();
 
-        $tthis->assertEquals( $car->ps()->version, 1 );
+        $this->assertEquals( $car->ps()->version, 1 );
     }
 
     /**
      * TODO: short description.
      * 
+     * @expectedException FaZend_POS_Exception
      * @return TODO
      */
     public function testCannotSetLastVersionNumber()
     {
         $car = new Model_Car();
-        $this->setExpectedException( 'FaZend_POS_Exception' );
         $car->ps()->version = 1;
     }
 
@@ -102,19 +125,18 @@ class FaZend_POS_PropertiesTest extends AbstractTestCase
     /**
      * TODO: short description.
      * 
+     * @expectedException FaZend_POS_Exception
      * @return TODO
      */
     public function testCannotSetLastUpdatedTimestamp()
     {
         $car = new Model_Car();
-        $this->setExpectedException( 'FaZend_POS_Exception' );
         $car->ps()->updated = time();
     }
 
     /**
      * TODO: short description.
      * 
-     * @return TODO
      */
     public function testCanGetIdOfObject()
     {
@@ -124,14 +146,12 @@ class FaZend_POS_PropertiesTest extends AbstractTestCase
         $bike = new Model_Bike();
         $bike->save();
         
-        $this->assertGreaterThan( 
-            $car->ps()->id, 
-            0, 
+        $this->assertTrue( 
+            $car->ps()->id > 0, 
             'Id returned was not greater than 0'
         );
-        $this->assertGreaterThan( 
-            $bike->ps()->id, 
-            $car->ps()->id, 
+        $this->assertTrue( 
+            $bike->ps()->id > $car->ps()->id, 
             'Second object\s id was not greater than first object\'s'
         );
     }
@@ -139,13 +159,13 @@ class FaZend_POS_PropertiesTest extends AbstractTestCase
     /**
      * TODO: short description.
      * 
+     * @expectedException FaZend_POS_Exception
      * @return TODO
      */
     public function testCannotSsetIdOfObject()
     {
         $car = new Model_Car();
-        $this->setExpectedException( 'FaZend_POS_Exception' );
-        $this->ps()->id = 3;
+        $car->ps()->id = 3;
     }
 
     /**
@@ -156,11 +176,10 @@ class FaZend_POS_PropertiesTest extends AbstractTestCase
     public function testCanGetTypeOfObject()
     {
         $car = new Model_Car();
-        $car->save();
 
         $this->assertEquals(
             $car->ps()->type,
-            'Car',
+            'Model_Car',
             'Returned type for Car object was not "Car"'
         );
     }
@@ -168,12 +187,12 @@ class FaZend_POS_PropertiesTest extends AbstractTestCase
     /**
      * TODO: short description.
      * 
+     * @expectedException FaZend_POS_Exception
      * @return TODO
      */
     public function testCannotSetTypeOfObject()
     {
         $car = new Model_Car(); 
-        $this->setExpectedException( 'FaZend_POS_Exception' );
         $car->ps()->type = 'Bike';
     }
 
@@ -191,13 +210,13 @@ class FaZend_POS_PropertiesTest extends AbstractTestCase
     /**
      * TODO: short description.
      * 
+     * @expectedException FaZend_POS_Exception
      * @return TODO
      */
     public function testCannotSetParent()
     {
         $car = new Model_Car();
-        $this->setExpectedException( 'FaZend_POS_Exception' );
-        $this->ps()->parent = new Model_Bike();
+        $car->ps()->parent = new Model_Bike();
     }
 
     /**
@@ -229,8 +248,8 @@ class FaZend_POS_PropertiesTest extends AbstractTestCase
 
         $version = $car->ps()->version;
 
-        $car->touch();
-        $car->touch();
+        $car->ps()->touch();
+        $car->ps()->touch();
 
         $car->status = 'active';
         $car->driver = 'John';
@@ -249,18 +268,17 @@ class FaZend_POS_PropertiesTest extends AbstractTestCase
     }
 
     /**
-     * TODO: short description.
      * 
-     * @return TODO
+     * @expectedException FaZend_POS_Exception
      */
     public function testWorkWithVersionInvalidVersionThrowsException()
     {
 
         $car = new Model_Car();
         $car->save();
-        $car->touch();
+        $car->ps()->touch();
 
-        $this->setExcpectedException( 'FaZend_POS_Exception' );
+        $this->setExpectedException( 'FaZend_POS_Exception' );
         $newCar = $car->ps()->workWithVersion( 9999 );
     }
 
@@ -295,7 +313,7 @@ class FaZend_POS_PropertiesTest extends AbstractTestCase
         $car->make  = 'Lexus';
         $car->model = 'IS300';
 
-        $this->setExcpectedException( 'FaZend_POS_Exception' );
+        $this->setExpectedException( 'FaZend_POS_Exception' );
         $car->ps()->rollback();
     }
 
