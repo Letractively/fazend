@@ -9,7 +9,7 @@ require_once 'FaZend/POS/Interface.php';
  * TODO: long description.
  * 
  */
-abstract class FaZend_POS_Abstract implements FaZend_POS_Interface
+abstract class FaZend_POS_Abstract implements FaZend_POS_Interface, ArrayAccess
 {
    
     //TODO in accordance with http://code.google.com/p/fazend/wiki/HowPersistenceWorks
@@ -28,11 +28,25 @@ abstract class FaZend_POS_Abstract implements FaZend_POS_Interface
     private $_version = null;
 
     /**
+     * Stores the current state of the object
+     * 
+     * @var int
+     */
+    private $_state;
+
+    /**
      * The table row for the object data
      * 
      * @var FaZend_POS_Model_Object
      */
     private $_fzObject;
+
+    /**
+     * Stores the object's ID.  Only used for serialization.
+     * 
+     * @var string  Defaults to null. 
+     */
+    public $__fzObjectId = null;
 
     /**
      * The table row for the snapshot data
@@ -63,26 +77,23 @@ abstract class FaZend_POS_Abstract implements FaZend_POS_Interface
      */
     private $_sysProperties;
 
+
+    /**
+     * Flag whether this object is the most current version
+     * (since the object was constructed.)  This will always be
+     * true untill the user forces a version.
+     * 
+     * @var boolean 
+     */
+    protected $_current = true;
+
     /**
      * Constructor.
      * @return void
      */
-    public function __construct( $version = null )
+    public function __construct( $objectId = null, $version = null )
     {
-        $class = get_class( &$this ); 
-
-        require_once 'FaZend/User.php';
-        $this->_user = FaZend_User::getCurrentUser();
-
-        require_once 'FaZend/POS/Model/Object.php';
-        $this->_fzObject = FaZend_POS_Model_Object::forClass( $class );
-
-        $this->_loadSnapshot( $version );
-
-        $this->_sysProperties = new FaZend_POS_Properties( 
-            $this, $this->_fzObject, $this->_fzSnapshot 
-        );
-        
+        $this->_initObject( $objectId, $version );
         $this->init();
     }
 
@@ -96,11 +107,21 @@ abstract class FaZend_POS_Abstract implements FaZend_POS_Interface
     {}
 
     /**
+     * Getter for "current" value
+     * 
+     * @return boolean
+     */
+    public function isCurrent()
+    {
+        return $this->_current;
+    }
+
+    /**
      * Accesses the system properties for this object.
      * 
      * @return FaZend_POS_Properties
      */
-    public final function & ps()
+    public final function ps()
     {
         return $this->_sysProperties;
     }
@@ -126,7 +147,37 @@ abstract class FaZend_POS_Abstract implements FaZend_POS_Interface
      */
     public function save()
     {
-        
+        $this->_saveSnapshot( true );
+        $this->_current = true;
+    }
+
+    /**
+     * TODO: short description.
+     * 
+     * @param object $objectId 
+     * @param mixed  $version  
+     * 
+     * @return TODO
+     */
+    public function _initObject( $objectId = null, $version = null )
+    {
+        $class = get_class( &$this ); 
+
+        require_once 'FaZend/User.php';
+        $this->_user = FaZend_User::getCurrentUser();
+
+        require_once 'FaZend/POS/Model/Object.php';
+        if( $objectId === null ) {
+            $this->_fzObject = FaZend_POS_Model_Object::create( $class );
+        } else {
+            $this->_fzObject = FaZend_POS_Model_Object::findByObjectId( $objectId );
+        }
+
+        $this->_loadSnapshot( $this->_fzObject, $version );
+
+        $this->_sysProperties = new FaZend_POS_Properties( 
+            $this, $this->_fzObject, $this->_fzSnapshot 
+        );
     }
 
     /**
@@ -136,12 +187,13 @@ abstract class FaZend_POS_Abstract implements FaZend_POS_Interface
      * 
      * @return void
      */
-    private function _loadSnapshot( $version = null )
+    private function _loadSnapshot( FaZend_POS_Model_Object $object,  $version = null ) 
     {
         $this->_properties = array();
-        
+        $this->_current = ( null == $version );
+
         require_once 'FaZend/POS/Model/Snapshot.php';
-        $this->_fzSnapshot = FaZend_POS_Model_Snapshot::load(
+        $this->_fzSnapshot = FaZend_POS_Model_Snapshot::forObject(
             $this->_fzObject, $version
         );
 
@@ -151,7 +203,12 @@ abstract class FaZend_POS_Abstract implements FaZend_POS_Interface
                 $this->_properties[ $name ]['value'] = $value;
                 $this->_properties[ $name ]['state'] = self::STATE_CLEAN;
             }
+            $this->_state = self::STATE_CLEAN;
+        } else {
+            // If no properties were loaded, assume this is a new object
+            $this->_state = self::STATE_DIRTY;
         }
+
     }
 
     /**
@@ -166,12 +223,16 @@ abstract class FaZend_POS_Abstract implements FaZend_POS_Interface
         // are open with the same version number, changes to 
         // one will overwrite the changes to the next.
         //---------------------------------------------------------
-        if( $this->_state == self::STATE_DIRTY ) {
-            $this->_fzSnapshot->version++;
+        if( $this->_state !== self::STATE_CLEAN ) {
+            
+            $version = $this->_fzSnapshot->version;
+            require_once 'FaZend/POS/Model/Snapshot.php';
+            $this->_fzSnapshot = FaZend_POS_Model_Snapshot::create(
+                $this->_fzObject 
+            );
             $this->_fzSnapshot->setProperties( $this->toArray() );
-            $this->_fzSnapshot->alive = 1;
-            $this->_fzSnapshot->user = $this->_user;
-            $this->_fzSnapshot->save();
+            $this->_fzSnapshot->save( $this->_user );
+
             foreach( $this->_properties as $name => $prop ) {
                 $this->_properties[ $name ][ 'state' ] = self::STATE_CLEAN;
             }
@@ -190,14 +251,23 @@ abstract class FaZend_POS_Abstract implements FaZend_POS_Interface
      */
     private final function _setProperty( $name, $value )
     {
-        //---------------------------------------
-        // Only write the changes if the property value is actually changing.
-        //---------------------------------------
-        if( !isset( $this->_properties[$name] ) || $this->_properties[$name] !== $value ) {
-            $this->_properties[$name]['state'] = self::STATE_DIRTY;
-            $this->_properties[$name]['value'] = $value;
-            $this->_state = self::STATE_DIRTY;
+        //--------------------------------------------------
+        // Translate a native array into a FaZend_POS_Array
+        //--------------------------------------------------
+        if( is_array( $value ) ) {
+            require_once 'FaZend/POS/Array.php';
+            $array = new FaZend_POS_Array();
+            foreach( $value as $k => $v )
+            {
+                $array[$k] = $v;
+            }
+
+            $value = $array;
         }
+        
+        $this->_properties[$name]['state'] = self::STATE_DIRTY;
+        $this->_properties[$name]['value'] = $value;
+        $this->_state = self::STATE_DIRTY;
 
         return $this->_properties[$name]['value'];
     }
@@ -217,8 +287,56 @@ abstract class FaZend_POS_Abstract implements FaZend_POS_Interface
     }
 
     /**
+     * For ArrayAccess
+     * 
+     * @param string $sOffset 
+     * 
+     * @return boolean
+     */
+    public function offsetExists( $sOffset )
+    {
+       return isset( $this->{$offset} );
+    }
+
+    /**
+     * For ArrayAccess
+     * 
+     * @param string $sOffset 
+     * 
+     * @return mixed
+     */
+    public function offsetGet( $sOffset )
+    {
+        return $this->{$sOffset};
+    }
+
+    /**
+     * for ArrayAccess
+     * 
+     * @param string $sOffset 
+     * @param string $value
+     * 
+     * @return void
+     */
+    public function offsetSet( $sOffset, $value )
+    {
+        return $this->{$sOffset} = $value;
+    }
+
+    /**
      * TODO: short description.
      * 
+     * @param string $sOffset 
+     * 
+     * @return TODO
+     */
+    public function offsetUnset( $sOffset )
+    {
+        unset( $this->{$sOffset} );
+    }
+
+    /**
+     * TODO: short description.
      * @return TODO
      */
     public function __destruct()
@@ -231,7 +349,7 @@ abstract class FaZend_POS_Abstract implements FaZend_POS_Interface
      * 
      * @param mixed $name 
      * 
-     * @return TODO
+     * @return TODOvar_export
      */
     public function __get( $name ) 
     {
@@ -274,7 +392,30 @@ abstract class FaZend_POS_Abstract implements FaZend_POS_Interface
     public function __unset( $name )
     {
         if( isset( $this->_properties[$name] ) ) {
-            $this->_setProperty( $name, null );
+            unset( $this->_properties[$name] );
         }
     }
+
+    /**
+     * TODO: short description.
+     * 
+     * @return TODO
+     */
+    public function __sleep()
+    {
+        $this->_saveSnapshot();
+        $this->__fzObjectId = intval((string) $this->_fzObject);
+        return array( '__fzObjectId' );
+    }
+
+    /**
+     * TODO: short description.
+     * 
+     * @return TODO
+     */
+    public function __wakeup()
+    {
+        $this->_initObject( $this->__fzObjectId );
+    }
+
 }

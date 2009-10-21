@@ -42,6 +42,9 @@ class Bootstrap extends FaZend_Application_Bootstrap_Bootstrap {
         $adapter->query(
             'insert into boat values (1, "boat", "super 8")');
 
+        $adapter->query(
+            'insert into user values (1, "test", "test")');
+
     }
 
 }
