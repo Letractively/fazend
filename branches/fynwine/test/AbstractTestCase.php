@@ -44,6 +44,13 @@ class AbstractTestCase extends FaZend_Test_TestCase {
     protected $_dbAdapter;
     
     /**
+     * A logged in test user
+     * 
+     * @var FaZend_User
+     */
+    protected $_user;
+
+    /**
      * Specific setup for test environment
      *
      * @return void
@@ -52,7 +59,10 @@ class AbstractTestCase extends FaZend_Test_TestCase {
         parent::setUp();
 
         $this->_dbAdapter = Zend_Db_Table_Abstract::getDefaultAdapter();
-
+        
+        require_once 'FaZend/User.php';
+        $this->_user = FaZend_User::register( 'test', 'test' );
+        $this->_user->logIn();
     }    
 
 }

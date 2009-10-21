@@ -24,8 +24,7 @@ require_once 'FaZend/POS/Properties.php';
  * 
  */
 class FaZend_POS_PropertiesTest extends AbstractTestCase 
-{
-    
+{   
     /**
      * TODO: short description.
      * 

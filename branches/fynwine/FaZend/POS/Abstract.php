@@ -120,6 +120,16 @@ abstract class FaZend_POS_Abstract implements FaZend_POS_Interface
     }
 
     /**
+     * TODO: short description.
+     * 
+     * @return TODO
+     */
+    public function save()
+    {
+        
+    }
+
+    /**
      * Loads a snapshot for the specified version
      * @throws FaZend_POS_InvalidVersionException if the specified version is
      * non-existant.
