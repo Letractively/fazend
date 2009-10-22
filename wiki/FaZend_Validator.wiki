@@ -29,7 +29,7 @@ elements.email.options.validators.email2.validator = "ValidateEmail"
 elements.email.options.validators.email2.options.messages.duplicateEmail = "Such email is already registered"
 }}}
 
-Or you can create your own validator, here is the example (file `application/validators/ValidateEmail`):
+Or you can create your own validator, here is the example (file `application/validators/ValidateEmail.php`):
 
 {{{
 class Validator_ValidateEmail extends Zend_Validate_Abstract {  
