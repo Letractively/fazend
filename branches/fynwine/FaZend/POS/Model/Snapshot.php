@@ -39,19 +39,19 @@ class FaZend_POS_Model_Snapshot extends FaZend_Db_Table_ActiveRow_fzSnapshot
     {
         if( $version == null ) {
             $query = self::retrieve()
-                ->where( 'fzObject = ?', (string)$fzObject );
+                ->where( 'fzObject = ?', (string)$fzObject )
+                ->order( 'version DESC' )
+                ;
         } else {
             $query = self::retrieve()
-                ->where( 'fzObject = ? AND version = ?', 
-                    array( (string)$fzObject, $version ) );
+                ->where( 'fzObject = ?', $fzObject )
+                ->where( 'version = ? ', $version )
+                ->where( 'baselined = 0 AND alive = 1' )
+                ;
         }
 
-        $fzSnapshot = $query->order( 'version DESC' )
-              ->setSilenceIfEmpty()
-              ->setRowClass( 'FaZend_POS_Model_Snapshot' )
-              ->fetchRow()
-              ;
-
+        $query->setSilenceIfEmpty()->setRowClass( 'FaZend_POS_Model_Snapshot' );
+        $fzSnapshot = $query->fetchRow();
 
         if( empty( $fzSnapshot ) && $version !== null )
         {
@@ -62,6 +62,36 @@ class FaZend_POS_Model_Snapshot extends FaZend_Db_Table_ActiveRow_fzSnapshot
         }
         
         return $fzSnapshot;
+    }
+
+    /**
+     * Marks any waiting approvals as approved.
+     * 
+     * @return TODO
+     */
+    public function approveBaseline()
+    {
+        require_once 'FaZend/POS/Model/Approval.php';
+        FaZend_POS_Model_Approval::decide( 
+            $this, 
+            FaZend_POS_Model_Approval::APPROVED 
+        );
+        $this->baselined = false;
+    }
+
+    /**
+     * Marks the awaiting approvals as rejcted
+     * 
+     * @return FaZend_POS_Model_Snapshot
+     */
+    public function rejectBaseline()
+    {
+        require_once 'FaZend/POS/Model/Approval.php';
+        FaZend_POS_Model_Approval::decide( 
+            $this, 
+            FaZend_POS_Model_Approval::REJECTED
+        );
+        $this->baselined = false;
     }
 
     /**
@@ -89,6 +119,28 @@ class FaZend_POS_Model_Snapshot extends FaZend_Db_Table_ActiveRow_fzSnapshot
         $this->properties = serialize( $properties );
     }
 
+    /**
+     * TODO: short description.
+     * 
+     * @param mixed $fzObject    
+     * @param mixed $numVersions 
+     * 
+     * @return TODO
+     */
+    public static function findVersionNums( FaZend_POS_Model_Object $fzObject, $numVersions )
+    {
+        $result = self::retrieve()->table()->getAdapter()
+            ->query( 'SELECT 
+                        version 
+                      FROM fzSnapshot 
+                      WHERE alive = 1 
+                        AND baselined = 0 
+                        AND fzObject= ?'
+                , $fzObject )
+            ->fetchAll()
+            ;
+        return $result;
+    }
 
     /**
      * Saves the current object
@@ -110,6 +162,6 @@ class FaZend_POS_Model_Snapshot extends FaZend_Db_Table_ActiveRow_fzSnapshot
         $this->version = $version;
         $this->alive = 1;
         $this->user = (string) $user;
-        parent::save();
+        return parent::save();
     }
 }

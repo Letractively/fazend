@@ -62,11 +62,6 @@ class FaZend_POS_Properties
      */
     public function wipe()
     {
-        //delete snapshots
-        $where = $this->_fzSnapshot
-            ->getAdapter()->quoteInto( 'fzObject = ?', $this->_fzObject );
-        $this->delete( $where );
-
         //delete object
         $where = $this->_fzObject
             ->getAdapter()->quoteInto( 'id = ?', $this->_fzObject );
@@ -173,12 +168,167 @@ class FaZend_POS_Properties
     }
 
     /**
+     * Returns true if the object is currently baselined, and the current user
+     * can approve it.
+     * 
+     * @return boolean
+     */
+    public function waitingForApproval()
+    {
+        require_once 'FaZend/POS/Model/Approval.php';
+        $approval = FaZend_POS_Model_Approval::findByUserAndSnapshot(
+            $this->_user, 
+            $this->_fzSnapshot 
+        );
+
+        return !empty( $approval );
+    }
+
+    /**
+     * TODO: short description.
+     * 
+     * @param array $users  an array of users who can approve this request    
+     * @param mixed $comment  the comment to save with the approval request
+     * @param mixed $timeLimit   a time limit in which this request must be
+     *      approved.
+     * 
+     * @return FaZend_POS_Abstract
+     */
+    public function baseline( array $users, $comment = '', $timeLimit = null )
+    {
+        $this->_assertBaselined( false );
+        require_once 'FaZend/POS/Model/Approval.php';
+
+        if( count( $users ) == 0 ) {
+            $approval = FaZend_POS_Model_Approval::create( 
+                $this->_fzSnapshot,
+                null,
+                $comment
+            );
+            $approval->decision = true;
+            $approval->save();
+
+        } else {
+
+            foreach( $users as $user ) {
+                $approval  = FaZend_POS_Model_Approval::create(
+                    $this->_fzSnapshot,
+                    $user,
+                    $comment
+                );
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * TODO: short description.
+     * 
+     * @return TODO
+     */
+    public function approve()
+    {
+        $this->_assertBaselined();
+        $this->_fzSnapshot->approveBaseline();
+        return $this;
+    }
+
+    /**
+     * TODO: short description.
+     * 
+     * @return TODO
+     */
+    public function reject()
+    {
+        $this->_assertBaselined();
+        $this->_fzSnapshot->rejectBaseline();
+        return $this;
+    }
+
+    /**
+     * TODO: short description.
+     * 
+     * @return boolean
+     */
+    public function isBaselined()
+    {
+        return $this->_fzSnapshot->baselined == true;
+    }
+
+    /**
+     * Determines if an object has been approved.
+     * 
+     * @return boolean false if the object is not baselined, or has not been
+     * approved.
+     */
+    public function isApproved()
+    {
+        if( $this->isBaselined() ) {
+            return $this->_getApprovalDecision() === true;
+        }
+        return false;
+    }
+
+    /**
+     * Determines if the object has been denied.
+     * 
+     * @return boolean true if the object has been declined, otherwise false
+     */
+    public function isRejected()
+    {
+        if( $this->isBaselined() ) {
+            return $this->_getApprovalDecision() === false;
+        }
+        return false;
+    }
+
+    /**
+     * Get the approval decision, if exists.
+     * 
+     * @return boolean|null
+     */
+    protected function _getApprovalDecision()
+    {
+        require_once 'FaZend/POS/Model/Approval.php';
+        $approval = FaZend_POS_Model_Approval::findDecided(
+            $this->_fzSnapshot 
+        );
+
+        if( !empty( $approval ) ) {
+            return $approval->decision;
+        }
+ 
+        return null;
+    }
+
+    /**
+     * Asserts that an object is either baselined or not baselined
+     * 
+     * @param bool $baselined Optional, defaults to true . 
+     * 
+     * @return TODO
+     */
+    protected function _assertBaselined( $baselined = true )
+    {
+        if( $this->isBaselined() !== $baselined ) {
+            require_once 'FaZend/Exception.php';
+            FaZend_Exception::raise( 'FaZend_POS_BaselineException',
+                'Object is' . ( $baselined ? ' not ' : '' ) . ' baselined',
+                'FaZend_POS_Exception'
+            );
+        }
+    }
+
+    /**
      * TODO: short description.
      * 
      * @return TODO
      */
     public function touch()
     {
+        $this->_assertBaselined( false );
+
         if( !$this->_pos->isCurrent() ) {
             throw new FaZend_POS_Exception(
                 'Cannot touch non-current version of object.'
@@ -227,9 +377,16 @@ class FaZend_POS_Properties
      */
     public function getVersions( $numVersions )
     {
+        $class = get_class( $this->_pos );
+        $verNums = $this->_fzObject->getVersions( $numVersions );
 
-
+        $versions = array();
+        foreach( $verNums as $row ) {
+            $ver = $row['version'];
+            $versions[$ver] = new $class( (string) $this->_fzObject, intval($ver) );
+        }
         
+        return $versions;
     }
 
     /**
@@ -252,9 +409,9 @@ class FaZend_POS_Properties
      */
     public function setACL( Zend_ACL $acl )
     {
+        $this->_assertBaselined( false );
         $this->_acl = $acl;
     }
-
 
     /**
      * TODO: short description.
@@ -281,6 +438,10 @@ class FaZend_POS_Properties
      */
     public function __set( $name, $value )
     {
+        $method = 'set' . ucfirst( $name );
+        if( method_exists( &$this, $method ) ) {
+            return call_user_func( array( &$this, $method ) );
+        }
         throw new FaZend_POS_Exception( 'Cannot set property ' . $name );
     }
 }

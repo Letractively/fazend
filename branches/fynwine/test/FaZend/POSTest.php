@@ -25,6 +25,34 @@ require_once 'FaZend/POS.php';
  */
 class FaZend_POSTest extends AbstractTestCase 
 {
+
+     protected $_user = null;
+
+    /**
+     * TODO: short description.
+     * 
+     * @return TODO
+     */
+    public function setUp()
+    {
+        parent::setUp();
+
+        $this->_user = FaZend_User::register( 'test2', 'test2' );
+        $this->_user->logIn();
+    }
+
+    
+    /**
+     * TODO: short description.
+     * 
+     * @return TODO
+     */
+    public function testRootReturnsRootObject()
+    {
+        $root = FaZend_POS::root();
+        $this->assertTrue( $root instanceOf FaZend_POS_Abstract, 
+            'Root method did not return an FaZend_POS_Abstract' );
+    }
     
     /**
      * TODO: short description.
@@ -33,7 +61,9 @@ class FaZend_POSTest extends AbstractTestCase
      */
     public function testRootCanAssignPOSObjects()
     {
-
+        $root = FaZend_POS::root();
+        $root->car = new Model_Car();
+        $this->assertTrue( $root->car instanceOf Model_Car );
     }
 
     /**
@@ -43,7 +73,13 @@ class FaZend_POSTest extends AbstractTestCase
      */
     public function testRootCanRetrieveAssignedPOSObjects()
     {
+        $root = FaZend_POS::root();
+        $root->car = new Model_Car();
+        unset( $root );
 
+        $root2 = FaZend_POS::root();
+        $this->assertTrue( isset( $root2->car ), 'Car property on root was not set' ); 
+        $this->assertTrue( $root2->car instanceOf ModelCar );
     }
 
     /**
@@ -53,7 +89,24 @@ class FaZend_POSTest extends AbstractTestCase
      */
     public function testRootCanAssignArray()
     {
+        require_once 'FaZend/POS/Array.php';
+        FaZend_POS::root()->car = new FaZend_POS_Array();
+    }
 
+    /**
+     * TODO: short description.
+     * 
+     * @return TODO
+     */
+    public function testRootCanAssignArrayItems()
+    {
+        $root = FaZend_POS::root();
+        require_once 'FaZend/POS/Array.php';
+        $root->car = new FaZend_POS_Array();
+        $root->car[] = new Model_Car();
+        $root->car[] = new Model_Car();
+
+        $this->assertTrue( count( $root->car ) > 0 );
     }
 
     /**
@@ -63,7 +116,7 @@ class FaZend_POSTest extends AbstractTestCase
      */
     public function testRootCanRetrieveArray()
     {
-
+        $this->setTestIncomplete();
     }
 
     /**
@@ -74,6 +127,7 @@ class FaZend_POSTest extends AbstractTestCase
     public function testDeletedObjectCannotBeRetrievedFromRoot()
     {
 
+        $this->markTestIncomplete();
     }
 
     /**
@@ -83,6 +137,6 @@ class FaZend_POSTest extends AbstractTestCase
      */
     public function testGetWaitingReturnsObjectsWaitingForUser()
     {
-
+        $this->markTestIncomplete();
     }
 }

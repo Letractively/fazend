@@ -251,6 +251,13 @@ abstract class FaZend_POS_Abstract implements FaZend_POS_Interface, ArrayAccess
      */
     private final function _setProperty( $name, $value )
     {
+        if( $this->ps()->isBaselined() {
+            require_once 'FaZend/Exception.php';
+            FaZend_Exception::raise( 'FaZend_POS_BaselinedException',
+                'Cannot set property of baselined object.'
+            );
+        }
+
         //--------------------------------------------------
         // Translate a native array into a FaZend_POS_Array
         //--------------------------------------------------

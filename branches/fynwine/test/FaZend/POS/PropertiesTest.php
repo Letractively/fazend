@@ -84,8 +84,12 @@ class FaZend_POS_PropertiesTest extends AbstractTestCase
     public function testCanRetrieveLatestVersionNumber()
     {
         $car = new Model_Car();
+        $car->model = 'test';
         $car->save();
 
+        $this->assertEquals( $car->ps()->version, 0 );
+        $car->model = 'test2';
+        $car->save();
         $this->assertEquals( $car->ps()->version, 1 );
     }
 
@@ -204,6 +208,8 @@ class FaZend_POS_PropertiesTest extends AbstractTestCase
     public function testCanGetParent()
     {
 
+        $this->markTestIncomplete();
+
 
     }
 
@@ -226,7 +232,7 @@ class FaZend_POS_PropertiesTest extends AbstractTestCase
      */
     public function testTouchOnlyUpdatesVersion()
     {
-
+        $this->markTestIncomplete();
     }
 
     /**
@@ -324,7 +330,22 @@ class FaZend_POS_PropertiesTest extends AbstractTestCase
      */
     public function testGetVersionsReturnsArrayOfLatestVersions()
     {
+        $numVersions = 5;
 
+        $car = new Model_Car();
+        for( $i = 0; $i < $numVersions; $i++ ) {
+            $car->version = $i;
+            $car->save();
+        }
+
+        $cars = $car->ps()->getVersions( $numVersions );
+
+        $this->assertEquals( $numVersions, count( $cars ) );
+        foreach( $cars as $car ) 
+        {
+            $this->assertTrue( $car instanceOf Model_Car, 
+                'returned version not instance of expected' );
+        }
     }
 
     /**
@@ -335,6 +356,7 @@ class FaZend_POS_PropertiesTest extends AbstractTestCase
     public function testGetAgeReturnsApproximateObjectAge()
     {
 
+        $this->markTestIncomplete();
     }
 
     /**
@@ -345,6 +367,7 @@ class FaZend_POS_PropertiesTest extends AbstractTestCase
     public function testTimeBoundaryIgnoresChangesWithinBoundary()
     {
 
+        $this->markTestIncomplete();
     }
 
     /**
@@ -352,29 +375,63 @@ class FaZend_POS_PropertiesTest extends AbstractTestCase
      * 
      * @return TODO
      */
-    public function setBaselineMarksObjectBaselined()
+    public function testUnbaselinedObjectIsNotBaselined()
     {
+        $car = new Model_Car();
+        $car->make  = 'Acura';
+        $car->model = 'Legend';
+        
+        $this->assertFalse( $car->ps()->isBaselined(), 
+            'isBaselined() Unbaselined object not false without baseline()' 
+        );
+    }
 
+    /**
+     * TODO: short description.
+     * 
+     * @return TODO
+     */
+    public function testBaselineMarksObjectBaselined()
+    {
+        $car = new Model_Car();
+        $car->ps()->baseline( array( $this->_user ), 'test' );
+
+        $result = $this->_dbAdapter->query( 'SELECT * FROM fzApproval' );
+        die( var_export( $result ) );
+
+        $this->assertTrue( $car->ps()->isBaselined(), 'Object was not baselined' );
     }
 
     public function testBaselinedObjectCannotBeModified()
     {
+        $car = new Model_Car();
+        $car->ps()->baseline( array( $this->_user ) );
 
+        $this->setExpectedException( 'FaZend_POS_BaselinedException' );
+        
+        $car->make  = 'Nissan';
     }
 
-    /**
-     * TODO: short description.
-     * 
-     * @return TODO
-     */
+    public function testBaselineObjectCannotBeReBaselined()
+    {
+        $car = new Model_Car();
+        $car->ps()->baseline( array( $this->_user ) );
+        
+        $this->setExpectedException( 'FaZend_POS_BaselinedException' );
+        
+        $car->ps()->baseline( array( $this->_user ) );
+    }
+
     public function testWaitingForApprovalIsTrueWhenBaselined()
     {
 
+        $this->markTestIncomplete();
     }
 
     public function testWaitingForApprovalIsFalseWhenNotBaselined()
     {
 
+        $this->markTestIncomplete();
     }
 
     /**
@@ -382,9 +439,14 @@ class FaZend_POS_PropertiesTest extends AbstractTestCase
      * 
      * @return TODO
      */
-    public function testIsApprovedIsTrueWhenNotBaselined()
+    public function testIsApprovedIsFalseWhenNotBaselined()
     {
+        $car = new Model_Car();
+        $car->make = 'Acura';
 
+        $this->assertFalse( $car->ps()->isApproved(), 
+            'isApproved() returns true for Non baselined objects'
+        );
     }
 
     /**
@@ -392,9 +454,15 @@ class FaZend_POS_PropertiesTest extends AbstractTestCase
      * 
      * @return TODO
      */
-    public function testIsApprovedIsFalseWhenBaselined()
+    public function testIsApprovedIsFalseWhenBaselinedAndNotApproved()
     {
+        $car = new Model_Car();
+        $car->make = 'Acura';
+        $car->ps()->baseline( array( $this->_user ) );
 
+        $this->assertFalse( $car->ps()->isApproved(), 
+            'isApproved() returns true for non approved baselined objects'
+        );
     }
 
     /**
@@ -402,7 +470,7 @@ class FaZend_POS_PropertiesTest extends AbstractTestCase
      * 
      * @return TODO
      */
-    public function testIsApprovedIsFalseWhenRejected()
+    public function testCannotRejectNonBaselinedObjects()
     {
 
     }
@@ -410,11 +478,55 @@ class FaZend_POS_PropertiesTest extends AbstractTestCase
     /**
      * TODO: short description.
      * 
+     * @expectedException FaZend_POS_NotBaselinedException
+     */
+    public function testCannotApproveNonBaselinedObjects()
+    {
+        $car = new Model_Car();
+        $car->make = 'Honda';
+        $car->ps()->approve();
+    }
+
+    /**
+     * TODO: short description.
+     * 
      * @return TODO
      */
-    public function testIsBaselinedIsTrueWhenBaselined()
+    public function testIsApprovedAndIsRejectedWhenRejected()
     {
+        $car = new Model_Car();
+        $car->make = 'Honda';
+        $car->ps()->baseline( array( $this->_user ) );
+        $car->ps()->reject();
 
+        $this->assertFalse( $car->ps()->isApproved(),
+            'isApproved() returned true for rejected baseline object'
+        );
+
+        $this->assertTrue( $car->ps()->isRejected(),
+            'isRejected() returned false for rejected baseline object'
+        );
+    }
+
+    /**
+     * TODO: short description.
+     * 
+     * @return TODO
+     */
+    public function testIsApprovedAndIsRejectedwhenApproved()
+    {
+        $car = new Model_Car();
+        $car->make = 'Honda';
+        $car->ps()->baseline( array( $this->_user ) );
+        $car->ps()->approve();
+
+        $this->assertTrue( $car->ps()->isApproved(),
+            'isApproved() returned false for rejected baseline object'
+        );
+
+        $this->assertFalse( $car->ps()->isRejected(),
+            'isRejected() returned true for rejected baseline object'
+        );
     }
 
     /**
@@ -424,7 +536,12 @@ class FaZend_POS_PropertiesTest extends AbstractTestCase
      */
     public function testIsBaselinedIsFalseWhenRejected()
     {
+        $car = new Model_Car();
+        $car->make = 'Mazda';
+        $car->ps()->baseline( array( $this->_user ) );
+        $car->ps()->reject();
 
+        $this->assertFalse( $car->ps()->isBaselined() );
     }
 
     /**
@@ -434,27 +551,12 @@ class FaZend_POS_PropertiesTest extends AbstractTestCase
      */
     public function testIsBaselinedIsFalseWhenApproved()
     {
+        $car = new Model_Car();
+        $car->make = 'Mazda';
+        $car->ps()->baseline( array( $this->_user ) );
+        $car->ps()->approve();
 
-    }
-
-    /**
-     * TODO: short description.
-     * 
-     * @return TODO
-     */
-    public function testIsRejectedIsTrueWhenRejected()
-    {
-
-    }
-
-    /**
-     * TODO: short description.
-     * 
-     * @return TODO
-     */
-    public function testIsRejectedIsFalseWhenApproved()
-    {
-
+        $this->assertFalse( $car->ps()->isBaselined() );
     }
 
     /**
@@ -465,6 +567,7 @@ class FaZend_POS_PropertiesTest extends AbstractTestCase
     public function testCannotTouchNonCurrentVersion()
     {
 
+        $this->markTestIncomplete();
     }
 
     /**
@@ -475,5 +578,6 @@ class FaZend_POS_PropertiesTest extends AbstractTestCase
     public function testCannotDeleteNotCurrentVersion()
     {
 
+        $this->markTestIncomplete();
     }
 }

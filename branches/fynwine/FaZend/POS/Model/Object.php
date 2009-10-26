@@ -40,4 +40,17 @@ class FaZend_POS_Model_Object extends FaZend_Db_Table_ActiveRow_fzObject
             ;
     }
 
+    /**
+     * Retreives a list of version numbers for this object.
+     * 
+     * @param mixed $numVersions Optional, defaults to null . 
+     * 
+     * @return TODO
+     */
+    public function getVersions( $numVersions = null )
+    {
+        require_once 'FaZend/POS/Model/Snapshot.php';
+        return FaZend_POS_Model_Snapshot::findVersionNums( $this, $numVersions );
+    }
+
 }
