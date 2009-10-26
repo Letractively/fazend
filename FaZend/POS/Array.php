@@ -1,5 +1,6 @@
 <?php
 
+require_once 'FaZend/POS/Abstract.php';
 /**
  * TODO: short description.
  * 
