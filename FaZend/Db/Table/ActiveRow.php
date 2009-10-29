@@ -17,7 +17,7 @@
 require_once 'Zend/Db/Table/Row.php';
 
 /**
- * One row
+ * One row, ActiveRow pattern
  *
  * @see http://framework.zend.com/manual/en/zend.loader.autoloader.html
  * @package Db
@@ -44,6 +44,7 @@ abstract class FaZend_Db_Table_ActiveRow extends Zend_Db_Table_Row {
     /**
      * Create new row or load the existing one
      *
+     * @param integer|false ID of the row to retrieve, otherwise creates NEW row
      * @return FaZend_Db_Table_Row
      */
     public function __construct($id = false) {
@@ -160,7 +161,7 @@ abstract class FaZend_Db_Table_ActiveRow extends Zend_Db_Table_Row {
 
         // you should not access ID field directly!
         if (strtolower($name) == 'id')
-            trigger_error("ID should not be directly accesses", E_USER_WARNING);
+            trigger_error("ID should not be directly accesses in " . get_class($this), E_USER_WARNING);
 
         // system field
         if (strtolower($name) == '__id')
@@ -194,6 +195,8 @@ abstract class FaZend_Db_Table_ActiveRow extends Zend_Db_Table_Row {
     /**
      * Set sub-objects by ID 
      *
+     * @param string Name of the property
+     * @param mixed Value of the property to set
      * @return void
      */
     public function __set($name, $value) {
@@ -234,9 +237,13 @@ abstract class FaZend_Db_Table_ActiveRow extends Zend_Db_Table_Row {
             // without explicit notification of the RowClass. In such a case
             // we can't create an exception with class FaZend_Db_Table_tablename_NotFoundException
             // because we will end up in new table automatic creation by the table loader
-            FaZend_Exception::raise(preg_match('/^FaZend_/', get_class($this)) ? 'FaZend_Db_Table_NotFoundException' : get_class($this) . '_NotFoundException', 
-                get_class($this) . " not found (ID: {$this->_preliminaryKey})",
-                'FaZend_Db_Table_NotFoundException');
+            FaZend_Exception::raise(
+                preg_match('/^FaZend_/', get_class($this)) ? 
+                    'FaZend_Db_Table_NotFoundException' : 
+                    get_class($this) . '_NotFoundException', // exception class name
+                get_class($this) . " not found (ID: {$this->_preliminaryKey})", // description of the exception
+                'FaZend_Db_Table_NotFoundException'  // parent class of the exception
+                );
 
         // if we found something  fill the data inside this class
         // and stop on it
@@ -254,7 +261,7 @@ abstract class FaZend_Db_Table_ActiveRow extends Zend_Db_Table_Row {
      * @param string Name of the column
      * @return boolean
      */
-    public function _isForeignKey($table, $column) {
+    protected function _isForeignKey($table, $column) {
         
         // if the array of ALL tables in the db is NOT already defined
         // we should grab it from the DB by SQL request

@@ -9,13 +9,13 @@ var runningUnit = false;
  * @return void
  */
 var _refreshScreen = function(json) {
-            
     // sanity check
     if (json === null) {
         return;
     }
     
     $('#output').html(json['output']);
+        
     $('#protocol').html(json['protocol']);
     
     if (json['spanlog']) {
@@ -68,6 +68,10 @@ function run(ahref, spanlog, unit) {
         data: {name: runningUnit},
         dataType: "json",
         success: _refreshScreen,
+        error: function (XMLHttpRequest, textStatus, errorThrown) {
+            $('#output').html(XMLHttpRequest.responseText);            
+            alert('Error in AJAX: ' + textStatus + ', error thrown: ' + errorThrown);
+        }
     });
     
 }

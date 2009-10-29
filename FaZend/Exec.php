@@ -54,6 +54,13 @@ class FaZend_Exec extends FaZend_StdObject {
      * @var string
      */
     protected $_name;
+    
+    /**
+     * Shall we show details in log?
+     *
+     * @var boolean
+     */
+    protected $_detailed = false;
 
     /**
      * Construct it
@@ -79,10 +86,20 @@ class FaZend_Exec extends FaZend_StdObject {
      * Create new task
      *
      * @param string Name of the task, unique!
+     * @param string Command to execute
      * @return FaZend_Exec
      */
-    public static function factory($name) {
-        return new FaZend_Exec($name);
+    public static function factory($name, $cmd = null) {
+        return new FaZend_Exec($name, $cmd);
+    }
+
+    /**
+     * Get output
+     *
+     * @return string
+     */
+    public function __toString() {
+        return (string)$this->output();
     }
 
     /**
@@ -135,7 +152,7 @@ class FaZend_Exec extends FaZend_StdObject {
     public function execute() {
 
         if ($this->isRunning())
-            return self::_output(self::_uniqueId($this->_name));
+            return $this->output();
                                 
         // serialize and save all local variables
         if (!@file_put_contents(self::_fileName(self::_uniqueId($this->_name), self::DATA_SUFFIX), 
@@ -146,7 +163,7 @@ class FaZend_Exec extends FaZend_StdObject {
 
         self::_execute(self::_uniqueId($this->_name), $this->_cmd, $this->_dir);
 
-        return self::_output(self::_uniqueId($this->_name));
+        return $this->output();
 
     }
 
@@ -156,7 +173,26 @@ class FaZend_Exec extends FaZend_StdObject {
      * @return string
      */
     public function output() {
-        return self::_output(self::_uniqueId($this->_name));
+        $output = self::_output(self::_uniqueId($this->_name));
+        
+        if (!$this->_detailed)
+            return $output;
+
+        $files = '';
+        foreach (array(self::PID_SUFFIX, self::DATA_SUFFIX, self::LOG_SUFFIX) as $suffix) {
+            $fileName = self::_fileName(self::_uniqueId($this->_name), $suffix);
+            $files .= 
+                "{$suffix}: '{$fileName}': " . 
+                (file_exists($fileName) ? filesize($fileName) . 'bytes, ' . FaZend_Date::make(filemtime($fileName)) : 'no file') .
+                "\n";
+        }
+        
+        return 
+        "Name '{$this->_name}', ID: '" . self::_uniqueId($this->_name) . "'\n" .
+        "Cmd: {$this->_cmd}\n" . 
+        $files . "\n" .
+        
+        ($output ? $output : 'NO OUTPUT');
     }
 
     /**
@@ -171,6 +207,16 @@ class FaZend_Exec extends FaZend_StdObject {
 
         self::_stop(self::_uniqueId($this->_name));
 
+    }
+    
+    /**
+     * Set log to be detailed
+     *
+     * @return void
+     **/
+    public function setDetailed() {
+        $this->_detailed = true;
+        return $this;
     }
 
     /**
@@ -257,7 +303,8 @@ class FaZend_Exec extends FaZend_StdObject {
      * @return boolean|string Output of the EXEC or false
      */
     protected static function _output($id) {
-        return @file_get_contents(self::_fileName($id, self::LOG_SUFFIX));
+        return 
+        @file_get_contents(self::_fileName($id, self::LOG_SUFFIX));
     }
 
     /**
@@ -282,12 +329,14 @@ class FaZend_Exec extends FaZend_StdObject {
      * @param string shell command
      * @return void
      */
-    protected static function _execute($id, $cmd, $dir) {
+    protected static function _execute($id, $cmd, $dir = null) {
         
         // execute the command and quit, saving the PID
         // @see: http://stackoverflow.com/questions/222414/asynchronous-shell-exec-in-php
-        $current = getcwd();
-        chdir($dir);
+        if (!is_null($dir)) {
+            $current = getcwd();
+            chdir($dir);
+        }
 
         $pidFile = self::_fileName($id, self::PID_SUFFIX);
 
@@ -300,8 +349,12 @@ class FaZend_Exec extends FaZend_StdObject {
             file_put_contents($pidFile, (string)self::WIN_FAKE_PID);
         }
 
+        // execute it!
         shell_exec($shell);
-        chdir($current);
+
+        if (!is_null($dir)) {
+            chdir($current);
+        }
 
         self::$_running[$id] = (int)@file_get_contents($pidFile);
 
