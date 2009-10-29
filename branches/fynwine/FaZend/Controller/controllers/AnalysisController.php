@@ -17,7 +17,8 @@
 /**
  * User Interface Modeller
  *
- * @package controllers
+ * @package Pan
+ * @subpackage Analysis
  */
 class Fazend_AnalysisController extends FaZend_Controller_Panel {
 
@@ -43,7 +44,7 @@ class Fazend_AnalysisController extends FaZend_Controller_Panel {
      */
     public function indexAction() {
         
-        $diagram = $this->view->diagram = FaZend_AnalysisModeller_Diagram::factory($this->_getParam('diagram'));
+        $diagram = $this->view->diagram = FaZend_Pan_Analysis_Diagram::factory($this->_getParam('diagram'));
 
     }
     
@@ -54,7 +55,7 @@ class Fazend_AnalysisController extends FaZend_Controller_Panel {
      */
     public function svgAction() {
 
-        $diagram = FaZend_AnalysisModeller_Diagram::factory($this->_getParam('diagram'));
+        $diagram = FaZend_Pan_Analysis_Diagram::factory($this->_getParam('diagram'));
         
         $this->_helper->layout->disableLayout();
         $this->view->setFilter(null);
