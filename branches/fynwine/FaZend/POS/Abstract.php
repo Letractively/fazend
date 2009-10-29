@@ -9,7 +9,7 @@ require_once 'FaZend/POS/Interface.php';
  * TODO: long description.
  * 
  */
-abstract class FaZend_POS_Abstract implements FaZend_POS_Interface, ArrayAccess
+abstract class FaZend_POS_Abstract implements ArrayAccess
 {
    
     //TODO in accordance with http://code.google.com/p/fazend/wiki/HowPersistenceWorks
@@ -147,7 +147,7 @@ abstract class FaZend_POS_Abstract implements FaZend_POS_Interface, ArrayAccess
      */
     public function save()
     {
-        $this->_saveSnapshot( true );
+        $this->_saveSnapshot();
         $this->_current = true;
     }
 
@@ -159,7 +159,7 @@ abstract class FaZend_POS_Abstract implements FaZend_POS_Interface, ArrayAccess
      * 
      * @return TODO
      */
-    public function _initObject( $objectId = null, $version = null )
+    private function _initObject( $objectId = null, $version = null )
     {
         $class = get_class( &$this ); 
 
@@ -174,7 +174,17 @@ abstract class FaZend_POS_Abstract implements FaZend_POS_Interface, ArrayAccess
         }
 
         $this->_loadSnapshot( $this->_fzObject, $version );
+    }
 
+    /**
+     * TODO: short description.
+     * 
+     * @return TODO
+     */
+    private function _initSysProperties()
+    {
+        require_once 'FaZend/POS/Properties.php';
+        unset( $this_sysProperties );
         $this->_sysProperties = new FaZend_POS_Properties( 
             $this, $this->_fzObject, $this->_fzSnapshot 
         );
@@ -209,6 +219,7 @@ abstract class FaZend_POS_Abstract implements FaZend_POS_Interface, ArrayAccess
             $this->_state = self::STATE_DIRTY;
         }
 
+        $this->_initSysProperties();
     }
 
     /**
@@ -225,12 +236,13 @@ abstract class FaZend_POS_Abstract implements FaZend_POS_Interface, ArrayAccess
         //---------------------------------------------------------
         if( $this->_state !== self::STATE_CLEAN ) {
             
-            $version = $this->_fzSnapshot->version;
+            $baselined = $this->_fzSnapshot->baselined;
             require_once 'FaZend/POS/Model/Snapshot.php';
             $this->_fzSnapshot = FaZend_POS_Model_Snapshot::create(
-                $this->_fzObject 
+                $this->_fzObject
             );
             $this->_fzSnapshot->setProperties( $this->toArray() );
+            $this->_fzSnapshot->baselined = $baselined;
             $this->_fzSnapshot->save( $this->_user );
 
             foreach( $this->_properties as $name => $prop ) {
@@ -238,6 +250,8 @@ abstract class FaZend_POS_Abstract implements FaZend_POS_Interface, ArrayAccess
             }
             $this->_state = self::STATE_CLEAN;
             $this->_version = $this->_fzSnapshot->version;
+
+            $this->_initSysProperties();
         }
     }
 
@@ -251,14 +265,7 @@ abstract class FaZend_POS_Abstract implements FaZend_POS_Interface, ArrayAccess
      */
     private final function _setProperty( $name, $value )
     {
-        if( $this->ps()->isBaselined() {
-            require_once 'FaZend/Exception.php';
-            FaZend_Exception::raise( 'FaZend_POS_BaselinedException',
-                'Cannot set property of baselined object.'
-            );
-        }
-
-        //--------------------------------------------------
+       //--------------------------------------------------
         // Translate a native array into a FaZend_POS_Array
         //--------------------------------------------------
         if( is_array( $value ) ) {
@@ -356,7 +363,7 @@ abstract class FaZend_POS_Abstract implements FaZend_POS_Interface, ArrayAccess
      * 
      * @param mixed $name 
      * 
-     * @return TODOvar_export
+     * @return TODO
      */
     public function __get( $name ) 
     {

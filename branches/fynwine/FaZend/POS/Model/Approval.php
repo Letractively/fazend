@@ -9,8 +9,8 @@
  */
 class FaZend_POS_Model_Approval extends FaZend_Db_Table_ActiveRow_fzApproval
 {
-    const APPROVED = true;
-    const REJECTED = false;
+    const APPROVED = 1;
+    const REJECTED = 0;
     const WAITING  = null;
 
     /**
@@ -21,10 +21,8 @@ class FaZend_POS_Model_Approval extends FaZend_Db_Table_ActiveRow_fzApproval
      * 
      * @return TODO
      */
-    public static function create( FaZend_POS_Model_Snapshot &$fzSnapshot, $user, $comment = '' )
+    public static function create( FaZend_POS_Model_Snapshot $fzSnapshot, $user, $comment = '' )
     {
-        $fzSnapshot->baselined = true;
-
         $approval = new self;
         $approval->fzSnapshot = $fzSnapshot;
         $approval->user = $user;
@@ -42,28 +40,19 @@ class FaZend_POS_Model_Approval extends FaZend_Db_Table_ActiveRow_fzApproval
      */
     public static function decide( FaZend_POS_Model_Snapshot $fzSnapshot, $decision )
     {
-        $decision = (bool) $decision;
-
-        //TODO too much coupling?
         require_once 'FaZend/User.php';
-        $user = FaZend_User::getUser();
+        $user = FaZend_User::getCurrentUser();
         
         $fzApproval = self::retrieve()
-            ->where( 'fzSnapshot = ?', $fzSnapshot )
+            ->where( 'fzSnapshot = ?', (string) $fzSnapshot )
             ->where( 'user = ?', $user )
-            ->fechRow()
+            ->fetchRow()
             ;
-        
+
         if( !empty( $fzApproval ) ) {
             $fzApproval->decision  = $decision;
+            $fzApproval->updated   = new Zend_Db_Expr( 'CURRENT_TIMESTAMP' );
             $fzApproval->save();
-
-            //delete other approval requests
-            $where = $this->_table->getAdapter()->quoteInto(
-                'fzSnapshot = ? AND user != ?', 
-                array( $fzSnapshot, $user )
-            );  
-            self::retrieve()->delete( $where );
         }
     }
 
@@ -74,15 +63,27 @@ class FaZend_POS_Model_Approval extends FaZend_Db_Table_ActiveRow_fzApproval
      * 
      * @return TODO
      */
-    public function findDecided( FaZend_POS_Model_Snapshot $fzSnapshot )
+    public static function findDecision( FaZend_POS_Model_Snapshot $fzSnapshot )
     {
-        return self::retrieve()
-            ->where( 'fzSnapshot = ?', $fzSnapshot )
-            ->where( 'decision != ?', self::WAITING )
+
+        $row = self::retrieve()
+            ->columns( array( 'id', 'decision' ) )
+            ->where( 'fzSnapshot = ?', (string) $fzSnapshot )
+            ->where( 'decision IS NOT NULL' )
+            ->group( 'fzSnapshot' )
+            ->order( 'updated' )
             ->setRowClass( 'FaZend_POS_Model_Approval' )
             ->setSilenceIfEmpty()
             ->fetchRow()
             ;
+
+
+
+        if( empty( $row ) ) {
+            return null;
+        } else {
+            return $row->decision;
+        }
     }
 
     /**

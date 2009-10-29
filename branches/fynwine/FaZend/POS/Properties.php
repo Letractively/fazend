@@ -35,6 +35,13 @@ class FaZend_POS_Properties
      * 
      * @var mixed
      */
+    protected $_user;
+
+    /**
+     * TODO: description.
+     * 
+     * @var mixed
+     */
     protected $_pos;
 
     /**
@@ -52,6 +59,9 @@ class FaZend_POS_Properties
         $this->_fzObject   = $object;
         $this->_fzSnapshot = $snapshot;
         $this->_pos        = $pos;
+
+        require_once 'FaZend/User.php';
+        $this->_user = FaZend_User::getCurrentUser();
     }
 
     
@@ -99,7 +109,7 @@ class FaZend_POS_Properties
      */
     public function getVersion()
     {
-        return intval( $this->_fzSnpashot->version );
+        return intval( $this->_fzSnapshot->version );
     }
 
     /**
@@ -119,7 +129,7 @@ class FaZend_POS_Properties
      */
     public function getId()
     {
-        return intval( $this->_fzSnapshot->fzObject );
+        return intval( (string) $this->_fzObject );
     }
 
     /**
@@ -152,7 +162,8 @@ class FaZend_POS_Properties
     public function workWithVersion( $versionNumber )
     {
         $class = get_class( $this->_pos );
-        return new $class( $versionNumber );
+        $id = (string)$this->_fzObject;
+        return new $class( intval( $id ), $versionNumber );
     }
 
     /**
@@ -196,8 +207,8 @@ class FaZend_POS_Properties
      */
     public function baseline( array $users, $comment = '', $timeLimit = null )
     {
-        $this->_assertBaselined( false );
         require_once 'FaZend/POS/Model/Approval.php';
+        $this->_fzSnapshot->baseline();
 
         if( count( $users ) == 0 ) {
             $approval = FaZend_POS_Model_Approval::create( 
@@ -218,8 +229,6 @@ class FaZend_POS_Properties
                 );
             }
         }
-
-        return $this;
     }
 
     /**
@@ -231,6 +240,7 @@ class FaZend_POS_Properties
     {
         $this->_assertBaselined();
         $this->_fzSnapshot->approveBaseline();
+        $this->_pos->save();
         return $this;
     }
 
@@ -243,6 +253,7 @@ class FaZend_POS_Properties
     {
         $this->_assertBaselined();
         $this->_fzSnapshot->rejectBaseline();
+        $this->_pos->save();
         return $this;
     }
 
@@ -253,7 +264,7 @@ class FaZend_POS_Properties
      */
     public function isBaselined()
     {
-        return $this->_fzSnapshot->baselined == true;
+        return $this->_fzSnapshot->isBaselined();
     }
 
     /**
@@ -291,12 +302,12 @@ class FaZend_POS_Properties
     protected function _getApprovalDecision()
     {
         require_once 'FaZend/POS/Model/Approval.php';
-        $approval = FaZend_POS_Model_Approval::findDecided(
+        $approval = FaZend_POS_Model_Approval::findDecision(
             $this->_fzSnapshot 
         );
 
         if( !empty( $approval ) ) {
-            return $approval->decision;
+            return $approval;
         }
  
         return null;
@@ -314,7 +325,7 @@ class FaZend_POS_Properties
         if( $this->isBaselined() !== $baselined ) {
             require_once 'FaZend/Exception.php';
             FaZend_Exception::raise( 'FaZend_POS_BaselineException',
-                'Object is' . ( $baselined ? ' not ' : '' ) . ' baselined',
+                'Object is' . ( $baselined ? ' not' : '' ) . ' baselined',
                 'FaZend_POS_Exception'
             );
         }
@@ -340,7 +351,7 @@ class FaZend_POS_Properties
                 'Cannot touch deleted object.'
             );
         }
-
+        
         $this->_fzSnapshot->save( $this->_user );
     }
 
