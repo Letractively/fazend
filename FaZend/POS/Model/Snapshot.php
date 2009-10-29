@@ -16,12 +16,12 @@ class FaZend_POS_Model_Snapshot extends FaZend_Db_Table_ActiveRow_fzSnapshot
      * 
      * @return TODO
      */
-    public static function create( $fzObject )
-    {
-        
-        $fzSnapshot = new self;
-        $fzSnapshot->fzObject = (string)$fzObject;
-        $fzSnapshot->version  = null;
+    public static function create( FaZend_POS_Model_Object $fzObject )
+    {        
+        $fzSnapshot = new FaZend_POS_Model_Snapshot();
+        $fzSnapshot->fzObject  = $fzObject;
+        $fzSnapshot->version   = null;
+        $fzSnapshot->baselined = false;
 
         return $fzSnapshot;
     }
@@ -39,12 +39,12 @@ class FaZend_POS_Model_Snapshot extends FaZend_Db_Table_ActiveRow_fzSnapshot
     {
         if( $version == null ) {
             $query = self::retrieve()
-                ->where( 'fzObject = ?', (string)$fzObject )
+                ->where( 'fzObject = ?', (string) $fzObject )
                 ->order( 'version DESC' )
                 ;
         } else {
             $query = self::retrieve()
-                ->where( 'fzObject = ?', $fzObject )
+                ->where( 'fzObject = ?', (string) $fzObject )
                 ->where( 'version = ? ', $version )
                 ->where( 'baselined = 0 AND alive = 1' )
                 ;
@@ -55,8 +55,12 @@ class FaZend_POS_Model_Snapshot extends FaZend_Db_Table_ActiveRow_fzSnapshot
 
         if( empty( $fzSnapshot ) && $version !== null )
         {
-            require_once 'FaZend/POS/InvalidVersionException.php';
-            throw new FaZend_POS_InvalidVersionException();
+            require_once 'FaZend/Exception.php';
+            FaZend_Exception::raise( 
+                'FaZend_POS_InvalidVersionException',
+                'The requested object version does not exist'.
+                'FaZend_POS_Exception'
+            );
         } else if( empty( $fzSnapshot ) ) {
             $fzSnapshot = self::create( $fzObject, $version );
         }
@@ -91,7 +95,6 @@ class FaZend_POS_Model_Snapshot extends FaZend_Db_Table_ActiveRow_fzSnapshot
             $this, 
             FaZend_POS_Model_Approval::REJECTED
         );
-        $this->baselined = false;
     }
 
     /**
@@ -129,17 +132,75 @@ class FaZend_POS_Model_Snapshot extends FaZend_Db_Table_ActiveRow_fzSnapshot
      */
     public static function findVersionNums( FaZend_POS_Model_Object $fzObject, $numVersions )
     {
-        $result = self::retrieve()->table()->getAdapter()
-            ->query( 'SELECT 
-                        version 
-                      FROM fzSnapshot 
-                      WHERE alive = 1 
-                        AND baselined = 0 
-                        AND fzObject= ?'
-                , $fzObject )
+        $result = self::retrieve()
+            ->columns( array( 'id', 'version' ) )
+            ->where( 'fzObject = ?', (string) $fzObject )
+            ->where( 'alive = 1' )
+            ->order( 'version DESC' )
+            ->limit( $numVersions )
+            ->setSilenceIfEmpty()
             ->fetchAll()
             ;
-        return $result;
+
+        $return = array();
+        foreach( $result as $row ) {
+            $return[] = $row->version;
+        }
+
+        return $return;
+    }
+
+    /**
+     * TODO: short description.
+     * 
+     * @param mixed                          
+     * 
+     * @return TODO
+     */
+    public static function getNextVersion( $fzObject )
+    {
+        require_once 'Zend/Db/Expr.php';
+        $row = self::retrieve()
+            ->columns( array( 
+                'id' => 'id',
+                'version' => new Zend_Db_Expr( 'MAX(version)+1' ) 
+                ) )
+            ->where( 'fzObject = ?', (string) $fzObject )
+            ->group( 'fzSnapshot' )
+            ->setRowClass( 'FaZend_POS_Model_Snapshot' )
+            ->setSilenceIfEmpty()
+            ->fetchRow()
+            ;
+
+        if( empty( $row ) ) {
+            return 0;
+        } else {
+            return $row->version;
+        }
+    }
+
+
+    /**
+     * TODO: short description.
+     * 
+     * @return TODO
+     */
+    public function baseline()
+    {
+        require_once 'FaZend/User.php';
+        $user = FaZend_User::getCurrentUser();
+        $this->baselined = true;
+        self::save( $user );
+    }
+
+    /**
+     * TODO: short description.
+     * 
+     * @return boolean
+     */
+    public function isBaselined()
+    {
+        return intval( $this->baselined ) > 0;
     }
 
     /**
@@ -151,17 +212,9 @@ class FaZend_POS_Model_Snapshot extends FaZend_Db_Table_ActiveRow_fzSnapshot
      */
     public function save( FaZend_User $user )
     {
-        //get the latest version
-        $result = $this->_table->getAdapter()
-            ->query( "SELECT MAX(version)+1 as version FROM fzSnapshot WHERE
-        fzObject = '{$this->fzObject}' GROUP BY fzObject" )
-            ->fetchColumn()
-            ;
-
-        $version = intval( $result );
-        $this->version = $version;
+        $this->version = self::getNextVersion( $this->fzObject ); 
         $this->alive = 1;
-        $this->user = (string) $user;
-        return parent::save();
+        $this->user = $user;
+        parent::save();
     }
 }

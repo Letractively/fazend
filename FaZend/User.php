@@ -247,7 +247,9 @@ class FaZend_User extends FaZend_Db_Table_ActiveRow_user {
         return self::retrieve()
             ->where('id = ?', $id)
             ->setRowClass(self::$_rowClass)
-            ->fetchRow();
+            ->setSilenceIfEmpty()
+            ->fetchRow()
+            ;
     }
 
     /**

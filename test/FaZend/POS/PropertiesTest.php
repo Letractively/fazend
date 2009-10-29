@@ -57,8 +57,8 @@ class FaZend_POS_PropertiesTest extends AbstractTestCase
         $car = new Model_Car();
         $car->save();
 
-        $actual   = (string) $car->ps()->editor->email;
-        $expected = (string) $this->_user->email;
+        $actual   = $car->ps()->editor->email;
+        $expected = $this->_user->email;
 
         $this->assertEquals( $expected, $actual );
     }
@@ -87,10 +87,12 @@ class FaZend_POS_PropertiesTest extends AbstractTestCase
         $car->model = 'test';
         $car->save();
 
-        $this->assertEquals( $car->ps()->version, 0 );
+        $this->assertEquals( 0, $car->ps()->version );
         $car->model = 'test2';
         $car->save();
-        $this->assertEquals( $car->ps()->version, 1 );
+
+
+        $this->assertEquals( 1, $car->ps()->version );
     }
 
     /**
@@ -119,11 +121,8 @@ class FaZend_POS_PropertiesTest extends AbstractTestCase
         $timestamp = $car->ps()->updated;
         //TODO we can't actually test that the time is accurate without
         //architectural changes.
-        
-        $this->assertTrue( 
-            $time < $timestamp, 
-            'Start time was not earlier than last updated time' 
-        );
+
+        $this->assertGreaterThan( $start, $timestamp, 'Start time was not earlier than updated' );
     }
 
     /**
@@ -149,14 +148,14 @@ class FaZend_POS_PropertiesTest extends AbstractTestCase
 
         $bike = new Model_Bike();
         $bike->save();
-        
-        $this->assertTrue( 
-            $car->ps()->id > 0, 
+
+        $this->assertGreaterThan(
+            0, $car->ps()->id,
             'Id returned was not greater than 0'
         );
-        $this->assertTrue( 
-            $bike->ps()->id > $car->ps()->id, 
-            'Second object\s id was not greater than first object\'s'
+        $this->assertGreaterThan( 
+            $car->ps()->id, $bike->ps()->id,
+            'Second object\'s id was not greater than first object\'s'
         );
     }
 
@@ -240,7 +239,7 @@ class FaZend_POS_PropertiesTest extends AbstractTestCase
      * 
      * @return TODO
      */
-    public function testWorkWithVersionReturnsCorrectVersion()
+    public function testWorkWithVersionReturnsCorrectSnapshot()
     {
         $make  = 'Lotus';
         $model = 'Elise 112 R';
@@ -260,31 +259,27 @@ class FaZend_POS_PropertiesTest extends AbstractTestCase
         $car->status = 'active';
         $car->driver = 'John';
 
-        $car = $car->ps()->workWithVersion( $version );
+        $car2 = $car->ps()->workWithVersion( $version );
 
-        $this->assertEquals( $version, $car->ps()->version );
-        
-        $params = $car->toArray();
+        $params = $car2->toArray();
         $this->assertEquals( $params['make'], $make );
         $this->assertEquals( $params['model'], $model );
         $this->assertEquals( $params['status'], $status );
-        $this->assertNotInArray( 'driver', array_keys( $params ), 
+        $this->assertArrayNotHasKey( 'driver', array_keys( $params ), 
                 'Property driver was not in expected version' );
 
     }
 
     /**
      * 
-     * @expectedException FaZend_POS_Exception
+     * @expectedException FaZend_POS_InvalidVersionException
      */
     public function testWorkWithVersionInvalidVersionThrowsException()
     {
-
         $car = new Model_Car();
         $car->save();
         $car->ps()->touch();
 
-        $this->setExpectedException( 'FaZend_POS_Exception' );
         $newCar = $car->ps()->workWithVersion( 9999 );
     }
 
@@ -305,7 +300,7 @@ class FaZend_POS_PropertiesTest extends AbstractTestCase
         
         $prevCar = $car->ps()->rollBack();
 
-        $this->assertEquals( $prevCar->owner, 'John', 'rollbacked property was not as expected' );
+        $this->assertEquals( 'John', $prevCar->owner, 'rollbacked property was not as expected' );
     }
 
     /**
@@ -394,32 +389,11 @@ class FaZend_POS_PropertiesTest extends AbstractTestCase
     public function testBaselineMarksObjectBaselined()
     {
         $car = new Model_Car();
+        $car->make  = 'Ford';
+        $car->model = 'Mustang';
         $car->ps()->baseline( array( $this->_user ), 'test' );
 
-        $result = $this->_dbAdapter->query( 'SELECT * FROM fzApproval' );
-        die( var_export( $result ) );
-
         $this->assertTrue( $car->ps()->isBaselined(), 'Object was not baselined' );
-    }
-
-    public function testBaselinedObjectCannotBeModified()
-    {
-        $car = new Model_Car();
-        $car->ps()->baseline( array( $this->_user ) );
-
-        $this->setExpectedException( 'FaZend_POS_BaselinedException' );
-        
-        $car->make  = 'Nissan';
-    }
-
-    public function testBaselineObjectCannotBeReBaselined()
-    {
-        $car = new Model_Car();
-        $car->ps()->baseline( array( $this->_user ) );
-        
-        $this->setExpectedException( 'FaZend_POS_BaselinedException' );
-        
-        $car->ps()->baseline( array( $this->_user ) );
     }
 
     public function testWaitingForApprovalIsTrueWhenBaselined()
@@ -468,17 +442,19 @@ class FaZend_POS_PropertiesTest extends AbstractTestCase
     /**
      * TODO: short description.
      * 
-     * @return TODO
+     * @expectedException FaZend_POS_BaselineException
      */
     public function testCannotRejectNonBaselinedObjects()
     {
-
+        $car = new Model_Car();
+        $car->make = 'Honda';
+        $car->ps()->reject();
     }
 
     /**
      * TODO: short description.
      * 
-     * @expectedException FaZend_POS_NotBaselinedException
+     * @expectedException FaZend_POS_BaselineException
      */
     public function testCannotApproveNonBaselinedObjects()
     {
@@ -518,30 +494,16 @@ class FaZend_POS_PropertiesTest extends AbstractTestCase
         $car = new Model_Car();
         $car->make = 'Honda';
         $car->ps()->baseline( array( $this->_user ) );
+
         $car->ps()->approve();
 
         $this->assertTrue( $car->ps()->isApproved(),
-            'isApproved() returned false for rejected baseline object'
+            'isApproved() returned false for approved baseline object'
         );
 
         $this->assertFalse( $car->ps()->isRejected(),
-            'isRejected() returned true for rejected baseline object'
+            'isRejected() returned true for approved baseline object'
         );
-    }
-
-    /**
-     * TODO: short description.
-     * 
-     * @return TODO
-     */
-    public function testIsBaselinedIsFalseWhenRejected()
-    {
-        $car = new Model_Car();
-        $car->make = 'Mazda';
-        $car->ps()->baseline( array( $this->_user ) );
-        $car->ps()->reject();
-
-        $this->assertFalse( $car->ps()->isBaselined() );
     }
 
     /**
