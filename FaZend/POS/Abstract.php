@@ -56,13 +56,6 @@ abstract class FaZend_POS_Abstract implements ArrayAccess
     private $_fzSnapshot;
 
     /**
-     * Contains the current FaZend_User to save as the editor.
-     * 
-     * @var FaZend_User
-     */
-    private $_user;
-
-    /**
      * A multi-dimensional array containing this object's values and their
      * current states
      * 
@@ -163,9 +156,6 @@ abstract class FaZend_POS_Abstract implements ArrayAccess
     {
         $class = get_class( &$this ); 
 
-        require_once 'FaZend/User.php';
-        $this->_user = FaZend_User::getCurrentUser();
-
         require_once 'FaZend/POS/Model/Object.php';
         if( $objectId === null ) {
             $this->_fzObject = FaZend_POS_Model_Object::create( $class );
@@ -243,7 +233,8 @@ abstract class FaZend_POS_Abstract implements ArrayAccess
             );
             $this->_fzSnapshot->setProperties( $this->toArray() );
             $this->_fzSnapshot->baselined = $baselined;
-            $this->_fzSnapshot->save( $this->_user );
+            require_once 'FaZend/User.php';
+            $this->_fzSnapshot->save( FaZend_User::getCurrentUser() );
 
             foreach( $this->_properties as $name => $prop ) {
                 $this->_properties[ $name ][ 'state' ] = self::STATE_CLEAN;
