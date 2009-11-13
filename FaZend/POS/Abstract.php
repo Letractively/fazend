@@ -103,7 +103,7 @@ abstract class FaZend_POS_Abstract implements ArrayAccess
      * 
      * @return void
      */
-    public function init()
+    protected function init()
     {}
 
     /**
