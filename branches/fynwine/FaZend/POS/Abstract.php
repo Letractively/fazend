@@ -94,7 +94,7 @@ abstract class FaZend_POS_Abstract implements ArrayAccess
     public function __construct( $objectId = null, $version = null )
     {
         $this->_initObject( $objectId, $version );
-        $this->init();
+        $this->_init();
     }
 
     /**
@@ -103,7 +103,7 @@ abstract class FaZend_POS_Abstract implements ArrayAccess
      * 
      * @return void
      */
-    protected function init()
+    protected function _init()
     {}
 
     /**
