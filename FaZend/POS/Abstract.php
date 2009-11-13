@@ -174,7 +174,7 @@ abstract class FaZend_POS_Abstract implements ArrayAccess
     private function _initSysProperties()
     {
         require_once 'FaZend/POS/Properties.php';
-        unset( $this_sysProperties );
+        unset( $this->_sysProperties );
         $this->_sysProperties = new FaZend_POS_Properties( 
             $this, $this->_fzObject, $this->_fzSnapshot 
         );
