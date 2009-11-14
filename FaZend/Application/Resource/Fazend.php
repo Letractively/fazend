@@ -33,7 +33,6 @@ class FaZend_Application_Resource_Fazend extends Zend_Application_Resource_Resou
      * @return Zend_Config Configuration of fazend, from INI file
      */
     public function init() {
-
         $options = $this->getOptions();
 
         validate()->true(isset($options['name']),
@@ -42,6 +41,7 @@ class FaZend_Application_Resource_Fazend extends Zend_Application_Resource_Resou
         $config = new Zend_Config($options);
         FaZend_Properties::setOptions($config);
 
+        $this->_initSessionOptions();
         $this->_initFrontControllerOptions();        
         $this->_initViewOptions();
         $this->_initBlindFaZend();
@@ -51,9 +51,45 @@ class FaZend_Application_Resource_Fazend extends Zend_Application_Resource_Resou
         $this->_initPluginCache();
         $this->_initLogger();
         $this->_initDbAutoloader();
-        $this->_initSessionOptions();
 
         return $config;
+    }
+
+    /**
+     * Configure session properly
+     *
+     * @return void
+     **/
+    protected function _initSessionOptions() {
+        // if there is NO session - ignore
+        if (!$this->_bootstrap->hasPluginResource('session'))
+            return;
+            
+        // if in testing mode - ignore this
+        if (Zend_Session::$_unitTestEnabled)
+            return;
+
+        // if in testing mode - ignore this
+        if (defined('CLI_ENVIRONMENT'))
+            return;
+
+        $dir = TEMP_PATH . '/' . FaZend_Properties::get()->name . '-sessions';
+        
+        // create this directory if necessary
+        if (!file_exists($dir)) {
+            if (@mkdir($dir) === false)
+                trigger_error("Session directory '{$dir}' can't be created", E_USER_WARNING);
+        }
+            
+        // is it available for writing?
+        if (file_exists($dir) && is_dir($dir) && is_writable($dir)) {
+            $options = array('save_path' => $dir);
+            Zend_Session::setOptions($options);
+        } else
+            trigger_error("Session directory '{$dir}' can't be used", E_USER_WARNING);
+        
+        // make session alive by COOKIE information
+        Zend_Session::rememberMe();
     }
 
     /**
@@ -62,7 +98,6 @@ class FaZend_Application_Resource_Fazend extends Zend_Application_Resource_Resou
      * @return void
      */
     protected function _initFrontControllerOptions() {
-
         // make sure the front controller already bootstraped
         $this->_bootstrap->bootstrap('frontController');
         $front = $this->_bootstrap->getResource('frontController');
@@ -79,7 +114,6 @@ class FaZend_Application_Resource_Fazend extends Zend_Application_Resource_Resou
             'controller' => 'error',
             'action' => 'error'
         )));
-
     }
         
     /**
@@ -88,7 +122,6 @@ class FaZend_Application_Resource_Fazend extends Zend_Application_Resource_Resou
      * @return void
      */
     protected function _initViewOptions() {
-
         // make sure the view already bootstraped
         $this->_bootstrap->bootstrap('view');
         $view = $this->_bootstrap->getResource('view');
@@ -114,7 +147,6 @@ class FaZend_Application_Resource_Fazend extends Zend_Application_Resource_Resou
         // session
         if (defined('CLI_ENVIRONMENT'))
             Zend_Session::$_unitTestEnabled = true;
-
     }
 
     /**
@@ -123,7 +155,6 @@ class FaZend_Application_Resource_Fazend extends Zend_Application_Resource_Resou
      * @return void
      */
     protected function _initBlindFaZend() {
-
         // make sure it is loaded already
         $this->_bootstrap->bootstrap('layout');
 
@@ -138,8 +169,7 @@ class FaZend_Application_Resource_Fazend extends Zend_Application_Resource_Resou
         $dirs = $front->getControllerDirectory();
 
         // if (!file_exists($dirs['default']))
-            // $front->setControllerDirectory(FAZEND_PATH . 'Controller/controllers/default', 'default');
-
+        // $front->setControllerDirectory(FAZEND_PATH . 'Controller/controllers/default', 'default');
     }        
 
     /**
@@ -148,7 +178,6 @@ class FaZend_Application_Resource_Fazend extends Zend_Application_Resource_Resou
      * @return void
      */
     protected function _initRoutes() {
-
         $this->_bootstrap->bootstrap('frontController');
         $front = $this->_bootstrap->getResource('frontController');
 
@@ -178,7 +207,6 @@ class FaZend_Application_Resource_Fazend extends Zend_Application_Resource_Resou
         $router->addConfig(new Zend_Config_Ini(FAZEND_PATH . '/Application/routes.ini', 'global'), 'routes');
 
         $front->setRouter($router);
-
     }    
 
     /**
@@ -187,7 +215,6 @@ class FaZend_Application_Resource_Fazend extends Zend_Application_Resource_Resou
      * @return void
      */
     protected function _initDbProfiler() {
-
         // profiler is used ONLY in development environment
         if ((APPLICATION_ENV !== 'development'))
             return;
@@ -201,7 +228,6 @@ class FaZend_Application_Resource_Fazend extends Zend_Application_Resource_Resou
 
         // turn ON the profiler
         $db->setProfiler(true);
-
     }
 
     /**
@@ -210,20 +236,17 @@ class FaZend_Application_Resource_Fazend extends Zend_Application_Resource_Resou
      * @return void
      */
     protected function _initDbAutoloader() {
-        
         $autoloader = Zend_Loader_Autoloader::getInstance();
         $autoloader->pushAutoloader(new FaZend_Db_Table_RowLoader(), 'FaZend_Db_Table_ActiveRow_');
         $autoloader->pushAutoloader(new FaZend_Db_TableLoader(), 'FaZend_Db_ActiveTable_');
-
     }
 
     /**
-     * Initialize cache for tables
+     * Initialize cache for tables metadata
      *
      * @return void
      */
     protected function _initTableCache() {
-
         $cache = Zend_Cache::factory('Core', new FaZend_Cache_Backend_Memory(),
             array(
                 'caching' => true,
@@ -244,7 +267,6 @@ class FaZend_Application_Resource_Fazend extends Zend_Application_Resource_Resou
      * @return void
      */
     protected function _initPluginCache() {
-
         // only in production
         if (APPLICATION_ENV !== 'production')
             return;
@@ -262,7 +284,6 @@ class FaZend_Application_Resource_Fazend extends Zend_Application_Resource_Resou
         }
 
         Zend_Loader_PluginLoader::setIncludeFileCache($classFileIncCache);
-
     }
 
     /**
@@ -282,31 +303,6 @@ class FaZend_Application_Resource_Fazend extends Zend_Application_Resource_Resou
         // if testing or development - log into memory as well
         if (APPLICATION_ENV !== 'production')
             FaZend_Log::getInstance()->addWriter('Memory', 'FaZendDebug');
-    }
-
-    /**
-     * Configure session properly
-     *
-     * @return void
-     **/
-    protected function _initSessionOptions() {
-        $this->_bootstrap->bootstrap('session');
-        
-        $dir = TEMP_PATH . '/' . FaZend_Properties::get()->name . '-sessions';
-        
-        // create this directory if necessary
-        if (!file_exists($dir))
-            @mkdir($dir);
-            
-        // is it available for writing?
-        if (file_exists($dir) && is_dir($dir) && is_writable($dir)) {
-            $options = array('save_path'=>$dir);
-            Zend_Session::setOptions($options);
-        } else
-            trigger_error("Session directory '{$dir}' can't be used", E_USER_WARNING);
-        
-        // make session alive by COOKIE information
-        Zend_Session::rememberMe();
     }
 
 }

@@ -70,7 +70,6 @@ class FaZend_Exec extends FaZend_StdObject {
      * @return void
      */
     protected function __construct($name, $cmd = null) {
-
         $this->_name = $name;
         $this->_cmd = $cmd;
 
@@ -79,7 +78,6 @@ class FaZend_Exec extends FaZend_StdObject {
         if (file_exists($dataFile)) {
             $this->_unserialize(@file_get_contents($dataFile));
         }
-
     }
 
     /**
@@ -94,7 +92,7 @@ class FaZend_Exec extends FaZend_StdObject {
     }
 
     /**
-     * Get output
+     * Get output of currently running task, if it's running
      *
      * @return string
      */
@@ -108,7 +106,6 @@ class FaZend_Exec extends FaZend_StdObject {
      * @return int Seconds
      */
     public function getDuration() {
-
         if (!$this->isRunning())
             return false;
 
@@ -118,7 +115,6 @@ class FaZend_Exec extends FaZend_StdObject {
             return false;
 
         return time() - @filemtime($pidFile);
-
     }
 
     /**
@@ -127,12 +123,10 @@ class FaZend_Exec extends FaZend_StdObject {
      * @return int
      */
     public function getPid() {
-
         if (!$this->isRunning())
             return false;
 
         return self::_pid(self::_uniqueId($this->_name));
-
     }
 
     /**
@@ -150,21 +144,22 @@ class FaZend_Exec extends FaZend_StdObject {
      * @return string
      */
     public function execute() {
-
+        // if the task IS running now - just return it's output
         if ($this->isRunning())
             return $this->output();
                                 
         // serialize and save all local variables
-        if (!@file_put_contents(self::_fileName(self::_uniqueId($this->_name), self::DATA_SUFFIX), 
-            $this->_serialize())) {
+        $dataFile = self::_fileName(self::_uniqueId($this->_name), self::DATA_SUFFIX);
+        if (!@file_put_contents($dataFile, $this->_serialize())) {
             FaZend_Exception::raise('FaZend_Exec_DataSaveFailure', 
-                "Failed to save local data before execution");
+                "Failed to save local data before execution: '{$dataFile}'");
         }
 
+        // execute the task
         self::_execute(self::_uniqueId($this->_name), $this->_cmd, $this->_dir);
 
+        // return output of the task
         return $this->output();
-
     }
 
     /**
@@ -173,14 +168,19 @@ class FaZend_Exec extends FaZend_StdObject {
      * @return string
      */
     public function output() {
-        $output = self::_output(self::_uniqueId($this->_name));
+        // calculate unique ID of the task
+        $id = self::_uniqueId($this->_name);
         
+        // get an output of the task
+        $output = self::_output($id);
+        
+        // if we don't need to return full details of the task - just return output
         if (!$this->_detailed)
             return $output;
 
         $files = '';
         foreach (array(self::PID_SUFFIX, self::DATA_SUFFIX, self::LOG_SUFFIX) as $suffix) {
-            $fileName = self::_fileName(self::_uniqueId($this->_name), $suffix);
+            $fileName = self::_fileName($id, $suffix);
             $files .= 
                 "{$suffix}: '{$fileName}': " . 
                 (file_exists($fileName) ? filesize($fileName) . 'bytes, ' . FaZend_Date::make(filemtime($fileName)) : 'no file') .
@@ -188,11 +188,12 @@ class FaZend_Exec extends FaZend_StdObject {
         }
         
         return 
-        "Name '{$this->_name}', ID: '" . self::_uniqueId($this->_name) . "'\n" .
+        "Name '{$this->_name}', ID: '{$id}'\n" .
+        "Process ID: " . self::_pid($id) . "\n" .
         "Cmd: {$this->_cmd}\n" . 
         $files . "\n" .
         
-        ($output ? $output : 'NO OUTPUT');
+        ($output !== false ? $output : 'NO OUTPUT');
     }
 
     /**
@@ -201,21 +202,20 @@ class FaZend_Exec extends FaZend_StdObject {
      * @return void
      */
     public function stop() {
-
         if (!$this->isRunning())
             return;
 
         self::_stop(self::_uniqueId($this->_name));
-
     }
     
     /**
      * Set log to be detailed
      *
+     * @param boolean Show details?
      * @return void
      **/
-    public function setDetailed() {
-        $this->_detailed = true;
+    public function setDetailed($detailed = true) {
+        $this->_detailed = $detailed;
         return $this;
     }
 
@@ -226,7 +226,7 @@ class FaZend_Exec extends FaZend_StdObject {
      * @return string
      */
     protected static function _uniqueId($name) {
-        return md5(FaZend_Properties::get()->name . $name);
+        return FaZend_Properties::get()->name . '-' . preg_replace('/[^\w\d]/', '-', $name);
     }
 
     /**
@@ -247,10 +247,10 @@ class FaZend_Exec extends FaZend_StdObject {
      * @return boolean
      */
     protected static function _isRunning($id) {
-        
         if (isset(self::$_running[$id]))
             return true;
         
+        // PID file for this particular task (by ID)
         $pidFile = self::_fileName($id, self::PID_SUFFIX);
 
         // if no file - there is no process
@@ -275,36 +275,34 @@ class FaZend_Exec extends FaZend_StdObject {
             self::_clear($id, true);
         }
 
+        // remember PID for this task in a static array
         return self::$_running[$id] = $pid;
-
     }
 
     /**
      * Clear files
      *
      * @param string ID of the task
+     * @param boolean Clear only PID file?
      * @return boolean
      */
     protected static function _clear($id, $pidOnly = false) {
-
         if (!$pidOnly) {
             @unlink(self::_fileName($id, self::LOG_SUFFIX));
             @unlink(self::_fileName($id, self::DATA_SUFFIX));
         }
 
         @unlink(self::_fileName($id, self::PID_SUFFIX));
-
     }
         
     /**
-     * Get output log
+     * Get output log, from log file for the currently running task
      *
      * @param string ID of the task
      * @return boolean|string Output of the EXEC or false
      */
     protected static function _output($id) {
-        return 
-        @file_get_contents(self::_fileName($id, self::LOG_SUFFIX));
+        return @file_get_contents(self::_fileName($id, self::LOG_SUFFIX));
     }
 
     /**
@@ -314,12 +312,10 @@ class FaZend_Exec extends FaZend_StdObject {
      * @return void
      */
     protected static function _pid($id) {
-
         if (!self::_isRunning($id))
             return false;
 
         return self::$_running[$id];
-
     }
 
     /**
@@ -330,7 +326,6 @@ class FaZend_Exec extends FaZend_StdObject {
      * @return void
      */
     protected static function _execute($id, $cmd, $dir = null) {
-        
         // execute the command and quit, saving the PID
         // @see: http://stackoverflow.com/questions/222414/asynchronous-shell-exec-in-php
         if (!is_null($dir)) {
@@ -357,7 +352,6 @@ class FaZend_Exec extends FaZend_StdObject {
         }
 
         self::$_running[$id] = (int)@file_get_contents($pidFile);
-
     }
 
     /**
@@ -367,9 +361,10 @@ class FaZend_Exec extends FaZend_StdObject {
      * @return void
      */
     protected static function _stop($id) {
-        if (stristr(PHP_OS, 'win'))
+        if (self::_isWindows())
             return;
 
+        // stop execution
         shell_exec('kill -9 ' . self::_pid($id));
     }
 
