@@ -23,44 +23,59 @@ require_once 'Zend/Filter/Interface.php';
  * @subpackage Filter
  */
 class FaZend_View_Filter_HtmlCompressor implements Zend_Filter_Interface {
+    
+    /**
+     * List of regex for replacements
+     *
+     * I don't like that I have to comment these three lines, but I can't
+     * find why this conversion SOMETIMES produce invalid layout in some
+     * browsers.
+     *
+     * @var array
+     */
+    protected static $_replacer = array(
+        '/[\n\r\t]+/' => ' ', // convert spacers into normal spaces
+        '/\s{2,}/' => '  ', // convert two-or-more spaces into two spaces
+        '/\s\/\>/' => '/>', // remove spaces between tag closing bracket
+        '/\<\!\-\-.*?\-\-\>/' => '', // remove comments
+
+        // '/\s+/' => ' ', // convert multiple spaces to single
+        // '/\>\s+/' => '>', // remove spaces after tags
+        // '/\s+\</' => '<', // remove spaces before tags
+    );
 
     /**
      * Defined by Zend_Filter_Interface
      *
      * Compress HTML into a long string
      *
-     * @param  string $value
+     * @param string HTML content to be compressed
      * @return string
      */
     public function filter($html) {
+        // we DON'T touch contect in these tags
+        $masked = array(
+            'pre', 
+            'script', 
+            'style', 
+            'textarea');
 
-        $masked = array('pre', 'script', 'style', 'textarea');
-
+        // convert masked tags into BASE64 form
         foreach($masked as $tag) {
             $matches = array();
             preg_match_all('/\<' . $tag . '(.*?)\>(.*?)\<\/' . $tag . '\>/msi', $html, $matches);
             foreach ($matches[0] as $id=>$match)
-                $html = str_replace($match, "<{$tag}{$matches[1][$id]}>".base64_encode($matches[2][$id])."</{$tag}>", $html);
+                $html = str_replace($match, "<{$tag}{$matches[1][$id]}>" . base64_encode($matches[2][$id]) . "</{$tag}>", $html);
         }    
 
-        $html = trim(preg_replace(array(
-            '/[\n\r\t]/',
-            '/\s+/',
-            '/\>\s+\</',
-            '/\s\/\>/',
-            '/\<\!\-\-.*?\-\-\>/',
-        ), array(
-            ' ',
-            ' ',
-            '><',
-            '/>',
-            '',
-        ), $html));
+        // compress HTML
+        $html = trim(preg_replace(array_keys(self::$_replacer), self::$_replacer, $html));
 
+        // deconvert masked tags from BASE64
         foreach($masked as $tag) {
             preg_match_all('/\<' . $tag . '(.*?)\>(.*?)\<\/' . $tag . '\>/msi', $html, $matches);
             foreach ($matches[0] as $id=>$match)
-                $html = str_replace($match, "<{$tag}{$matches[1][$id]}>".base64_decode($matches[2][$id])."</{$tag}>", $html);
+                $html = str_replace($match, "<{$tag}{$matches[1][$id]}>" . base64_decode($matches[2][$id]) . "</{$tag}>", $html);
         }    
 
         return $html;
