@@ -10,6 +10,6 @@ class FaZend_POS
 {
     public static function root()
     {
-        return new FaZend_POS_Abstract( 1 );
+        return new FaZend_POS_Root();
     }
 }
