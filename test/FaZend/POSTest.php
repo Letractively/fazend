@@ -63,6 +63,7 @@ class FaZend_POSTest extends AbstractTestCase
     {
         $root = FaZend_POS::root();
         $root->car = new Model_Car();
+
         $this->assertTrue( $root->car instanceOf Model_Car );
     }
 
@@ -75,7 +76,6 @@ class FaZend_POSTest extends AbstractTestCase
     {
         $root = FaZend_POS::root();
         $root->car = new Model_Car();
-        unset( $root );
 
         $root2 = FaZend_POS::root();
         $this->assertTrue( isset( $root2->car ), 'Car property on root was not set' ); 
@@ -116,7 +116,7 @@ class FaZend_POSTest extends AbstractTestCase
      */
     public function testRootCanRetrieveArray()
     {
-        $this->setTestIncomplete();
+        $this->markTestIncomplete();
     }
 
     /**
