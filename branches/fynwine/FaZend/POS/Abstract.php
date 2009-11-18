@@ -127,8 +127,10 @@ abstract class FaZend_POS_Abstract implements ArrayAccess
     public function toArray()
     {
         $return = array();
-        foreach( $this->_properties as $name => $prop ) {
-            $return[ $name ] = $prop['value'];
+        if( is_array( $this->_properties ) ) {
+            foreach( $this->_properties as $name => $prop ) {
+                $return[ $name ] = $prop['value'];
+            }
         }
         return $return;
     }
@@ -189,7 +191,7 @@ abstract class FaZend_POS_Abstract implements ArrayAccess
      */
     private function _loadSnapshot( FaZend_POS_Model_Object $object,  $version = null ) 
     {
-        $this->_properties = array();
+        $this->_properties = null;
         $this->_current = ( null == $version );
 
         require_once 'FaZend/POS/Model/Snapshot.php';
@@ -199,16 +201,14 @@ abstract class FaZend_POS_Abstract implements ArrayAccess
 
         $props = unserialize( $this->_fzSnapshot->properties );
         if( is_array( $props ) ) {
+            $this->_properties = array();
             foreach( $props as $name => $value ) {
                 $this->_properties[ $name ]['value'] = $value;
                 $this->_properties[ $name ]['state'] = self::STATE_CLEAN;
             }
-            $this->_state = self::STATE_CLEAN;
-        } else {
-            // If no properties were loaded, assume this is a new object
-            $this->_state = self::STATE_DIRTY;
         }
 
+        $this->_state = self::STATE_CLEAN;
         $this->_initSysProperties();
     }
 
@@ -224,7 +224,9 @@ abstract class FaZend_POS_Abstract implements ArrayAccess
         // are open with the same version number, changes to 
         // one will overwrite the changes to the next.
         //---------------------------------------------------------
-        if( $this->_state !== self::STATE_CLEAN ) {
+        if( $this->_state !== self::STATE_CLEAN && !empty( $this->_properties ) {
+
+            
             
             $baselined = $this->_fzSnapshot->baselined;
             require_once 'FaZend/POS/Model/Snapshot.php';
@@ -371,6 +373,10 @@ abstract class FaZend_POS_Abstract implements ArrayAccess
      */
     public function __set( $name, $value )
     {
+        if( $value instanceOf FaZend_POS_Properties ) {
+            //TODO figure out why this is happening
+            return;
+        }
         $this->_setProperty( $name, $value );
     }
 

@@ -16,3 +16,5 @@ CREATE TABLE IF NOT EXISTS `fzObject` (
 
 ) AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 ENGINE=InnoDB;
 
+INSERT INTO ( `id`, `class` ) VALUES ( null, 'FaZend_POS_Root' );
+
