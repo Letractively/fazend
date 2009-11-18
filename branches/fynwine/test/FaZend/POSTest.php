@@ -50,7 +50,7 @@ class FaZend_POSTest extends AbstractTestCase
     public function testRootReturnsRootObject()
     {
         $root = FaZend_POS::root();
-        $this->assertTrue( $root instanceOf FaZend_POS_Abstract, 
+        $this->assertTrue( $root instanceOf FaZend_POS_Root, 
             'Root method did not return an FaZend_POS_Abstract' );
     }
     
@@ -63,6 +63,8 @@ class FaZend_POSTest extends AbstractTestCase
     {
         $root = FaZend_POS::root();
         $root->car = new Model_Car();
+
+        die( var_export( $root->car->toArray() ) );
 
         $this->assertTrue( $root->car instanceOf Model_Car );
     }
