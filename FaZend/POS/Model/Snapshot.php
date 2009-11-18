@@ -214,7 +214,7 @@ class FaZend_POS_Model_Snapshot extends FaZend_Db_Table_ActiveRow_fzSnapshot
     {
         $this->version = self::getNextVersion( $this->fzObject ); 
         $this->alive = 1;
-        $this->user = $user;
+        $this->user = (string) $user;
         parent::save();
     }
 }
