@@ -45,6 +45,9 @@ class Bootstrap extends FaZend_Application_Bootstrap_Bootstrap {
         $adapter->query(
             'insert into user values (1, "test", "test")');
 
+        $adapter->query(
+            'INSERT INTO fzObject values (1, \'FaZend_POS_Root\')');
+
     }
 
 }
