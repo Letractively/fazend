@@ -59,7 +59,6 @@ class FaZend_User extends FaZend_Db_Table_ActiveRow_user {
      * @return boolean
      */
     public static function isLoggedIn () {
-
         if (isset(self::$_loggedIn))
             return self::$_loggedIn;
 
@@ -89,7 +88,6 @@ class FaZend_User extends FaZend_Db_Table_ActiveRow_user {
      * @throw FaZend_User_NotLoggedIn
      */
     public static function getCurrentUser () {
-        
         if (!self::isLoggedIn())
             FaZend_Exception::raise('FaZend_User_NotLoggedIn', 'user is not logged in');
 
@@ -103,32 +101,20 @@ class FaZend_User extends FaZend_Db_Table_ActiveRow_user {
      * @throw FaZend_User_LoginFailed
      */
     public function logIn () {
-
-        require_once 'Zend/Db/Table.php';
-        require_once 'Zend/Auth/Adapter/DbTable.php';
-
         $authAdapter = new Zend_Auth_Adapter_DbTable(Zend_Db_Table::getDefaultAdapter());
-
-
-
         $authAdapter->setTableName('user')
             ->setIdentityColumn('email')
             ->setCredentialColumn('password')
             ->setIdentity(strtolower($this->email))
             ->setCredential($this->password);
 
+        $result = self::_auth()->authenticate($authAdapter);
 
-        $result = $this->_auth()->authenticate($authAdapter);
-
-        if (!$result->isValid()) {
-
-
-
+        if (!$result->isValid())
             FaZend_Exception::raise('FaZend_User_LoginFailed', implode('; ', $result->getMessages()).' (code: #'.(-$result->getCode()).')');
-        }
-        $data = $authAdapter->getResultRowObject(); 
-        $this->_auth()->getStorage()->write($data);
 
+        $data = $authAdapter->getResultRowObject(); 
+        self::_auth()->getStorage()->write($data);
 
         // forget previous status
         self::$_loggedIn = true;
@@ -140,12 +126,10 @@ class FaZend_User extends FaZend_Db_Table_ActiveRow_user {
      * @return void
      */
     public static function logOut () {
-
         // forget previous status
         self::$_loggedIn = false;
 
         self::_auth()->clearIdentity();
-
     }
 
     /**
@@ -174,7 +158,6 @@ class FaZend_User extends FaZend_Db_Table_ActiveRow_user {
      * @return boolean
      */
     public static function register ($email, $password, array $data = array()) {
-
         $user = new FaZend_User();
         $user->email = strtolower($email);
         $user->password = $password;
@@ -217,7 +200,6 @@ class FaZend_User extends FaZend_Db_Table_ActiveRow_user {
         }
 
         return $user;    
-
     }
 
     /**
@@ -227,29 +209,10 @@ class FaZend_User extends FaZend_Db_Table_ActiveRow_user {
      * @return boolean
      */
     public static function findByEmail ($email) {
-
         return self::retrieve()
             ->where('email = ?', $email)
             ->setRowClass(self::$_rowClass)
             ->fetchRow();
-
-    }
-
-    /**
-     * Retrieve a user by id
-     * 
-     * @param int $id 
-     * 
-     * @return FaZend_User
-     */
-    public static function findById( $id ) 
-    {   
-        return self::retrieve()
-            ->where('id = ?', $id)
-            ->setRowClass(self::$_rowClass)
-            ->setSilenceIfEmpty()
-            ->fetchRow()
-            ;
     }
 
     /**
@@ -280,13 +243,11 @@ class FaZend_User extends FaZend_Db_Table_ActiveRow_user {
      * @return Zend_Auth
      */
     protected static function _auth() {
-
         if (!isset(self::$_auth)) {
             self::$_auth = Zend_Auth::getInstance();
         }
 
         return self::$_auth;
-
     }
 
 }
