@@ -64,8 +64,6 @@ class FaZend_POSTest extends AbstractTestCase
         $root = FaZend_POS::root();
         $root->car = new Model_Car();
 
-        die( var_export( $root->car->toArray() ) );
-
         $this->assertTrue( $root->car instanceOf Model_Car );
     }
 
@@ -80,8 +78,8 @@ class FaZend_POSTest extends AbstractTestCase
         $root->car = new Model_Car();
 
         $root2 = FaZend_POS::root();
-        $this->assertTrue( isset( $root2->car ), 'Car property on root was not set' ); 
-        $this->assertTrue( $root2->car instanceOf ModelCar );
+
+        $this->assertTrue( $root2->car instanceOf Model_Car );
     }
 
     /**
@@ -118,7 +116,18 @@ class FaZend_POSTest extends AbstractTestCase
      */
     public function testRootCanRetrieveArray()
     {
-        $this->markTestIncomplete();
+        require_once 'FaZend/POS/Array.php';
+        $root->car = new FaZend_POS_Array();
+        $root->car[] = new Model_Car();
+        $root->car[] = new Model_Car();
+
+        $cars = $root->car;
+
+        //TODO this is actually the best we can do.  PHP's is_array function
+        // only returns true for native array
+        $this->assertTrue( !empty( $cars ), 'property was not an array' );
+
+
     }
 
     /**
