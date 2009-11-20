@@ -224,7 +224,7 @@ abstract class FaZend_POS_Abstract implements ArrayAccess
         // are open with the same version number, changes to 
         // one will overwrite the changes to the next.
         //---------------------------------------------------------
-        if( $this->_state !== self::STATE_CLEAN && !empty( $this->_properties ) {
+        if( $this->_state !== self::STATE_CLEAN && !empty( $this->_properties )) {
 
             
             
