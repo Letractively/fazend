@@ -162,3 +162,165 @@ When the object becomes baselined all branches becomes unavailable.
  * Automated cleaning of very old version
  * `exportXML()`, `importXML()`
  * `diff()`
+
+= How `FaZend_POS` is implemented =
+
+== Database Schema ==
+
+There are 4 tables in the database (SQL available at `FaZend/POS/database/*.sql`):
+
+ * `fzObject`: collection of all persistent objects
+ * `fzPartOf`: collection of _part-of_ relations between objects
+ * `fzSnapshot`: collection of momentary values of objects
+ * `fzApproval`: collection of approval requests
+
+We *never* delete or update any records in these tables. We may only add new records. We _may_ delete only to remove some history, some expired records from `fzSnapshot` table. Other tables get only `INSERT` operations, never `UPDATE` or `DELETE`.
+
+We may also sometimes perform a _garbage collection_, by means of selecting all classes from `fzObject.class` column and trying to instantiate them in PHP. Maybe some of them are from previous versions of the application and are no longer valid. In this case we *may* remove the objects from the database.
+
+== Sample Scenarios ==
+
+=== Creating a New Object ===
+
+You're doing this in PHP:
+
+{{{
+$root = FaZend_POS::root();
+$root->cars = new FaZend_POS_Array();
+}}}
+
+A database gets this data:
+
+{{{
+fzObject {id: 1, class: 'FaZend_POS_Array'}
+fzObject {id: 2, class: 'FaZend_POS_PartOf'}
+fzPartOf {id: 1, name: 'cars', fzObject: 2, parent: NULL, child: 1}
+}}}
+
+When the object is being created we create a new record in `fzObject` and save no data into `fzSnapshot`, since the class `FaZend_POS_Array` doesn't have any PHP properties encapsulated. The object's ID is `1` and the object's class is `FaZend_POS_Array`.
+
+The object `FaZend_POS::root()` has no instance in `fzObject` table, it is just a representative of the entire object storage. That's why the `parent` column equals to `NULL` in the relationship record.
+
+=== Building Relations Between Objects ===
+
+Now we need to set a _part-of_ relationship between two objects, in PHP code:
+
+{{{
+$bmw = new Car();
+$root->cars['my car'] = $bmw;
+}}}
+
+In a database:
+
+{{{
+fzObject {id: 3, class: 'Car'}
+fzObject {id: 4, class: 'FaZend_POS_PartOf'}
+fzPartOf {id: 1, name: 'my car', fzObject: 4, parent: 2, child: 3}
+}}}
+
+As you see, two new objects are created in `fzObject` table: `#3` and `#4`. The object `#4` is a relationship between the object `#1` (`FaZend_POS_Array`) and the object `#3` (`Car`). To add this information to the relationship we must create a record in `fzPartOf` table, where we give a name to this relationship (`my car`), we link it to the relationship-object (`#4`) and we configure necessary links to the parent (`FaZend_POS_Array`) and the child (`Car`).
+
+=== Setting Static PHP Properties of Objects ===
+
+In PHP:
+
+{{{
+$bmw->color = 'black';
+$bwm->model = 'bmw';
+}}}
+
+In a database:
+
+{{{
+fzSnapshot {id: 1, 
+    fzObject: 3, 
+    version: 1, 
+    properties: {color: 'black', model: 'bmw'},
+    alive: 1,
+    updated: '15-July-2009',
+    user: NULL,
+    comment: '',
+    baselined: NULL}
+}}}
+
+When we change an object in PHP, we should reflect these changes in the database. Every change has a record in `fzSnapshot` table. `properties` column contains a PHP-serialized associative array of object properties (`{color: 'black', model: 'bmw'}`).
+
+The snapshot record has a link to the object (`fzObject: 3`) and the version unique number of this particular snapshot (`version: 1`). Versions are numbered from `1` to infinity. Every next snapshot gets a version one-bigger than the previous one.
+
+Alive-flag (`alive: 1`) tells that this snapshot has an object which is not deleted yet. If the object has to be deleted we just create a next snapshot where this flag we set to `false`. That's how we _delete_ objects from the storage. If you want to wipe the object out, together with its entire history and all links to it, you should use `ps()->wipe()` method, which will delete a record from `fzObject` table, together with snapshots, links and approval requests - it's a dangerous operation.
+
+=== Changing Relations Between Objects ===
+
+In PHP:
+
+{{{
+$audi = new Car();
+$root->cars['my car'] = $audi;
+}}}
+
+In database:
+
+{{{
+fzObject {id: 5, class: 'Car'}
+fzObject {id: 6, class: 'FaZend_POS_PartOf'}
+fzPartOf {id: 2, name: 'my car', fzObject: 6, parent: 1, child: 5}
+fzSnapshot {id: 2, fzObject: 4, version: 1, alive: 0, ...}
+}}}
+
+=== Changing Static PHP Properties of Objects ===
+
+In PHP:
+
+{{{
+$bmw->color = 'blue';
+}}}
+
+In database:
+
+{{{
+fzSnapshot {id: 3, 
+    fzObject: 3, 
+    version: 2, 
+    properties: {color: 'blue', model: 'bmw'}, ...}
+}}}
+
+== SQL Queries ==
+
+=== Getting a Single Object ===
+
+We can get an object only from a parent object, in PHP:
+
+{{{
+$root = FaZend_POS::root()->cars;
+$myCar = $root->cars['my car'];
+}}}
+
+We assume that `$this->cars` object ID is `21234`:
+
+{{{
+SELECT * FROM (SELECT fzSnapshot.* FROM fzObject
+    JOIN fzPartOf ON (parent = 21234 AND name = 'my car')
+    JOIN fzSnapshot ON fzSnapshot.fzObject = fzPartOf.fzObject
+    ORDER BY version DESC) AS versions GROUP BY fzObject
+    HAVING alive = 1
+}}}
+
+=== Getting a List of Child Objects ===
+
+We can get a list of all objects linked to the given one, in PHP:
+
+{{{
+$root = FaZend_POS::root();
+foreach ($root->cars as $car)
+    // ...
+}}}
+
+In SQL (we assume that `$root->cars` object ID is `21234`):
+
+{{{
+SELECT * FROM (SELECT fzSnapshot.* FROM fzObject
+    JOIN fzPartOf ON parent = 21234
+    JOIN fzSnapshot ON fzSnapshot.fzObject = fzPartOf.fzObject
+    ORDER BY version DESC) AS versions GROUP BY fzObject
+    HAVING alive = 1
+}}}
