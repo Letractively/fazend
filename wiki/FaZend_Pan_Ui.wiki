@@ -10,16 +10,16 @@ Inside your view scripts you use meta-tags to inform FaZend about functional lay
 <!-- @text("You can edit your photos...") -->
 
 <!-- @table()
-    ->addColumn('id', '%3d')
-    ->addColumn('description', '%40s')
-    ->addOption(array('disable', 'enable'))
+    ->addColumn('id', '%3d', 5)
+    ->addColumn('description', '%40s', 20)
+    ->addOption('on', array('disable', 'enable'))
     -->
 
 <!-- @link('Upload new photo', 'photos/upload') -->
 
 <!-- @form()
-    ->addField('title', 'text', 'Title of your photo')
-    ->addField('description', 'textarea', 'Describe your photo') 
+    ->addField('title', 'text', '%10s', 'Title of your photo')
+    ->addField('description', 'textarea', '%50s', 'Describe your photo') 
     -->
 }}}
 
