@@ -1,0 +1,108 @@
+#summary Zend Object-Relational Mapping (ORM)
+
+= Assumptions =
+
+We assume that:
+
+  * All tables have one-column primary key, or column 'id'
+  * Foreign keys are named the same way as referenced tables
+
+= Active Record =
+
+For example, you have two tables in the DB:
+
+{{{
+create table Owner (
+  id integer not null primary key autoincrement, 
+  name varchar(50) not null)
+
+create table Product (
+  id integer not null primary key autoincrement, 
+  text varchar(1024) not null, 
+  owner integer not null constraint fk_product_owner references owner(id))
+}}}
+
+You declare two PHP classes (text after `FaZend_Db_Table_ActiveRow_` is the name of your table):
+
+{{{
+class Owner extends FaZend_Db_Table_ActiveRow_Owner {}
+class Product extends FaZend_Db_Table_ActiveRow_Product {}
+}}}
+
+Now, in order to get an active row from the table:
+
+{{{
+$owner = new Owner(13);
+}}}
+
+To work with it, save, update, etc:
+
+{{{
+$product = new Product();
+$product->text = 'just test';
+$product->owner = $owner;
+$product->save();
+}}}
+
+You can get other active rows from this row:
+
+{{{
+$product = new Product(10);
+$name = $product->owner->name;
+}}}
+
+Or you can find a new row with `retrieve()` method:
+
+{{{
+$product = Product::retrieve()
+    ->where('owner = ?', $owner)
+    ->setSilenceIfEmpty() // don't throw exception if not found, just return FALSE
+    ->setRowClass('Product') // returned rows will be instances of this class
+    ->fetchRow();
+}}}
+
+= List of Active Records =
+
+You can get a row set in a convenient way:
+
+{{{
+$list = Owner::retrieve()
+  ->where('name is not null')
+  ->order('id desc')
+  ->fetchAll();
+}}}
+
+Or, for example:
+
+{{{
+FaZend_Db_ActiveTable_OtherTable::retrieve()
+  ->table()
+  ->update('time = NOW()');
+}}}
+
+More extended example:
+
+{{{
+$list = Owner::retrieve(false) // don't use default FROM clause
+    ->from('owner', array('name')) // specify where to select FROM
+    ->where('name > ?', new Zend_Db_Expr('NOW()')) // use Zend syntax
+    ->setRowClass('OwnerName') // set class name of each returned row
+    ->fetchAll();
+}}}
+
+== Delayed `fetchAll()` ==
+
+Important improvement made to the standard method `fetchAll()`. Now you can do this operation with big amounts of data:
+
+{{{
+$rowset = FaZend_Db_ActiveTable_bigTable::retrieve()->fetchAll();
+$count = count($rowset);
+}}}
+
+Even if your `$rowset` is huge, this operation will be done fast and memory-safe. Method `fetchAll()` won't download any data to memory until you actually access them. Method `count()` doesn't work with any particular row in the set, so nothing will be downloaded. Instead, new SQL query will be created on-fly, which will look like: 
+
+{{{
+SELECT COUNT(*) FROM (...)
+}}}
+
+Where `...` will be replaced by your original SQL query. All this is done on-fly.
