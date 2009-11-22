@@ -74,3 +74,5 @@ Add this line to your apache `httpd.conf` file and restart apache:
 
 Alias /project "/_path_to_your_project_/php/src/public"
 }}}
+
+Now this link should work: `http://localhost/project`.
