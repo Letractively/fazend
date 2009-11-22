@@ -2,7 +2,7 @@
 
 = Usage Sample =
 
-Inside your view scripts you should use meta-tags to inform FaZend about the functional layout of your pages, e.g.:
+Inside your view scripts you use meta-tags to inform FaZend about functional layout of your pages, e.g.:
 
 {{{
 <!-- @actor("RegisteredUser") -->
@@ -34,10 +34,112 @@ Inside your view scripts you should use meta-tags to inform FaZend about the fun
  * `@table()` - static table
  * `@form()` - form
 
-== `bar()` ==
+== `@home()` ==
 
-== `link()` ==
+Current page is a home page for the actor. You should mark your `index.phtml` files with this meta, if actor will reach the page by default.
 
-== `table()` ==
+== `@actor()` ==
 
-== `form()` ==
+This page is only for the specified actor. If you need to add several actors to the page, you should add several metas, e.g.:
+
+{{{
+<!— @actor('ActorUser') —>
+<!— @actor('ActorAdmin') —>
+}}}
+
+== `@title()` ==
+
+Describes the title of the page.
+
+== `@text()` ==
+
+Adds a text paragraph. Inside the text you can use special symbols that will be changed to random values while mocking the pages. In the example below UI mockup will show something like `Your balance: 32897 USD`:
+
+{{{
+<!-- @text('Your balance: %5d USD') -->
+}}}
+
+Also, you can specify an array of strings and a random element of the array will be visible in mockup. The example will display one of currency codes:
+
+{{{
+<!-- @text(array('USD', 'EUR', 'GBP')) -->
+}}}
+
+Random string text will be visible instead of `%s` and the size of the text could be modified (_lorem ipsum_ of 50 letters):
+
+{{{
+<!-- @text('%50s')
+    ->setBold() 
+    -->
+}}}
+
+== `@bar()` ==
+
+A collection of links to other pages, e.g.:
+
+{{{
+<!-- @bar()
+    ->addLink('details', 'Your Account Details', 'account/details') 
+    ->addLink('statement', 'Recent Account Statement', 'account/statement') 
+    ->addLink('pdf', 'Download PDF') 
+    -->
+}}}
+
+First parameter of `addLink` is a unique name of the link inside this _bar_. Second parameter is a visible title of this link, visible to end-user. The third optional parameter is a name of view script to be linked.
+
+== `@link()` ==
+
+One simple standalone link to another view script, e.g.:
+
+{{{
+<!— @link()
+    ->setLabel('Click to view account details of user # %3d')
+    ->setDestination('account/details') 
+    -->
+}}}
+
+== `@table()` ==
+
+Spreadsheet with random and static data, e.g.:
+
+{{{
+<!— @table()
+    ->setTotalLines(4)
+    
+    ->addColumn('ID', '%4d', '5')
+    ->addColumn('Country', array('USA', 'Canada', 'Germany'), '9')
+    ->addColumn('IP', '%2d.%2d.%2d.%2d', '13')
+   
+    ->addSorter('ID')
+    ->addSorter('Country')
+
+    ->addOption('delete', false, 'Delete Record')
+    ->addOption('ID', 'account/details')
+
+    ->setPaginator()
+    -->
+}}}
+
+`setTotalLines(n)` tells mockup builder to show _n_ lines in the spreadsheet. `setPaginator()` adds a fake paginator at the end of the spreadsheet.
+
+`addColumn(name, content, width)` adds a new column to the spreadsheet with name equals to _name_, content in each row equals to _content_ and a width of _width_ letters.
+
+`addOption(name, link, header)` adds a link to each row either as a separate label or to certain column. If _name_ equals to a name of some column added previously to the spreadsheet - the link will be attached to this cell. Otherwise it will be visible at the end of row, in a separate column called `options`. _Link_ tells modeler which page to link to every row. _Header_ is an optional title of the link.
+
+`addSorter(name)` adds a sorter option to the column _name_.
+
+== `@form()` ==
+
+Form for data entrance, e.g.:
+
+{{{
+<!-- @form()
+    ->addField('name', 'text', array('John Smith', 'Pamela Nixon'), 'What is your full name:')
+    ->addField('age', 'text', '%3d', 'How old are you:')
+    ->addField('sex', 'select', array('female', 'male'), 'Your sex:')
+    ->addField('comment', 'textarea', 'some text...', 'What is your main interest:')
+    ->addField('save', 'submit', 'Create New Account', 'account/create')
+    -->
+}}}
+
+`addField(name, type, content, header)` adds new field to the form. _Name_ is a unique name of this field. _Type_ could be one of: `text`, `select`, `textarea`, `submit`.
