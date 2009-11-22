@@ -61,7 +61,7 @@ Key steps for a new project setup:
 Add this line to your apache `httpd.conf` file and restart apache:
 
 {{{
-<Directory /code/project/php/src/public>
+<Directory /_path_to_your_project_/php/src/public>
     Options Indexes FollowSymLinks Includes
     SetEnv APPLICATION_ENV development
     Allow from all
@@ -72,5 +72,5 @@ Add this line to your apache `httpd.conf` file and restart apache:
     RewriteBase /project
 </Directory>
 
-Alias /project "/code/project/php/src/public"
+Alias /project "/_path_to_your_project_/php/src/public"
 }}}
