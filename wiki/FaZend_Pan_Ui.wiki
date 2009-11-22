@@ -43,8 +43,8 @@ Current page is a home page for the actor. You should mark your `index.phtml` fi
 This page is only for the specified actor. If you need to add several actors to the page, you should add several metas, e.g.:
 
 {{{
-<!— @actor('ActorUser') —>
-<!— @actor('ActorAdmin') —>
+<!-- @actor('ActorUser') -->
+<!-- @actor('ActorAdmin') -->
 }}}
 
 == `@title()` ==
@@ -92,7 +92,7 @@ First parameter of `addLink` is a unique name of the link inside this _bar_. Sec
 One simple standalone link to another view script, e.g.:
 
 {{{
-<!— @link()
+<!-- @link()
     ->setLabel('Click to view account details of user # %3d')
     ->setDestination('account/details') 
     -->
@@ -103,7 +103,7 @@ One simple standalone link to another view script, e.g.:
 Spreadsheet with random and static data, e.g.:
 
 {{{
-<!— @table()
+<!-- @table()
     ->setTotalLines(4)
     
     ->addColumn('ID', '%4d', '5')
