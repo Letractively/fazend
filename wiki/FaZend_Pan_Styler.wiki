@@ -9,7 +9,7 @@ Inside your `PHTML` files you should use meta tags to add certain behavior, e.g.
 {{{
 <html>
 <?=$this->headLink()->appendFile('http://jqueryui.com/latest/ui/ui.core.js')?>
-<!--%%css('http://jqueryui.com/latest/ui/ui.core.js')%%—>
+<!--%%css('http://jqueryui.com/latest/ui/ui.core.js')%%-->
 
 <table>
 <? foreach ($data as $row): ?>
