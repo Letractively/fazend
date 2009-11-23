@@ -4,7 +4,7 @@
 
 You open a file `FaZend/Pan/Styler/index.html` in any web browser. In the opened page you select a `layout.phtml` file from your project. Click "Open" and you will see your site with CSS and fake data. The same operation can do a HTML/CSS designer without a necessity to deploy a project locally.
 
-You will be forwarded to the URL: `index.html?p=/usr/me/dev/.../application/layout/scripts/layout.phtml`
+You will be forwarded to the URL: `index.html?p=/usr/me/dev/.../application/layout/scripts/layout.phtml&logged=1` (or something similar).
 
 Inside your `PHTML` files you should use meta tags to add certain behavior, e.g. in your `layout.phtml`:
 
@@ -38,3 +38,5 @@ Inside your `PHTML` files you should use meta tags to add certain behavior, e.g.
 </table>
 </html>
 }}}
+
+This approach is very helpful when programmers are separated from graphic designers and the process is very iterative. You need to make changes to CSS and graphics and at the same time changes to functionality.
