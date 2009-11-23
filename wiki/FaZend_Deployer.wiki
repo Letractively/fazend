@@ -6,6 +6,9 @@
 You create a file `application/deploy/database/1 user.sql`:
 
 {{{
+--
+-- This is a simple table for the list of users
+--
 CREATE TABLE IF NOT EXISTS `user` (
   `id` INT UNSIGNED NOT NULL AUTO_INCREMENT COMMENT "Unique ID of the user",
   `email` VARBINARY(200) NOT NULL COMMENT "Unique user email",
