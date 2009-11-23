@@ -40,3 +40,16 @@ Inside your `PHTML` files you should use meta tags to add certain behavior, e.g.
 }}}
 
 This approach is very helpful when programmers are separated from graphic designers and the process is very iterative. You need to make changes to CSS and graphics and at the same time changes to functionality.
+
+= Meta Tags =
+
+All meta tags supported:
+
+ * `html(page)`
+ * `css(page)`
+ * `if(condition)`
+ * `endif()`
+ * `repeat(num)`
+ * `endrepeat()`
+
+Everything else between `<!--%%` and `-->` is treated as unformatted text and is not parsed.
