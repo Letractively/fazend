@@ -4,6 +4,8 @@
 
 You open a file `FaZend/Pan/Styler/index.html` in any web browser. In the opened page you select a `layout.phtml` file from your project. Click "Open" and you will see your site with CSS and fake data. The same operation can do a HTML/CSS designer without a necessity to deploy a project locally.
 
+You will be forwarded to the URL: `index.html?p=/usr/me/dev/.../application/layout/scripts/layout.phtml`
+
 Inside your `PHTML` files you should use meta tags to add certain behavior, e.g. in your `layout.phtml`:
 
 {{{
@@ -18,11 +20,21 @@ Inside your `PHTML` files you should use meta tags to add certain behavior, e.g.
     <td><?=$row->id?><!--%%13%%--></td>
     <td><?=$row->name?><!--%%John Smith%%--></td>
   </tr>
-  <!--%%end()%%-->
+  <!--%%endrepeat()%%-->
 <? endforeach; ?>
 
 <?=$this->render('partials/info.phtml')?>
-<!--%%html('partials/info.phtml')%%-->
+<!--%%html('partials/info.phtml')%%—>
+
+<? if ($user->isLoggedIn()): ?>
+<!--%%if('logged = 1')%%-->
+  <p>Hello, <?=$user->name?>!</p>
+<!--%%endif()%%-->
+<? else: ?>
+<!--%%if('logged = 0')%%-->
+  <p>Please login!</p>
+<!--%%endif()%%-->
+<? endif; ?>
 </table>
 </html>
 }}}
