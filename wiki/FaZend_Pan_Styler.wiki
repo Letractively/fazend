@@ -1,0 +1,25 @@
+#summary HTML to CSS converter and modeler
+
+= How it works =
+
+You open a file `FaZend/Pan/Styler/index.html` in any web browser. In the opened page you select a `layout.phtml` file from your project. Click "Open" and you will see your site with CSS and fake data. The same operation can do a HTML/CSS designer without a necessity to deploy a project locally.
+
+Inside your `PHTML` files you should use meta tags to add certain behavior, e.g. in your `layout.phtml`:
+
+{{{
+<html>
+<?=$this->headLink()->appendFile('http://jqueryui.com/latest/ui/ui.core.js')?>
+<!--%%css('http://jqueryui.com/latest/ui/ui.core.js')%%—>
+
+<table>
+<? foreach ($data as $row): ?>
+  <!--%%repeat(5)%%-->
+  <tr>
+    <td><?=$row->id?><!--%%id%%--></td>
+    <td><?=$row->name?><!--%%name%%--></td>
+  </tr>
+  <!--%%end()%%-->
+<? endforeach; ?>
+</table>
+</html>
+}}}
