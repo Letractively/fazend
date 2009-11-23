@@ -11,7 +11,7 @@ Inside your `PHTML` files you should use meta tags to add certain behavior, e.g.
 {{{
 <html>
 <?=$this->headLink()->appendFile('http://jqueryui.com/latest/ui/ui.core.js')?>
-<!--%%css('http://jqueryui.com/latest/ui/ui.core.js')%%-->
+<!--%%css('http://jqueryui.com/latest/ui/ui.core.js')%%—>
 
 <table>
 <? foreach ($data as $row): ?>
@@ -24,7 +24,7 @@ Inside your `PHTML` files you should use meta tags to add certain behavior, e.g.
 <? endforeach; ?>
 
 <?=$this->render('partials/info.phtml')?>
-<!--%%html('partials/info.phtml')%%—>
+<!--%%html('views/scripts/partials/info.phtml')%%—>
 
 <? if ($user->isLoggedIn()): ?>
 <!--%%if('logged = 1')%%-->
