@@ -15,8 +15,8 @@ Inside your `PHTML` files you should use meta tags to add certain behavior, e.g.
 <? foreach ($data as $row): ?>
   <!--%%repeat(5)%%-->
   <tr>
-    <td><?=$row->id?><!--%%id%%--></td>
-    <td><?=$row->name?><!--%%name%%--></td>
+    <td><?=$row->id?><!--%%13%%--></td>
+    <td><?=$row->name?><!--%%John Smith%%--></td>
   </tr>
   <!--%%end()%%-->
 <? endforeach; ?>
