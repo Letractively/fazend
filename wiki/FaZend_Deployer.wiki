@@ -16,3 +16,5 @@ CREATE TABLE IF NOT EXISTS `user` (
 }}}
 
 That's it. The database will be deployed automatically during the next continuous integration lifecycle.
+
+Files shall be named as `<number> <space> <table name> ".sql"`, where `<number>` is an ordering number, to let Deployer know which table shall be created first, which second, and so forth.
