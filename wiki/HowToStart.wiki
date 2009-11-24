@@ -69,10 +69,12 @@ Add this line to your apache `httpd.conf` file and restart apache:
     RewriteEngine On
     RewriteCond %{REQUEST_FILENAME} !-f
     RewriteRule ^(.*) index.php [L]
-    RewriteBase /project
+    RewriteBase /projectName
 </Directory>
 
-Alias /project "/_path_to_your_project_/php/src/public"
+Alias /projectName "/_path_to_your_project_/php/src/public"
 }}}
 
-Now this link should work: `http://localhost/project`.
+Now this link should work: `http://localhost/projectName`.
+
+Review database configuration parameters you will find in `application/app.ini` in section `development`. You should create a local database and user with the mentioned names. Don't create any tables or views, they will be created automatically from SQL files, by FaZend_Deployer.
