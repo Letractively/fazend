@@ -156,7 +156,7 @@ abstract class FaZend_POS_Abstract implements ArrayAccess
      */
     private function _initObject( $objectId = null, $version = null )
     {
-        $class = get_class( &$this ); 
+        $class = get_class( $this ); 
 
         require_once 'FaZend/POS/Model/Object.php';
         if( $objectId === null ) {
