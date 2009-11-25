@@ -434,8 +434,8 @@ class FaZend_POS_Properties
     public function __get( $name ) 
     {
         $method = 'get' . ucfirst( $name );            
-        if( method_exists( &$this, $method ) ) {
-            return call_user_func( array( &$this, $method  ) );
+        if( method_exists( $this, $method ) ) {
+            return call_user_func( array( $this, $method  ) );
         }
     }
 
@@ -450,8 +450,8 @@ class FaZend_POS_Properties
     public function __set( $name, $value )
     {
         $method = 'set' . ucfirst( $name );
-        if( method_exists( &$this, $method ) ) {
-            return call_user_func( array( &$this, $method ) );
+        if( method_exists( $this, $method ) ) {
+            return call_user_func( array( $this, $method ) );
         }
         throw new FaZend_POS_Exception( 'Cannot set property ' . $name );
     }
