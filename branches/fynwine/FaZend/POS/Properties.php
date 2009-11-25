@@ -60,8 +60,11 @@ class FaZend_POS_Properties
         $this->_fzSnapshot = $snapshot;
         $this->_pos        = $pos;
 
-        require_once 'FaZend/User.php';
-        $this->_user = FaZend_User::getCurrentUser();
+        require_once 'FaZend/POS.php';
+        if( FaZend_POS::$userId == null ) {
+            FaZend_POS::$userId = FaZend_User::getCurrentUser();
+        }
+        $this->_user = FaZend_User::$userId;
     }
 
     
