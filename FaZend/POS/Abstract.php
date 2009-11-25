@@ -86,6 +86,10 @@ abstract class FaZend_POS_Abstract implements ArrayAccess
      */
     public function __construct( $objectId = null, $version = null )
     {
+        //TODO is this reall the place to do this?
+        if( FaZend_POS::$userId === null ) {
+            FaZend_POS::$userId = FaZend_User::getCurrentUser();
+        }
         $this->_initObject( $objectId, $version );
         $this->_init();
     }
@@ -225,8 +229,6 @@ abstract class FaZend_POS_Abstract implements ArrayAccess
         // one will overwrite the changes to the next.
         //---------------------------------------------------------
         if( $this->_state !== self::STATE_CLEAN && !empty( $this->_properties )) {
-
-            
             
             $baselined = $this->_fzSnapshot->baselined;
             require_once 'FaZend/POS/Model/Snapshot.php';
@@ -236,7 +238,7 @@ abstract class FaZend_POS_Abstract implements ArrayAccess
             $this->_fzSnapshot->setProperties( $this->toArray() );
             $this->_fzSnapshot->baselined = $baselined;
             require_once 'FaZend/User.php';
-            $this->_fzSnapshot->save( FaZend_User::getCurrentUser() );
+            $this->_fzSnapshot->save( FaZend_POS::$userId );
 
             foreach( $this->_properties as $name => $prop ) {
                 $this->_properties[ $name ][ 'state' ] = self::STATE_CLEAN;

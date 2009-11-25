@@ -41,8 +41,8 @@ class FaZend_POS_Model_Approval extends FaZend_Db_Table_ActiveRow_fzApproval
     public static function decide( FaZend_POS_Model_Snapshot $fzSnapshot, $decision )
     {
         require_once 'FaZend/User.php';
-        $user = FaZend_User::getCurrentUser();
-        
+        $user = FaZend_POS::$userId;
+
         $fzApproval = self::retrieve()
             ->where( 'fzSnapshot = ?', (string) $fzSnapshot )
             ->where( 'user = ?', $user )

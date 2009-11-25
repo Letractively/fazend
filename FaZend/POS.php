@@ -8,6 +8,13 @@
  */
 final class FaZend_POS
 {
+    /**
+     * The Current FaZend_User id to use.
+     * 
+     * @var int  Defaults to null. 
+     */
+    public static $userId = null;
+
     public static function root()
     {
         /**

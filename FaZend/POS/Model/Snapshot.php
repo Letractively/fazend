@@ -188,9 +188,11 @@ class FaZend_POS_Model_Snapshot extends FaZend_Db_Table_ActiveRow_fzSnapshot
     public function baseline()
     {
         require_once 'FaZend/User.php';
-        $user = FaZend_User::getCurrentUser();
+        if( FaZend_POS::$userId == null ) {
+            FaZend_POS::$userId = FaZend_User::getCurrentUser();
+        }
         $this->baselined = true;
-        self::save( $user );
+        self::save( FaZend_POS::$userId );
     }
 
     /**
