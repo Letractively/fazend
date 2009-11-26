@@ -212,11 +212,15 @@ class FaZend_POS_Model_Snapshot extends FaZend_Db_Table_ActiveRow_fzSnapshot
      * 
      * @return TODO
      */
-    public function save( FaZend_User $user = null )
+    public function save( $user = null )
     {
+        if ( $user instanceOf FaZend_User ) {
+            $user = (string) $user;
+        }
+
         $this->version = self::getNextVersion( $this->fzObject ); 
         $this->alive = 1;
-        $this->user = (string) $user;
+        $this->user = $user;
         parent::save();
     }
 }
