@@ -64,7 +64,7 @@ class FaZend_POS_Properties
         if( FaZend_POS::$userId == null ) {
             FaZend_POS::$userId = FaZend_User::getCurrentUser();
         }
-        $this->_user = FaZend_User::$userId;
+        $this->_user = FaZend_POS::$userId;
     }
 
     
