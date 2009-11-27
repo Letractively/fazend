@@ -45,8 +45,9 @@ This approach is very helpful when programmers are separated from graphic design
 
 All meta tags supported:
 
- * `html(page)`
- * `css(page)`
+ * `html(page)` - injects a HTML page into current layout
+ * `css(page)` - injects a CSS
+ * `img(file)` - injects a graphic file
  * `if(condition)`
  * `endif()`
  * `repeat(num)`
