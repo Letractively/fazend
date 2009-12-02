@@ -12,7 +12,7 @@
  */
 function getFileContent($fileName) {
     if (!file_exists($fileName))
-        Zend_Exception::raise('FileNotFoundException', 
+        FaZend_Exception::raise('FileNotFoundException', 
             "File {$fileName} doesn't exist", 'Exception')
     return file_get_contents($fileName)
 }
