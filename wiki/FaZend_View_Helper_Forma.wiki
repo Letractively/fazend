@@ -34,4 +34,4 @@ Right inside your view script:
     ?>
 }}}
 
-That's it. The form will execute your specified method, passing there form data.
+That's it. The form will execute your specified method. And parameters from the form will be passed to the method specified (`Model_Person::create`).
