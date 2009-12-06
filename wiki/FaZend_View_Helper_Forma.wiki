@@ -1,0 +1,37 @@
+#summary Controller-less forma
+
+= Sample Usage =
+
+Your model class:
+
+{{{
+class Model_Person {
+    public static function create($name, $sex, $sendEmail, $resume, $photo) {
+        // ...
+    }
+}
+}}}
+
+Right inside your view script:
+
+{{{
+<?=$this->forma()
+    ->addField('text', 'name')
+        ->fieldLabel('Your name')
+        ->fieldRequired(true)
+        ->fieldAttrib('maxlength', 45)
+    ->addField('select', 'sex')
+        ->fieldLabel('Your sex')
+        ->fieldOptions(array('female', 'male'))
+    ->addField('hidden', 'sendEmail')
+        ->fieldValue(true)
+    ->addField('textarea', 'resume')
+        ->fieldAttrib('cols', 50)
+        ->fieldAttrib('rows', 5)
+    ->addField('file', 'photo')
+    ->addField('submit')
+        ->fieldAction('Model_Person', 'create')
+    ?>
+}}}
+
+That's it. The form will execute your specified method, passing there form data.
