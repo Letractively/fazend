@@ -35,3 +35,9 @@ Right inside your view script:
 }}}
 
 That's it. The form will execute your specified method. And parameters from the form will be passed to the method specified (`Model_Person::create`).
+
+The benefits you get:
+
+ * Majority of forms don't need controllers, since they are simple
+ * Validation could be done in model class, throwing exceptions out - they will be converted into form error messages
+ * You don't need INI files for form creation and in general less text to type
