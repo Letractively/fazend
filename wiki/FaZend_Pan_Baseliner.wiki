@@ -42,7 +42,7 @@ New unit test is created and added to the project repository. Now either all you
 The format is simple:
 
 {{{
-@baseline <email> <method> ([<params>]) <comment>
+@baseline <email> <method> ([<params>]) [<comment>]
 }}}
 
 to be continued...
