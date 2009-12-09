@@ -4,7 +4,7 @@
 
 You have some architecture and design concepts, that you want to stay in your code no matter what. There are many people in the project team and you can't control what each of them will do later with your code. When you're an architect, you want to implement some architecture concepts and rest assured that they are not compromised later.
 
-The proposed scenario ('''this is just an idea, no implementation yet'''):
+The proposed scenario (*this is just an idea, no implementation yet*):
 
  1. You declare your concepts right inside the code by means of docBlock tag `@baseline`
  1. You run a unit test creator that collects all baseline tags and creates a unit test
@@ -24,15 +24,25 @@ class Model_Image {
 }
 }}}
 
-When you're creating this class you want to be sure that '''never''' during the lifecycle of the project it could be removed from the code, no matter what other programmers decide to do. You use `@baseline` construct, as shown above.
+When you're creating this class you want to be sure that *never* during the lifecycle of the project it could be removed from the code, no matter what other programmers decide to do. You use `@baseline` construct, as shown above.
 
 Then you make a unit test:
 
 {{{
-$ php index.php Baseliner
+$ php index.php Baseliner me@example.com mesecretpassword
 ………
 unit test successfully created, 28 baseline instructions found and documented
 file saved: ../tests/baseliner/me-example-com-BaselinerTest.php
 }}}
 
 New unit test is created and added to the project repository. Now either all your baseline instructions are valid or the unit test fails.
+
+= Full Reference of `@baseline` =
+
+The format is simple:
+
+{{{
+@baseline <email> <method> ([<params>]) <comment>
+}}}
+
+to be continued...
