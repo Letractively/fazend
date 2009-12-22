@@ -16,6 +16,7 @@ Right inside your view script:
 
 {{{
 <?=$this->forma()
+    ->setBehavior('forward', 'index', 'index')
     ->addField('text', 'name')
         ->fieldLabel('Your name')
         ->fieldRequired(true)
