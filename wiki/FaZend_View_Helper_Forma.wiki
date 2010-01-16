@@ -17,6 +17,7 @@ Right inside your view script:
 {{{
 <?=$this->forma()
     ->setBehavior('forward', 'index', 'index')
+    ->addAttrib('id', 'form13')
     ->addField('text', 'name')
         ->fieldLabel('Your name')
         ->fieldRequired(true)
@@ -24,12 +25,14 @@ Right inside your view script:
     ->addField('select', 'sex')
         ->fieldLabel('Your sex')
         ->fieldOptions(array('female', 'male'))
+        ->fieldConverter('integer') // convert this field into INTEGER
     ->addField('hidden', 'sendEmail')
         ->fieldValue(true)
     ->addField('textarea', 'resume')
         ->fieldAttrib('cols', 50)
         ->fieldAttrib('rows', 5)
     ->addField('file', 'photo')
+        ->fieldConverter('Model_File', 'factory') // convert it by means of Model_File::factory()
     ->addField('submit')
         ->fieldAction('Model_Person', 'create')
     ?>
