@@ -1,0 +1,47 @@
+<!--
+ *
+ * FaZend Framework
+ *
+ * This source file is subject to the new BSD license that is bundled
+ * with this package in the file LICENSE.txt. It is also available 
+ * through the world-wide-web at this URL: http://www.fazend.com/license
+ * If you did not receive a copy of the license and are unable to
+ * obtain it through the world-wide-web, please send an email
+ * to license@fazend.com so we can send you a copy immediately.
+ *
+-->
+
+<?=$this->render('adm/_menu.phtml')?>
+
+<h1>Content of DB tables<?=$this->table ? ' [' . $this->table . ']' : false?></h1>
+
+<p>table: <select onChange="window.location = '<?=$this->url(array('action'=>'tables', 'table'=>''), 'adm', true)?>/' + this.options[this.selectedIndex].text;">
+    <? foreach ($this->tables as $table): ?>
+
+        <option name="<?=$table?>" <?=$this->table == $table ? 'selected="selected"' : false?>><?=$table?></option>
+
+    <? endforeach; ?>
+</select><?=$this->table ? '&nbsp;' . count($this->retrieve->fetchAll()) . ' total' : false?></p>
+
+<? if ($this->table): ?>
+
+    <? 
+    try {
+        
+        $customScript = 'adm/' . strtolower($this->table) . '.phtml';
+        echo $this->render($customScript);
+
+    } catch (Zend_View_Exception $e) {
+    ?>
+
+        <p style="color: red;">If you want to customize this view, 
+        just create [<tt><?=$customScript?></tt>] file in your view scripts directory.</p>
+
+    <? } ?>
+
+    <?=$this->htmlTable()
+        ->setPaginator($this->paginator)?>
+
+    <p><?=$this->paginator?></p>
+
+<? endif; ?>

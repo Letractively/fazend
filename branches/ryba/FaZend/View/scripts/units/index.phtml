@@ -1,0 +1,65 @@
+<!--
+ *
+ * FaZend Framework
+ *
+ * This source file is subject to the new BSD license that is bundled
+ * with this package in the file LICENSE.txt. It is also available 
+ * through the world-wide-web at this URL: http://www.fazend.com/license
+ * If you did not receive a copy of the license and are unable to
+ * obtain it through the world-wide-web, please send an email
+ * to license@fazend.com so we can send you a copy immediately.
+ *
+-->
+
+<?
+    $this->includeCSS('units.css');
+
+    $this->includeJQuery();
+    $this->includeJS('units.js');
+
+    $this->headTitle('units');
+?>
+
+<div class="wrapper">
+
+    <? $latest = ''; ?>
+
+    <? foreach ($this->tests as $test): ?>
+
+        <? foreach (($sectors = array_slice(explode('/', $test), 0, -1)) as $id=>$sector): ?>
+
+            <? $title = implode('/', array_slice($sectors, 0, $id+1)); ?>
+
+            <? if (strpos($latest, $title) !== false) continue; ?>
+
+            <span style="margin-left: <?=substr_count($title, '/') * 20?>px;"><?=$sector?></span>
+            <br/>
+
+        <? endforeach; ?>
+
+        <? $md5 = 'x' . md5($test); ?>
+
+        <span class="unit"
+            style="margin-left: <?=substr_count($test, '/') * 20?>px;"
+            id="<?=$md5?>"
+            title="<?=$this->escape($test)?>"
+            onclick="run($('#<?=$md5?>'), $('#log_<?=$md5?>'), '<?=$test?>');"><?=$this->escape(ltrim(substr($test, strrpos($test, '/')), '/'))?></span>
+            
+        <span class="unitlog" 
+            id="log_<?=$md5?>"
+            onclick="stop('<?=$test?>');"
+            title="stop it now"></span>
+
+        <br/>
+
+        <? $latest = $test; ?>
+
+    <? endforeach; ?>
+
+</div>
+
+<div class="panel">
+    <pre id="output"></pre>
+    <pre id="protocol"></pre>
+</div>
+
