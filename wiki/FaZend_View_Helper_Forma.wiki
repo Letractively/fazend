@@ -5,8 +5,13 @@
 Your model class:
 
 {{{
-class Model_Person {
-    public static function create($name, $sex, $sendEmail, $resume, $photo) {
+class Model_Person
+{
+    public static function create($name, $sex, $sendEmail, $resume, Model_File $photo)
+    {
+        validate()
+            ->type($sex, 'integer', "SEX should be BOOL (TRUE=male, FALSE=female")
+            ->regex($name, '/^[a-zA-Z\s]+$/', "Invalid name format");
         // ...
     }
 }
@@ -24,8 +29,8 @@ Right inside your view script:
         ->fieldAttrib('maxlength', 45)
     ->addField('select', 'sex')
         ->fieldLabel('Your sex')
-        ->fieldOptions(array('female', 'male'))
-        ->fieldConverter('integer') // convert this field into INTEGER
+        ->fieldOptions(array(0=>'female', 1=>'male'))
+        ->fieldConverter('boolean') // convert this field into INTEGER
     ->addField('hidden', 'sendEmail')
         ->fieldValue(true)
     ->addField('textarea', 'resume')
