@@ -10,7 +10,7 @@ class Model_Person
     public static function create($name, $sex, $sendEmail, $resume, Model_File $photo)
     {
         validate()
-            ->type($sex, 'integer', "SEX should be BOOL (TRUE=male, FALSE=female")
+            ->type($sex, 'boolean', "SEX should be BOOL (TRUE=male, FALSE=female")
             ->regex($name, '/^[a-zA-Z\s]+$/', "Invalid name format");
         // ...
     }
