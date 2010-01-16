@@ -87,7 +87,19 @@ $list = Owner::retrieve(false) // don't use default FROM clause
     ->from('owner', array('name')) // specify where to select FROM
     ->where('name > ?', new Zend_Db_Expr('NOW()')) // use Zend syntax
     ->setRowClass('OwnerName') // set class name of each returned row
-    ->fetchAll();
+    ->fetchOne(); // select just one column
+}}}
+
+You can use dynamic binding:
+
+{{{
+$list = Owner::retrieve()
+    ->where('name LIKE :pattern')
+    ->orWhere('id IN :ids')
+    ->fetchAll(array(
+        'pattern'=>'[[:alnum:]]', 
+        'ids' => array(1, 3, 45, 98)
+    ));
 }}}
 
 == Delayed `fetchAll()` ==
