@@ -30,7 +30,7 @@ Right inside your view script:
     ->addField('select', 'sex')
         ->fieldLabel('Your sex')
         ->fieldOptions(array(0=>'female', 1=>'male'))
-        ->fieldConverter('boolean') // convert this field into INTEGER
+        ->fieldConverter('boolean') // convert this field into BOOLEAN
     ->addField('hidden', 'sendEmail')
         ->fieldValue(true)
     ->addField('textarea', 'resume')
