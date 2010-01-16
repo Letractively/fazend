@@ -15,7 +15,7 @@ class Model_Person {
 Right inside your view script:
 
 {{{
-<?=$this->forma()
+<?=$this->forma(1) // this id will distinguish many forms on one page
     ->setBehavior('forward', 'index', 'index')
     ->addAttrib('id', 'form13')
     ->addField('text', 'name')
