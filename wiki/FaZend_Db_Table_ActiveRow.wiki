@@ -118,3 +118,18 @@ SELECT COUNT(*) FROM (...)
 }}}
 
 Where `...` will be replaced by your original SQL query. All this is done on-fly.
+
+= Class Mapping =
+
+In you bootstrap add this line:
+
+{{{
+FaZend_Db_Table_ActiveRow::addMapping('/^product\.created$/', 'Zend_Date');
+}}}
+
+Now you will get `Zend_Date` directly from DB, i.e.:
+
+{{{
+$product = new Model_Product(23); // get object from DB by primary key ID
+echo $product->created->get(Zend_Date::DATE_MEDIUM);
+}}}
