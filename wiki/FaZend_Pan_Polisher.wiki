@@ -1,0 +1,17 @@
+#summary Automated code polisher
+
+= Scenario of Usage =
+
+You should create a file `LICENSE.txt` in `/project_root/trunk/php/LICENSE.txt`, which should have one first line and a paragraph of text. This text will be automatically inserted into every `PHP`, `CSS`, `PHTML` files.
+
+Then you go with this:
+
+{{{
+$ cd php/src/public
+$ php index.php Polish --dry-run
+}}}
+
+Read the log. When you're happy with what you see, remove the `--dry-run' parameter and make real changes to the code. Polisher makes the following changes to the code:
+
+ * Converts TAB-s into 4 spaces
+ * Injects LICENSE.txt into docBlocks
