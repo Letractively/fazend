@@ -21,12 +21,15 @@ Right inside your view script:
 
 {{{
 <?=$this->forma(1) // this id will distinguish many forms on one page
+    ->addBehavior('flash', 'Account registered: %s (%d bytes in resume)', 
+        array('{name}', 'strlen(strval({resume}))')) // set flashMessage message
     ->addBehavior('redirect', 'registered', 'index') // will be forwarded to /index/registered
     ->addAttrib('id', 'form13')
     ->addField('text', 'name')
         ->fieldLabel('Your name')
         ->fieldRequired(true)
         ->fieldAttrib('maxlength', 45)
+        ->fieldConverter('Model_Name') // convert field into Model_Name
     ->addField('select', 'sex')
         ->fieldLabel('Your sex')
         ->fieldOptions(array(0=>'female', 1=>'male'))
