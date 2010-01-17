@@ -21,7 +21,7 @@ Right inside your view script:
 
 {{{
 <?=$this->forma(1) // this id will distinguish many forms on one page
-    ->setBehavior('forward', 'index', 'index')
+    ->addBehavior('redirect', 'registered', 'index') // will be forwarded to /index/registered
     ->addAttrib('id', 'form13')
     ->addField('text', 'name')
         ->fieldLabel('Your name')
