@@ -15,3 +15,9 @@ Read the log. When you're happy with what you see, remove the `--dry-run' parame
 
  * Converts TAB-s into 4 spaces
  * Injects LICENSE.txt into docBlocks
+
+We're planning to integrate `PHP_Beautifier` here, in order to enable the following changes:
+
+ * To enforce Kernigan&Richie style of curled braces
+ * To enforce an existence of phpDoc blocks for every method, class and file
+ * To enforce proper indentation
