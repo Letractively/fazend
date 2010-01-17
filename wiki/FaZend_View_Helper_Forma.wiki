@@ -21,8 +21,8 @@ Right inside your view script:
 
 {{{
 <?=$this->forma(1) // this id will distinguish many forms on one page
-    ->addBehavior('flash', 'Account registered: %s (%d bytes in resume)', 
-        array('{name}', 'strlen(strval({resume}))')) // set flashMessage message
+    ->addBehavior('flash', 
+        'Account registered: %s (%d bytes in resume)', '{name}', 'strlen(strval({resume}))') // set flashMessage message
     ->addBehavior('redirect', 'registered', 'index') // will be forwarded to /index/registered
     ->addAttrib('id', 'form13')
     ->addField('text', 'name')
