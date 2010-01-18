@@ -12,6 +12,7 @@ Inside your view script:
     ->addColumnLink('email', 'id', 'id', array('action'=>'edit'))
     ->setParser('password', create_function('$value, $row', 'return "***";'))
     ->addColumnStyle('email', "width: 120px;")
+    ->addConverter('email', 'Model_Email')
     ->allowRawHtml('details')
     ->addOption('del', 'id', 'id', array('action'=>'del'))
     ->skipOption('del', create_function('$row', 'return !$row->isAdmin();'))
@@ -55,3 +56,11 @@ tr.highlight
 `setNoDataMessage($msg)` changes the default `no data` message to the custom one. This message is visible when the paginator has no data to render.
 
 `addColumnLink($title, $httpVar, $column, array $urlParams)` adds a link right to the column, using the same style of link specification as `addOption()`. The link will be located on the entire text of the given column (`$title`).
+
+`addConverter($column, $class, $method)` adds new converter to the column value. The converter could be one of the following:
+
+ * a scalar type name: `integer`, `boolean`, `string`, or `float`
+ * a `callback`
+ * a string starting with `->`, which will be attached to the value to get it's sub-element
+ * name of the class
+ * name of the class and name of the static method in this class.
