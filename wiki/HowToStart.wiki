@@ -35,7 +35,7 @@ FaZend http://fazend.googlecode.com/svn/trunk/FaZend
 Save the file and do this:
 
 {{{
-svn commit projectName -m "svn:externals properly set"
+svn commit projectName -m "svn:externals property set"
 }}}
 
 From now on the directory `/library` will have two subdirectories: `Zend` and `FaZend`, which will updated automatically from other repositories every time you `svn update` your project. The benefits you get:
