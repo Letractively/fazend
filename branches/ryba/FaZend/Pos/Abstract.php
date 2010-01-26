@@ -23,7 +23,7 @@
  * POS root or to some other POS object, e.g.:
  *
  * <code>
- * FaZend_Pos_Abstract::root()->obj = $obj = new Model_My_Pos_Object();
+ * FaZend_Pos_Properties::root()->obj = $obj = new Model_My_Pos_Object();
  * $obj->test = 'works good!';
  * </code>
  *
@@ -32,20 +32,6 @@
 abstract class FaZend_Pos_Abstract implements ArrayAccess, Countable, Iterator
 {
     
-    /**
-     * Root object
-     *
-     * @var FaZend_Pos_Abstract
-     **/
-    protected static $_root = null;
-    
-    /**
-     * Name of root class
-     *
-     * @var string
-     **/
-    protected static $_rootClass = 'FaZend_Pos_Root';
-   
     /**
      * Contains the system properties for this object
      * 
@@ -63,77 +49,13 @@ abstract class FaZend_Pos_Abstract implements ArrayAccess, Countable, Iterator
     protected $__posId = null;
 
     /**
-     * Set name of root class
-     *
-     * You can give your own name of the class, which will be used for
-     * ROOT object. Overriding the _init() method in that class you will
-     * be able to initialize your root tree before usage.
-     *
-     * Your ROOT class should be a child from FaZend_Pos_Root.
-     *
-     * @param string Name of root class
-     * @return void
-     **/
-    public static function setRootClass($rootClass) 
-    {
-        self::$_rootClass = $rootClass;
-        self::cleanPosMemory();
-    }
-
-    /**
-     * Get root object, the main object of the entire POS tree
-     *
-     * @return FaZend_Pos_Abstract
-     **/
-    public static function root() 
-    {
-        if (is_null(self::$_root)) {
-            self::$_root = new self::$_rootClass();
-            self::$_root->init();
-        }
-        return self::$_root;
-    }
-
-    /**
-     * Clean the entire POS structure from memory
-     *
-     * Be careful with this method, it is mostly used for unit testing. When
-     * you're clearing the memory, you DON'T save changes to the database. All
-     * your changes will be saved only during destruction of objects. Consider
-     * the example:
-     *
-     * <code>
-     * FaZend_Pos_Abstract::root()->obj = $obj = new Model_My_Pos_Object();
-     * $obj->test = 'works good!';
-     * FaZend_Pos_Abstract::cleanPosMemory();
-     * isset(FaZend_Pos_Abstract::root()->obj->test); // return FALSE
-     * </code>
-     *
-     * Another example, which explains how it should be done:
-     *
-     * <code>
-     * FaZend_Pos_Abstract::root()->obj = $obj = new Model_My_Pos_Object();
-     * $obj->test = 'works good!';
-     * $obj->ps()->save(); // forces the object to be saved to DB
-     * FaZend_Pos_Abstract::cleanPosMemory();
-     * isset(FaZend_Pos_Abstract::root()->obj->test); // return TRUE
-     * </code>
-     *
-     * @return void
-     **/
-    public static function cleanPosMemory() 
-    {
-        self::$_root = null;
-        FaZend_Pos_Properties::cleanPosMemory();
-    }
-    
-    /**
      * Constructor, you CAN'T override it!
      *
      * If you need to setup some initial (!) behavior, you should use init()
      *
      * @return void
      * @see init()
+     * @throws FaZend_Pos_Abstract_ExplicitPropertyFound
      */
     public final function __construct()
     {
@@ -144,32 +66,13 @@ abstract class FaZend_Pos_Abstract implements ArrayAccess, Countable, Iterator
             if ($property->isStatic())
                 continue;
             if (!in_array($property->getName(), array('__ps', '__posId'))) {
-                FaZend_Exception::raise('FaZend_Pos_Abstract_ExplicitPropertyFound',
+                FaZend_Exception::raise(
+                    'FaZend_Pos_Abstract_ExplicitPropertyFound',
                     "You're not allowed to explicitly declare properties in POS classes, " .
                     "since they won't be persistent. Property '{$property->getName()}' found in " .
-                    get_class($this));
+                    get_class($this)
+                );
             }
-        }
-    }
-
-    /**
-     * Save all changes to DB
-     *
-     * @return void
-     **/
-    public final function __destruct() 
-    {
-        // We don't want any exceptions to be thrown in constructor, 
-        // since they will destroy the entire application framework. That's
-        // why we catch them here and log them.
-        try {
-            $this->ps()->save(false);
-        } catch (FaZend_Pos_Exception $e) {
-            $msg = get_class($e) . ' in ' . get_class($this) . "::__destruct: {$e->getMessage()}";
-            if (defined('TESTING_RUNNING'))
-                echo $msg . "\n";
-            else
-                logg($msg);
         }
     }
 
@@ -192,12 +95,12 @@ abstract class FaZend_Pos_Abstract implements ArrayAccess, Countable, Iterator
      * example:
      *
      * <code>
-     * FaZend_Pos_Abstract::root()->obj = $obj = new Model_My_Pos_Object();
+     * FaZend_Pos_Properties::root()->obj = $obj = new Model_My_Pos_Object();
      * $obj->test = 'works good!';
      * $obj->ps()->save(); // you're saving changes to the DB
      * $ver = $obj->ps()->version; // you get current version of the object
-     * FaZend_Pos_Abstract::cleanPosMemory();
-     * isset(FaZend_Pos_Abstract::root()->obj->test); // return TRUE
+     * FaZend_Pos_Properties::cleanPosMemory();
+     * isset(FaZend_Pos_Properties::root()->obj->test); // return TRUE
      * </code>
      *
      * Object in the DB are static, while in PHP they are dymanic. In other
@@ -205,8 +108,8 @@ abstract class FaZend_Pos_Abstract implements ArrayAccess, Countable, Iterator
      * For example:
      *
      * <code>
-     * $car = FaZend_Pos_Abstract::root()->car;
-     * $car2 = FaZend_Pos_Abstract::root()->car;
+     * $car = FaZend_Pos_Properties::root()->car;
+     * $car2 = FaZend_Pos_Properties::root()->car;
      * </code>
      *
      * As you see from the example, two PHP variables will be linked to the
@@ -220,15 +123,37 @@ abstract class FaZend_Pos_Abstract implements ArrayAccess, Countable, Iterator
      * @param FaZend_Pos_Properties Properties to be explicitly set, if we need
      *     to link this object to already existing clone. The method will be called
      *     with this parameter specified only from FaZend_Pos_Properties::_attachTo()
+     * @param boolean Throw exception if nothing found?
+     * @param boolean Clean PS?
      * @return FaZend_Pos_Properties
      * @see FaZend_Pos_Properties::_attachTo()
+     * @throws FaZend_Pos_LostObjectException
      */
-    public final function ps(FaZend_Pos_Properties $ps = null)
+    public final function ps(FaZend_Pos_Properties $ps = null, $throwException = true, $clean = false)
     {
-        if (!is_null($ps))
+        if ($ps instanceof FaZend_Pos_Properties)
             $this->__ps = $ps;
-        if (!isset($this->__ps))
-            $this->__ps = new FaZend_Pos_Properties($this);
+            
+        if (is_null($this->__ps)) {
+            if (!$throwException)
+                return null;
+                
+            FaZend_Exception::raise(
+                'FaZend_Pos_LostObjectException',
+                sprintf(
+                    'Object of class %s is not in POS, ->ps() is not accessible (spl: %s)',
+                    get_class($this),
+                    spl_object_hash($this)
+                ),
+                'FaZend_Pos_Exception'
+            );
+        }
+        // clean it, see FaZend_Pos_Properties::cleanPosMemory()
+        if ($clean) {
+            unset($this->__ps);
+            return null;
+        }
+            
         return $this->__ps;
     }
 
@@ -426,23 +351,26 @@ abstract class FaZend_Pos_Abstract implements ArrayAccess, Countable, Iterator
     public function __wakeup() 
     {
         if ($this instanceof FaZend_Pos_Root) {
-            FaZend_Exception::raise('FaZend_Pos_RootUnserializationProhibited',
+            FaZend_Exception::raise(
+                'FaZend_Pos_RootUnserializationProhibited',
                 "Object of class " . get_class($this) . " can't be unserialized, since it's ROOT",
-                'FaZend_Pos_Exception');
+                'FaZend_Pos_Exception'
+            );
         }
 
         if (!isset($this->__posId) || !$this->__posId) {
-            FaZend_Exception::raise('FaZend_Pos_UnserializationFailure',
+            FaZend_Exception::raise(
+                'FaZend_Pos_UnserializationFailure',
                 "Object of class " . get_class($this) . " wasn't properly serialized",
-                'FaZend_Pos_Exception');
+                'FaZend_Pos_Exception'
+            );
         }
 
         // The only thing we know about the object is its ID (fzObject.id).
         // Now we should recover its "parent", in order to make it attached
         // to the POS structure. This operation will be done recursively, until
         // the ROOT is reached.
-        $this->ps()->recoverById($this->__posId);
-        
+        FaZend_Pos_Properties::recoverById($this, $this->__posId);
     }
 
     /**
@@ -455,9 +383,11 @@ abstract class FaZend_Pos_Abstract implements ArrayAccess, Countable, Iterator
     public function __sleep() 
     {
         if ($this instanceof FaZend_Pos_Root) {
-            FaZend_Exception::raise('FaZend_Pos_RootSerializationProhibited',
+            FaZend_Exception::raise(
+                'FaZend_Pos_RootSerializationProhibited',
                 "Object of class " . get_class($this) . " can't be serialized, since it's ROOT",
-                'FaZend_Pos_Exception');
+                'FaZend_Pos_Exception'
+            );
         }
 
         // We should validate, maybe we already serialized this object before?
@@ -468,9 +398,11 @@ abstract class FaZend_Pos_Abstract implements ArrayAccess, Countable, Iterator
                 $this->__posId = $this->ps()->id;
                 $this->ps()->save();
             } catch (FaZend_Pos_LostObjectException $e) {
-                FaZend_Exception::raise('FaZend_Pos_SerializationProhibited',
+                FaZend_Exception::raise(
+                    'FaZend_Pos_SerializationProhibited',
                     "Object of class " . get_class($this) . " can't be serialized, since it's not in POS",
-                    'FaZend_Pos_Exception');
+                    'FaZend_Pos_Exception'
+                );
             } 
         }
         

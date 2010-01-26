@@ -17,34 +17,23 @@
 require_once 'FaZend/View/Helper/Forma/Field.php';
 
 /**
- * Text field, but hidden
+ * Just show log
  *
- * @package Model_Form
+ * @package helpers
  */
-class FaZend_View_Helper_Forma_FieldHidden extends FaZend_View_Helper_Forma_Field
+class FaZend_View_Helper_Forma_Behavior_ShowLog extends FaZend_View_Helper_Forma_Behavior_Abstract
 {
 
     /**
-     * Create and return form element
+     * Execute it
      *
-     * @param string Name of the element
-     * @return Zend_Form_Element
-     */
-    protected function _getFormElement($name)
-    {
-        return new Zend_Form_Element_Hidden($name);
-    }
-
-    /**
-     * Configure form element
-     *
-     * @param Zend_Form_Element The element to configure
+     * @param string HTML to show (form or something else)
+     * @param string Log of the form execution
      * @return void
      */
-    protected function _configureFormElement(Zend_Form_Element $element)
+    public function run(&$html, $log)
     {
-        $element->setDecorators(array())
-            ->setValue($this->_value);
+        $html = "<pre class='log'>{$log}</pre>";
     }
 
 }

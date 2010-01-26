@@ -21,14 +21,16 @@ require_once 'FaZend/Controller/Action.php';
  *
  * @package controllers
  */ 
-class Fazend_ErrorController extends FaZend_Controller_Action { 
+class Fazend_ErrorController extends FaZend_Controller_Action
+{
 
     /**
      * Not found action
      *
      * @return void
      */
-    public function notfoundAction() {
+    public function notfoundAction()
+    {
         // 404 error -- controller or action not found
         $this->getResponse()->setHttpResponseCode(404);
 
@@ -47,7 +49,8 @@ class Fazend_ErrorController extends FaZend_Controller_Action {
      *
      * @return void
      */
-    public function errorAction() { 
+    public function errorAction()
+    { 
         // Ensure the default view suffix is used so we always return good 
         // content
         $this->_helper->viewRenderer->setViewSuffix('phtml');
@@ -88,17 +91,19 @@ class Fazend_ErrorController extends FaZend_Controller_Action {
         $this->view->showError = FaZend_Properties::get()->errors->display;
 
         // notify admin by email
-        if (FaZend_Properties::get()->errors->email) {
+        if (FaZend_Properties::get()->errors->email && !defined('TESTING_RUNNING')) {
             $lines = array();
             foreach (debug_backtrace() as $line) 
-                $lines[] = "{$line['file']} ({$line['line']})";
+                $lines[] = isset($line['file']) ? "{$line['file']} ({$line['line']})" : false;
 
             $siteName = parse_url(WEBSITE_URL, PHP_URL_HOST);
             // send email to the site admin admin
             FaZend_Email::create('fazendException.tmpl')
                 ->set('toEmail', FaZend_Properties::get()->errors->email)
                 ->set('toName', 'Admin of ' . $siteName)
-                ->set('subject', $siteName . ' internal PHP error, rev.' . FaZend_Revision::get() . ', ' . $_SERVER['REQUEST_URI'])
+                ->set('subject', $siteName . ' internal PHP error, rev.' . 
+                    FaZend_Revision::get() . 
+                    (isset($_SERVER['REQUEST_URI']) ? ', ' . $_SERVER['REQUEST_URI'] : false))
                 ->set('text', 
                     get_class($errors->exception) . ': ' . $errors->exception->getMessage() . "\n\n" .
                     implode("\n", $lines) . "\n\n" .

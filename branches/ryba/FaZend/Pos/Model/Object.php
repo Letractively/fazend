@@ -15,10 +15,9 @@
  */
 
 /**
- * TODO: short description.
+ * 'fzObject' PHP representative
  * 
- * TODO: long description.
- * 
+ * @package Pos
  */
 class FaZend_Pos_Model_Object extends FaZend_Db_Table_ActiveRow_fzObject
 {
@@ -31,13 +30,13 @@ class FaZend_Pos_Model_Object extends FaZend_Db_Table_ActiveRow_fzObject
      * @param string Name inside the parent
      * @return FaZend_Pos_Model_Object
      */
-    public static function create(FaZend_Pos_Abstract $pos, FaZend_Pos_Abstract $parent, $name)
+    public static function create(FaZend_Pos_Abstract $pos, FaZend_Pos_Abstract $parent = null, $name = null)
     {
-        $object = new FaZend_Pos_Model_Object();
+        $object = new self();
         $object->class = get_class($pos);
         $object->save();
         
-        FaZend_Pos_Model_PartOf::create($object, $parent->ps()->fzObject, $name);
+        // FaZend_Pos_Model_PartOf::create($object, $parent->ps()->fzObject, $name);
         
         return $object;
     }
@@ -48,6 +47,7 @@ class FaZend_Pos_Model_Object extends FaZend_Db_Table_ActiveRow_fzObject
      * @param FaZend_Pos_Abstract Parent object
      * @param string Name inside the parent
      * @return FaZend_Pos_Model_Object
+     * @throws FaZend_Pos_Model_Object_NotFoundException
      */
     public static function findByParent(FaZend_Pos_Abstract $parent, $name)
     {
@@ -74,7 +74,7 @@ class FaZend_Pos_Model_Object extends FaZend_Db_Table_ActiveRow_fzObject
                 ->fetchRow()
                 ;
         } catch (FaZend_Pos_Model_Object_NotFoundException $e) {
-            $root = new FaZend_Pos_Model_Object();
+            $root = new self();
             $root->class = 'FaZend_Pos_Root';
             $root->save();
             return $root;

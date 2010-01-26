@@ -32,7 +32,7 @@
 
     <!-- main task, executed by the project -->
     <target name="main" 
-        depends="svn, lint, test, deploy, sniffer, doc, ping, clean"
+        depends="svn, lint, phpcs, test, deploy, sniffer, doc, ping, clean"
         description="Validate, compile, deploy and clean">
     </target>
 
@@ -45,6 +45,9 @@
 
         <if><not><isset property="to.coverage" /></not><then>
             <property name="to.coverage" value="false" /></then></if>
+
+        <if><not><isset property="to.phpcs" /></not><then>
+            <property name="to.phpcs" value="false" /></then></if>
 
         <if><isset property="to.deploy" /><then>
             <echo msg="Property [to.deploy] is set by caller: ${to.deploy}" />    
@@ -154,23 +157,36 @@
                 </batchtest>
             </phpunit>
         </then><else>
-            <phpunit printsummary="yes" haltonerror="yes" haltonfailure="yes">
-                <formatter type="plain" usefile="no" />
-                <batchtest>
-                    <fileset dir="${project.basedir}/src/library/FaZend/Test/tests">
-                        <include name="**/*Test.php"/>
-                        <exclude name="**/Abstract*.php"/>
-                        <exclude name="**/_*.php"/>
-                        <exclude name=".svn/**"/>
-                    </fileset>
-                    <fileset dir="${project.basedir}/test">
-                        <include name="**/*Test.php"/>
-                        <exclude name="**/Abstract*.php"/>
-                        <exclude name="**/_*.php"/>
-                        <exclude name=".svn/**"/>
-                    </fileset>
-                </batchtest>
-            </phpunit>
+            <!-- one individual test, specified in -Dto.unit=... -->
+            <if><isset property="to.unit" /><then>
+                <phpunit printsummary="yes" haltonerror="yes" haltonfailure="yes">
+                    <formatter type="plain" usefile="no" />
+                    <batchtest>
+                        <fileset dir="${project.basedir}">
+                            <include name="${to.unit}"/>
+                            <include name="test/${to.unit}"/>
+                        </fileset>
+                    </batchtest>
+                </phpunit>
+            </then><else>
+                <phpunit printsummary="yes" haltonerror="yes" haltonfailure="yes">
+                    <formatter type="plain" usefile="no" />
+                    <batchtest>
+                        <fileset dir="${project.basedir}/src/library/FaZend/Test/tests">
+                            <include name="**/*Test.php"/>
+                            <exclude name="**/Abstract*.php"/>
+                            <exclude name="**/_*.php"/>
+                            <exclude name=".svn/**"/>
+                        </fileset>
+                        <fileset dir="${project.basedir}/test">
+                            <include name="**/*Test.php"/>
+                            <exclude name="**/Abstract*.php"/>
+                            <exclude name="**/_*.php"/>
+                            <exclude name=".svn/**"/>
+                        </fileset>
+                    </batchtest>
+                </phpunit>
+            </else></if>
         </else></if>
 
         <if><istrue value="${to.deploy}" /><then>
@@ -229,6 +245,24 @@
             <echo msg="Access protection files deployed to code coverage report directory" />    
         </then></if>
     </target>    
+
+    <target name="phpcs" description="Validate the quality of PHP code with PHPCS utility">
+        <if><istrue value="${to.phpcs}" /><then>
+            <!-- see: http://pear.php.net/package/PHP_CodeSniffer/download -->
+            <exec command="phpcs 
+                -n
+                --report=full
+                --standard=Zend 
+                --ignore='.svn/*' 
+                --extensions='php' 
+                ${project.basedir}/src/application" 
+                escape="false"
+                checkreturn="true" 
+                passthru="true" />
+        </then><else>
+            <echo msg="Skipped, since to.phpcs is FALSE" />    
+        </else></if>
+    </target>
 
     <target name="sniffer" description="Run PHP Code Sniffer to validate code quality">
         <if><istrue value="${to.deploy}" /><then>
@@ -299,7 +333,10 @@
     </target>
 
     <target name="ping" description="Ping the production server and show the result">
-        <if><istrue value="${to.deploy}" /><then>
+        <if><and>
+            <istrue value="${to.deploy}" />
+            <isset property="live.home" />
+        </and><then>
             <!-- the Task is defined as PHP class, see phings/UploadByFTP.php -->
             <taskdef name="pingFaZend" classname="src.library.FaZend.Application.Phing.PingFaZend" />
 
@@ -318,6 +355,7 @@
         <if><istrue value="${to.deploy}" /><then>
             <!-- delete all previously created documentation -->
             <delete dir="${project.basedir}/build/api" failonerror="true" verbose="false" includeemptydirs="true" />
+            <mkdir dir="${project.basedir}/build/api" />
 
             <!-- create new php documentation -->
             <exec command="phpdoc --useconfig ${project.basedir}/src/library/FaZend/Application/Phing/phpDocumentor.ini" 

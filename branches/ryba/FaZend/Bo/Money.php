@@ -31,11 +31,13 @@ class FaZend_Bo_Money
 {
 
     /**
-     * The value, in cents, in original currency (NOT in USD!)
+     * The value, in points, in original currency (NOT in USD!)
+     *
+     * 100 points = 1 cent
      *
      * @var integer
      */
-    protected $_cents;
+    protected $_points;
     
     /**
      * Currency
@@ -78,6 +80,17 @@ class FaZend_Bo_Money
     }
 
     /**
+     * Create object from given amount of POINTS
+     *
+     * @param integer Total amount of points
+     * @return FaZend_Bo_Money
+     */
+    public static function convertFromPoints($points) 
+    {
+        return self::factory($points / 10000);
+    }
+
+    /**
      * Set value
      *
      * @param string Text representation of the cost
@@ -90,14 +103,33 @@ class FaZend_Bo_Money
         $value = (string)$value;
         
         if ($value && !is_numeric($value)) {
-            if (!preg_match('/^([\-\+]?\d+(?:\.\d+)?)(?:\s?(\w{3}))?$/', str_replace(',', '', $value), $matches)) {
+            // remove spaces and replace comas with dots
+            $value = preg_replace(
+                array('/\s+/', '/\,/'), 
+                array('', '.'), 
+                $value
+            );
+
+            // @todo this is UGLY, and we need to do it with regexp
+            $slices = explode('.', $value);
+            $value = implode('', array_slice($slices, 0, -1)) . '.' . $slices[count($slices)-1];
+            
+            // @todo Zend_Locale should be properly used 
+            // bug(Zend_Locale::getTranslationList('currency'));
+            if (preg_match('/[a-zA-Z]{3}/', $value, $matches)) {
+                $currency = strtoupper($matches[0]);
+            }
+            
+            // validate format
+            if (!preg_match('/\d+(?:\.\d+)?/', $value, $matches)) {
                 FaZend_Exception::raise(
                     'FaZend_Bo_Money_InvalidFormat', 
-                    "Invalid cost format: '{$value}'"
+                    "Invalid cost format '{$value}', numeric literal not found"
                 );
             }
-            $value = $matches[1];
-            $currency = $matches[2];
+            if (strpos($value, '-') !== false)
+                $matches[0] = '-' . $matches[0];
+            $value = $matches[0];
         }
         
         // we should implement it properly
@@ -105,8 +137,9 @@ class FaZend_Bo_Money
             ->setFormat(array(
                 'precision' => 2, // cents to show
                 'display' => Zend_Currency::USE_SHORTNAME,
-                'position' => Zend_Currency::RIGHT));
-        $this->_cents = (int)($value * 100);
+                'position' => Zend_Currency::RIGHT
+            ));
+        $this->_points = (int)($value * 10000);
     }
 
     /**
@@ -116,7 +149,7 @@ class FaZend_Bo_Money
      */
     public function __toString()
     {
-        return $this->_currency->toCurrency($this->_cents / 100);
+        return $this->_currency->toCurrency($this->_points / 10000);
     }
 
     /**
@@ -130,9 +163,19 @@ class FaZend_Bo_Money
     {
         switch ($name) {
             case 'usd':
-                return $this->_getCents() / 100;
+                return $this->_getPoints() / 10000;
             case 'cents':
-                return $this->_getCents();
+                return $this->_getPoints() / 100;
+            case 'points':
+                return $this->_getPoints();
+            case 'original':
+                return $this->_points / 10000;
+            case 'origCents':
+                return $this->_points / 100;
+            case 'origPoints':
+                return $this->_points;
+            case 'currency':
+                return $this->_currency;
             default:
                 FaZend_Exception::raise(
                     'FaZend_Bo_Money_UnknownProperty',
@@ -142,14 +185,15 @@ class FaZend_Bo_Money
     }
 
     /**
-     * Return the value in USD (cents)
+     * Return the value in USD points
      *
      * @return integer
      * @todo implement it properly, getting conversion rates somewhere
+     * @uses $_points
      */
-    protected function _getCents()
+    protected function _getPoints()
     {
-        return $this->_cents * $this->_getRate($this->_currency);
+        return $this->_points * $this->_getRate($this->_currency);
     }
     
     /**
@@ -161,7 +205,7 @@ class FaZend_Bo_Money
     public function add($money = null)
     {
         $this->_normalize($money);
-        $this->_cents += $money;
+        $this->_points += $money;
         return $this;
     }
 
@@ -174,7 +218,7 @@ class FaZend_Bo_Money
     public function sub($money = null)
     {
         $this->_normalize($money);
-        $this->_cents -= $money;
+        $this->_points -= $money;
         return $this;
     }
 
@@ -194,7 +238,7 @@ class FaZend_Bo_Money
             );
         }
 
-        $this->_cents *= $money;
+        $this->_points *= $money;
         return $this;
     }
 
@@ -218,9 +262,9 @@ class FaZend_Bo_Money
         }
         
         if ($money instanceof FaZend_Bo_Money)
-            return $this->_cents / $div;
+            return $this->_points / $div;
 
-        $this->_cents /= $money;
+        $this->_points /= $money;
         return $this;
     }
 
@@ -234,8 +278,8 @@ class FaZend_Bo_Money
     {
         $this->_normalize($money);
         if ($orEqual)
-            return $this->_cents >= $money;
-        return $this->_cents > $money;
+            return $this->_points >= $money;
+        return $this->_points > $money;
     }
 
     /**
@@ -248,8 +292,18 @@ class FaZend_Bo_Money
     {
         $this->_normalize($money);
         if ($orEqual)
-            return $this->_cents <= $money;
-        return $this->_cents < $money;
+            return $this->_points <= $money;
+        return $this->_points < $money;
+    }
+    
+    /**
+     * Is it zero?
+     *
+     * @return boolean
+     */
+    public function isZero() 
+    {
+        return empty($this->_points);
     }
     
     /**
@@ -292,15 +346,15 @@ class FaZend_Bo_Money
                 break;
             
             case $money instanceof FaZend_Bo_Money:
-                $money = $money->cents;
+                $money = $money->points;
                 break;
         
             case is_string($money):
-                $money = self::factory($money)->cents;
+                $money = self::factory($money)->points;
                 break;
         
             default:
-                $money *= 100;
+                $money *= 10000;
                 break;
         }
     }

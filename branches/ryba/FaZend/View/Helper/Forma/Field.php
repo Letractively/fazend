@@ -9,10 +9,9 @@
  * obtain it through the world-wide-web, please send an email
  * to license@fazend.com so we can send you a copy immediately.
  *
- * @author Yegor Bugaenko <egor@technoparkcorp.com>
- * @copyright Copyright (c) TechnoPark Corp., 2001-2009
+ * @copyright Copyright (c) FaZend.com
  * @version $Id$
- *
+ * @category FaZend
  */
 
 /**
@@ -22,6 +21,13 @@
  */
 abstract class FaZend_View_Helper_Forma_Field
 {
+
+    /**
+     * List of directories where to find plugins
+     *
+     * @var string[]
+     */
+    protected static $_pluginDirs = array();
 
     /**
      * Helper instance
@@ -82,6 +88,18 @@ abstract class FaZend_View_Helper_Forma_Field
      * @see _setConvertTo()
      */
     protected $_converters = array();
+    
+    /**
+     * Add new directory to list of dirs where to find plugins
+     *
+     * @param string Class name prefix
+     * @param string Absolute path to the dir
+     * @return void
+     */
+    public static function addPluginDir($prefix, $dir) 
+    {
+        self::$_pluginDirs[$prefix] = $dir;
+    }
 
     /**
      * Private constructor
@@ -98,14 +116,23 @@ abstract class FaZend_View_Helper_Forma_Field
      *
      * @param string Type of field
      * @param Helper_Forma Form, the owner
-     * @return Model_Form_Field
-     * #throws Model_Form_Field_ClassNotFound
+     * @return FaZend_View_Helper_Form_Field
+     * @throws FaZend_View_Helper_Forma_Field_NotFound
      */
     public static function factory($type, FaZend_View_Helper_Forma $helper)
     {
-        require_once 'FaZend/View/Helper/Forma/Field' . ucfirst($type) . '.php';
-        $className = 'FaZend_View_Helper_Forma_Field' . ucfirst($type);
-        return new $className($helper);
+        foreach (self::$_pluginDirs as $prefix=>$dir) {
+            $file = $dir . '/Field' . ucfirst($type) . '.php';
+            if (file_exists($file)) {
+                require_once $file;
+                $className = $prefix . ucfirst($type);
+                return new $className($helper);
+            }
+        }
+        FaZend_Exception::raise(
+            'FaZend_View_Helper_Forma_Field_NotFound',
+            "Plugin '{$type}' not found"
+        );
     }
 
     /**
@@ -137,6 +164,7 @@ abstract class FaZend_View_Helper_Forma_Field
      * @param string Method name
      * @param array List of params
      * @return value
+     * @throws FaZend_View_Helper_Forma_InvalidOption
      */
     public function __call($method, $args)
     {
@@ -145,11 +173,12 @@ abstract class FaZend_View_Helper_Forma_Field
 
         // ->fieldRequired(...) will be converted to _setRequired(...)
         $func = '_set' . substr($method, 5);
-        if (!method_exists($this, $func))
+        if (!method_exists($this, $func)) {
             FaZend_Exception::raise(
                 'FaZend_View_Helper_Forma_InvalidOption', 
                 "Method '{$func}' is unknown in " . get_class($this)
             );
+        }
             
         call_user_func_array(array($this, $func), $args);
 
@@ -274,41 +303,48 @@ abstract class FaZend_View_Helper_Forma_Field
      * Setter, to add label to the field
      *
      * @param string Label to show above the field
-     * @return void
+     * @return $this
      */
-    protected function _setLabel($label) {
+    protected function _setLabel($label)
+    {
         $this->_label = $label;
+        return $this;
     }
 
     /**
      * Setter, to add help message to the field
      *
      * @param string Help to show below the field
-     * @return void
+     * @return $this
      */
-    protected function _setHelp($help) {
+    protected function _setHelp($help)
+    {
         $this->_help = $help;
+        return $this;
     }
 
     /**
      * Setter, to add value to the field
      *
      * @param string Value to show in the field
-     * @return void
+     * @return $this
      */
-    protected function _setValue($value) {
+    protected function _setValue($value)
+    {
         $this->_value = $value;
+        return $this;
     }
 
     /**
      * This field is required
      *
      * @param boolean Is it required?
-     * @return void
+     * @return $this
      */
     protected function _setRequired($required = true)
     {
         $this->_required = $required;
+        return $this;
     }
 
     /**
@@ -316,22 +352,24 @@ abstract class FaZend_View_Helper_Forma_Field
      *
      * @param string Attribute name
      * @param string Attribute value
-     * @return void
+     * @return $this
      */
     protected function _setAttrib($attrib, $value)
     {
         $this->_attribs[$attrib] = $value;
+        return $this;
     }
 
     /**
      * Set new validator
      *
      * @param callback Validator of the field value
-     * @return void
+     * @return $this
      */
     protected function _setValidator($validator)
     {
         $this->_validators[] = $validator;
+        return $this;
     }
 
     /**
@@ -339,7 +377,7 @@ abstract class FaZend_View_Helper_Forma_Field
      *
      * @param string Type name
      * @param string Method name to use for conversion
-     * @return void
+     * @return $this
      * @uses $_converters
      */
     protected function _setConverter($type, $method = null)
@@ -348,6 +386,7 @@ abstract class FaZend_View_Helper_Forma_Field
             'type' => $type,
             'method' => $method
         );
+        return $this;
     }
 
 }
