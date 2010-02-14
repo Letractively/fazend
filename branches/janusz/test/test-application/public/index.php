@@ -19,15 +19,15 @@ defined('APPLICATION_PATH') or
     define('APPLICATION_PATH', realpath('../'));
 defined('FAZEND_PATH') or
     define('FAZEND_PATH', realpath('../../../FaZend'));
-    
-$zendPath = realpath(dirname(__FILE__) . '/../../../../zend-trunk');
-if (!$zendPath || !is_dir($zendPath)) {
-    echo "Installation Error: Zend Framework /trunk should be located here: {$zendPath}";
-    die();
-} else {
-    defined('ZEND_PATH') or define('ZEND_PATH', $zendPath);
+
+$zendPath = getenv('ZEND_PATH');
+if (empty($zendPath)) {
+    $zendPath = realpath(dirname(__FILE__) . '/../../../../zend-trunk');
 }
-set_include_path(realpath($zendPath) . PATH_SEPARATOR . get_include_path());
+defined('ZEND_PATH') or
+    define('ZEND_PATH', $zendPath);
 unset($zendPath);
+
+set_include_path(realpath(ZEND_PATH) . PATH_SEPARATOR . get_include_path());
 
 include '../../../FaZend/Application/index.php';

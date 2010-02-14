@@ -189,7 +189,10 @@ class FaZend_Pan_Ui_Navigation
                 $matches = array();
                 if (preg_match_all('/<!--\s?\@actor\s?\([\"\'](.*?)[\'\"]\)/', $content, $matches)) {
                     foreach ($matches[1] as $match) {
-                        $actors[] = $this->_allow($match, $label);
+                        $match = explode(':', $match);
+                        foreach ($match as $actor) {
+                            $actors[] = $this->_allow(trim($actor), $label);
+                        }
                     }
                 } else {
                     $actors[] = $this->_allow(self::ANONYMOUS, $label);
