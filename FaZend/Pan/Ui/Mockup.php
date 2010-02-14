@@ -165,9 +165,12 @@ class FaZend_Pan_Ui_Mockup
         $actors = array();
 
         foreach ($this->_getMetas() as $meta)
-            if ($meta instanceof FaZend_Pan_Ui_Meta_Actor)
-                $actors[] = $meta->label;
-
+            if ($meta instanceof FaZend_Pan_Ui_Meta_Actor) {
+                $tmp = explode(':', $meta->label);
+                foreach ($tmp as $actor) {
+                    $actors[] = trim($actor);
+                }
+            }
         return $actors;
     }
 
