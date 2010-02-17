@@ -10,11 +10,16 @@
  * @return string Content of the given file
  * @throw FileNotFoundException If a given file is not found
  */
-function getFileContent($fileName) {
-    if (!file_exists($fileName))
-        FaZend_Exception::raise('FileNotFoundException', 
-            "File {$fileName} doesn't exist", 'Exception')
-    return file_get_contents($fileName)
+function getFileContent($fileName)
+{
+    if (!file_exists($fileName)) {
+        FaZend_Exception::raise(
+            'FileNotFoundException', 
+            "File '{$fileName}' doesn't exist",
+            'Exception'
+        );
+    }
+    return file_get_contents($fileName);
 }
 
 /**
@@ -23,7 +28,8 @@ function getFileContent($fileName) {
  * @param string Long line
  * @return void
  */
-function echoLog($line) {
+function echoLog($line)
+{
     try {
         echo $this->getFileContent(self::LOGFILE);
     } catch (FileNotFoundException $e) {
