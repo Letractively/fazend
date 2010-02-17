@@ -52,12 +52,20 @@ echo Renderer::factory(
     )
 )->render($dates);
 
-// using class method
+// using class method, will always return now()
 echo Renderer::factory(
     array(
         'Zend_Date', // class name, or it could be an object
-        'get' // method name
+        'now' // method name, static only
     )
+)->render($dates);
+
+// using lambda function, PHP 5.3+
+echo Renderer::factory(
+    function ($date)
+    {
+        return $date->get(Zend_Date::MONTH);
+    }
 )->render($dates);
 }}}
 
@@ -70,3 +78,65 @@ As you see, in `Renderer` you don't have to worry about the callback format, you
  * FaZend_Db_Table_ActiveRow: for class mapping
 
 = Injections =
+
+Sometimes you need callback to have links to other objects, not only to the parameters sent to it. For example you want to create a callback, which will convert date to certain format, predefined:
+
+{{{
+echo Renderer::factory(
+    FaZend_Callback::factory('${a1}->get(${i1})')
+    ->inject(Zend_Date::MONTH)
+)->render($dates);
+}}}
+
+In the example above `${i1}` will be replaced by the first injected parameter (`Zend_Date::MONTH`). This mechanism is very useful if you need your callback to access some "global" variables, and change them, e.g.:
+
+{{{
+$max = null;
+echo Renderer::factory(
+    FaZend_Callback::factory(
+        '
+        ${a1}->get(Zend_Date::MONTH);
+        if (${a1}->isLater(${i1})) {
+            ${i1}->set(${a1});
+        }
+        '
+    )
+    ->inject($max)
+)->render($dates);
+echo "Maximum date is: {$max}";
+}}}
+
+= Callbacks in `htmlTable()` view helper =
+
+You can use callbacks in `htmlTable()` view helper, in order to change types of cells or formatting of cells/rows:
+
+{{{
+<?=$this->htmlTable()
+    ->setIterator($dates)
+    ->showColumns(null)
+    ->addColumn('get')
+    ->setColumnTitle('Month')
+    ->addConverter('get', '${a1}->get(Zend_Date::MONTH)')
+    ->addFormatter('${a2}->isEarlier(Zend_Date::now())', 'color:red')
+    ?>
+}}}
+
+= Callbacks in `forma()` view helper =
+
+You can use callbacks in `forma()` view helper, in order to change types of input values:
+
+{{{
+<?=$this->forma()
+    ->addBehavior('nothing')
+    ->addField('text', 'a1')
+        ->fieldAttrib('maxlength', 20)
+        ->fieldAttrib('size', 15)
+        ->fieldLabel('Date Of Birth')
+        ->fieldConverter('new Zend_Date(${a1})')
+    ->addField('submit', 'submit')
+        ->fieldValue('Set Date of Birth')
+        ->fieldAction(array($user, 'setDateOfBirth'))
+    ?>
+}}}
+
+Two callbacks are used: one for field conversion to `Zend_Date` type, and second for `setDateOfBirth()` calling.
