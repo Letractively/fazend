@@ -1,6 +1,6 @@
 #summary Simple way of working with exceptions
 
-= Example usage of FaZend_Exception =
+= Dynamic Exception Classes, Usage Example =
 
 {{{
 /**
