@@ -50,7 +50,8 @@ echo Renderer::factory(
         '$date',
         'return $date->get(Zend_Date::MONTH)'
     )
-)->render($dates);
+)
+->render($dates);
 
 // using class method, will always return now()
 echo Renderer::factory(
@@ -58,7 +59,8 @@ echo Renderer::factory(
         'Zend_Date', // class name, or it could be an object
         'now' // method name, static only
     )
-)->render($dates);
+)
+->render($dates);
 
 // using lambda function, PHP 5.3+
 echo Renderer::factory(
@@ -66,7 +68,8 @@ echo Renderer::factory(
     {
         return $date->get(Zend_Date::MONTH);
     }
-)->render($dates);
+)
+->render($dates);
 }}}
 
 As you see, in `Renderer` you don't have to worry about the callback format, you just call it passing some variables into it.
@@ -85,7 +88,8 @@ Sometimes you need callback to have links to other objects, not only to the para
 echo Renderer::factory(
     FaZend_Callback::factory('${a1}->get(${i1})')
     ->inject(Zend_Date::MONTH)
-)->render($dates);
+)
+->render($dates);
 }}}
 
 In the example above `${i1}` will be replaced by the first injected parameter (`Zend_Date::MONTH`). This mechanism is very useful if you need your callback to access some "global" variables, and change them, e.g.:
@@ -102,7 +106,8 @@ echo Renderer::factory(
         '
     )
     ->inject($max)
-)->render($dates);
+)
+->render($dates);
 echo "Maximum date is: {$max}";
 }}}
 
