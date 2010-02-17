@@ -124,7 +124,10 @@ Where `...` will be replaced by your original SQL query. All this is done on-fly
 In you bootstrap add this line:
 
 {{{
-FaZend_Db_Table_ActiveRow::addMapping('/^product\.created$/', 'Zend_Date');
+FaZend_Db_Table_ActiveRow::addMapping(
+    '/^product\.created$/', 
+    'new Zend_Date(${a1})'
+);
 }}}
 
 Now you will get `Zend_Date` directly from DB, i.e.:
