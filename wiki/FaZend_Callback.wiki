@@ -1,0 +1,72 @@
+#summary Universal callback wrapper
+
+= Usase Sample =
+
+Imagine you need to instruct your class about some behavior that it has to call, when necessary. There are a few options in PHP to do it:
+
+ * pass PHP string to `eval()`
+ * create new function with `create_function()` and pass it as parameter
+ * instruct to call some method in some class, giving its details as `array()`
+ * create lambda function (PHP5.3 only)
+
+All such options are wrapped in one class `FaZend_Callback` in order to abstract the caller from the options selected by the behavior provider. Here we define a `Renderer` class, that is responsible for rendering of an array of some items. This class doesn't know how exactly to render each element, but it relies on the callback injected:
+
+{{{
+class Renderer
+{
+    protected $_callback;
+    public function factory($callback)
+    {
+        $renderer = new self();
+        $renderer->_callback = FaZend_Callback::factory($callback);
+        return $renderer;
+    }
+    public function render(array $items)
+    {
+        $html = '';
+        foreach ($items as $item) {
+            $html .= $this->_callback->call($item);
+        }
+        return $html;
+    }
+}
+}}}
+
+Now you can use this class in different ways:
+
+{{{
+$dates = array(
+    new Zend_Date('10/12/2010'),
+    new Zend_Date('3/7/2009'),
+    Zend_Date::now(),
+);
+
+// using eval()
+echo Renderer::factory('${a1}->get(Zend_Date::MONTH)')->render($dates);
+
+// using create_function()
+echo Renderer::factory(
+    create_function(
+        '$date',
+        'return $date->get(Zend_Date::MONTH)'
+    )
+)->render($dates);
+
+// using class method
+echo Renderer::factory(
+    array(
+        'Zend_Date', // class name, or it could be an object
+        'get' // method name
+    )
+)->render($dates);
+}}}
+
+As you see, in `Renderer` you don't have to worry about the callback format, you just call it passing some variables into it.
+
+`FaZend_Callback` is used in:
+
+ * FaZend_View_Helper_HtmlTable: for formatters and converters
+ * FaZend_View_Helper_Forma: for converters
+ * FaZend_Db_Table_ActiveRow: for class mapping
+
+= Injections =
