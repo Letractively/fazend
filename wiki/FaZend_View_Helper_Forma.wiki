@@ -21,15 +21,23 @@ Right inside your view script:
 
 {{{
 <?=$this->forma(1) // this id will distinguish many forms on one page
-    ->addBehavior('flash', 
-        'Account registered: %s (%d bytes in resume)', '{name}', 'strlen(strval({resume}))') // set flashMessage message
+    ->addBehavior(
+        'flash', 
+        '
+        sprintf(
+            "Account registered: %s (%d bytes in resume)", 
+            ${a1}, 
+            strlen(strval(${a4}))
+        )
+        '
+    ) // set flashMessage message
     ->addBehavior('redirect', 'registered', 'index') // will be forwarded to /index/registered
     ->addAttrib('id', 'form13')
     ->addField('text', 'name')
         ->fieldLabel('Your name')
         ->fieldRequired(true)
         ->fieldAttrib('maxlength', 45)
-        ->fieldConverter('Model_Name') // convert field into Model_Name
+        ->fieldConverter('new Model_Name(${a1})') // convert field into Model_Name
     ->addField('select', 'sex')
         ->fieldLabel('Your sex')
         ->fieldOptions(array(0=>'female', 1=>'male'))
@@ -40,9 +48,9 @@ Right inside your view script:
         ->fieldAttrib('cols', 50)
         ->fieldAttrib('rows', 5)
     ->addField('file', 'photo')
-        ->fieldConverter('Model_File', 'factory') // convert it by means of Model_File::factory()
+        ->fieldConverter('Model_File::factory(${a1}') // convert it by means of Model_File::factory()
     ->addField('submit')
-        ->fieldAction('Model_Person', 'create')
+        ->fieldAction(array('Model_Person', 'create')) // call Model_Person::create(), when the form is filled
     ?>
 }}}
 
