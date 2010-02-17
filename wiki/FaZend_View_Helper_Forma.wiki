@@ -48,7 +48,7 @@ Right inside your view script:
         ->fieldAttrib('cols', 50)
         ->fieldAttrib('rows', 5)
     ->addField('file', 'photo')
-        ->fieldConverter('Model_File::factory(${a1}') // convert it by means of Model_File::factory()
+        ->fieldConverter('Model_File::factory(${a1})') // convert it by means of Model_File::factory()
     ->addField('submit')
         ->fieldAction(array('Model_Person', 'create')) // call Model_Person::create(), when the form is filled
     ?>
