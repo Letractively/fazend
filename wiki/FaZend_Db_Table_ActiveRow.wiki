@@ -1,5 +1,7 @@
 #summary Zend Object-Relational Mapping (ORM)
 
+Read more in php|Architect, February 2010, article named "FaZend: Object Relational Mapping"
+
 = Assumptions =
 
 We assume that:
