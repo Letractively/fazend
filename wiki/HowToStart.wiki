@@ -22,7 +22,7 @@ Your project structure should be like this (full example in /directory-structure
 Then do this (`vi` on Linux machine, `notepad` on Windows):
 
 {{{
-svn propedit svn:externals ProjectName/trunk/php/src/library --editor-cmd=vi
+$ svn propedit svn:externals ProjectName/trunk/php/src/library --editor-cmd=vi
 }}}
 
 In the file opened for edit add these two lines:
@@ -35,7 +35,7 @@ FaZend http://fazend.googlecode.com/svn/trunk/FaZend
 Save the file and do this:
 
 {{{
-svn commit projectName -m "svn:externals property set"
+$ svn commit projectName -m "svn:externals property set"
 }}}
 
 From now on the directory `/library` will have two subdirectories: `Zend` and `FaZend`, which will updated automatically from other repositories every time you `svn update` your project. The benefits you get:
@@ -55,6 +55,16 @@ Key steps for a new project setup:
   # Setup Google Analytics and configure it in `app.ini`
   # Setup Google Webmasters and verify it
   # configure files in your project: `build.properties`, `app.ini`, `backup.ini`
+
+== Initial Deployment of Directory Structure ==
+
+In order to add default FaZend files to your project directory you can do this:
+
+{{{
+$ svn co svn://svn.fazend.com/my-project /path/to/my/project
+$ svn export http://fazend.googlecode.com/svn/trunk/directory-structure /path/to/my/project
+$ svn ci -m "initial directory structure" /path/to/my/project
+}}}
 
 = Local Configuration =
 
