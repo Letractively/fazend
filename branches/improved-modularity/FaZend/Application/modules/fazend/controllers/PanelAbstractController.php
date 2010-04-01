@@ -14,15 +14,22 @@
  * @category FaZend
  */
 
+/**
+ * FaZend_Controller_Action
+ */
 require_once 'Zend/Controller/Action.php';
-require_once 'FaZend/Controller/controllers/LoginController.php';
+
+/**
+ * @see Fazend_LoginController
+ */
+require_once 'FaZend/Application/modules/fazend/controllers/LoginController.php';
 
 /**
  * Action controller for Panel
  *
  * @package Controller
  */
-class FaZend_Controller_Panel extends FaZend_Controller_Action
+abstract class Fazend_PanelAbstractController extends FaZend_Controller_Action
 {
 
     /**

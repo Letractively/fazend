@@ -44,6 +44,8 @@ class FaZend_Application_Resource_Fazend extends Zend_Application_Resource_Resou
             "[Fazend.name] should be defined in your app.ini file"
         );
         FaZend_Revision::setName($name);
+        
+        
     }
 
 }

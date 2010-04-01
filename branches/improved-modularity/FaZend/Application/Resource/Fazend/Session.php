@@ -56,7 +56,7 @@ class FaZend_Application_Resource_Fazend_Session extends Zend_Application_Resour
             return;
         }
 
-        $dir = TEMP_PATH . '/' . FaZend_Properties::get()->name . '-sessions';
+        $dir = TEMP_PATH . '/' . FaZend_Revision::getName() . '-sessions';
         
         // create this directory if necessary
         if (!file_exists($dir)) {

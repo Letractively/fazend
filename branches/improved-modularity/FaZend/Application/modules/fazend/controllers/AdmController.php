@@ -14,14 +14,17 @@
  * @category FaZend
  */
 
-require_once 'FaZend/Controller/Action.php';
+/**
+ * @see Fazend_PanelAbstractController
+ */
+require_once 'FaZend/Application/modules/fazend/controllers/PanelAbstractController.php';
 
 /**
  * Admin controller
  *
  * @package controllers
  */
-class Fazend_AdmController extends FaZend_Controller_Panel
+class Fazend_AdmController extends Fazend_PanelAbstractController
 {
 
     /**

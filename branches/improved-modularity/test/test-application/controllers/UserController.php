@@ -14,7 +14,7 @@
  * @category FaZend
  */
 
-require_once 'FaZend/Controller/controllers/UserController.php';
+require_once 'FaZend/Application/modules/fazend/controllers/UserController.php';
             
 /**
  * User functions (login, logout, register, etc)

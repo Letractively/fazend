@@ -15,12 +15,17 @@
  */
 
 /**
+ * @see Fazend_PanelAbstractController
+ */
+require_once 'FaZend/Application/modules/fazend/controllers/PanelAbstractController.php';
+
+/**
  * Map of the database
  *
  * @package Pan
  * @subpackage Database
  */
-class Fazend_DbmapController extends FaZend_Controller_Panel
+class Fazend_DbmapController extends Fazend_PanelAbstractController
 {
 
     /**

@@ -15,11 +15,16 @@
  */
 
 /**
+ * @see Fazend_PanelAbstractController
+ */
+require_once 'FaZend/Application/modules/fazend/controllers/PanelAbstractController.php';
+
+/**
  * User Interface Modeller
  *
  * @package controllers
  */
-class Fazend_UiController extends FaZend_Controller_Panel
+class Fazend_UiController extends Fazend_PanelAbstractController
 {
 
     /**
