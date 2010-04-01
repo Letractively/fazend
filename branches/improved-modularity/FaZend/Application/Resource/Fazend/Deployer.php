@@ -10,38 +10,41 @@
  * to license@fazend.com so we can send you a copy immediately.
  *
  * @copyright Copyright (c) FaZend.com
- * @version $Id$
+ * @version $Id: Deployer.php 1747 2010-03-17 19:17:38Z yegor256@gmail.com $
  * @category FaZend
  */
 
+/**
+ * @see Zend_Application_Resource_ResourceAbstract
+ */
 require_once 'Zend/Application/Resource/ResourceAbstract.php';
 
 /**
- * Resource for initializing FaZend_Email
+ * Deployer of DB
  *
  * @uses Zend_Application_Resource_Base
  * @package Application
  * @subpackage Resource
  */
-class FaZend_Application_Resource_Email extends Zend_Application_Resource_ResourceAbstract
+class FaZend_Application_Resource_Fazend_Deployer extends Zend_Application_Resource_ResourceAbstract
 {
 
     /**
-     * Defined by Zend_Application_Resource_Resource
+     * Initializes the resource
      *
-     * @return boolean
+     * @return void
+     * @see Zend_Application_Resource_Resource::init()
      */
-    public function init()
+    public function init() 
     {
-        // get options from INI file
-        $options = $this->getOptions();
+        // db is mandatory
+        if (!$this->getBootstrap()->hasPluginResource('db')) {
+            return;
+        }
+        
+        $this->_bootstrap->bootstrap('db');
 
-        // make sure view is initialized
-        $this->_bootstrap->bootstrap('view');
-
-        // save configuration into static class
-        FaZend_Email::config(new Zend_Config($options), $this->_bootstrap->getResource('view'));
-
-        return true;
+        // configure deployer and deploy DB schema
+        FaZend_Deployer::getInstance(new Zend_Config($this->getOptions()))->deploy();
     }
 }

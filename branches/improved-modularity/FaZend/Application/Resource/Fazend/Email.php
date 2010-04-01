@@ -10,7 +10,7 @@
  * to license@fazend.com so we can send you a copy immediately.
  *
  * @copyright Copyright (c) FaZend.com
- * @version $Id$
+ * @version $Id: Email.php 1747 2010-03-17 19:17:38Z yegor256@gmail.com $
  * @category FaZend
  */
 
@@ -20,13 +20,14 @@
 require_once 'Zend/Application/Resource/ResourceAbstract.php';
 
 /**
- * Resource for initializing FaZend framework
+ * Resource for initializing FaZend_Email
  *
  * @uses Zend_Application_Resource_Base
  * @package Application
  * @subpackage Resource
+ * @see FaZend_Email
  */
-class FaZend_Application_Resource_Fazend extends Zend_Application_Resource_ResourceAbstract
+class FaZend_Application_Resource_Fazend_Email extends Zend_Application_Resource_ResourceAbstract
 {
 
     /**
@@ -35,16 +36,16 @@ class FaZend_Application_Resource_Fazend extends Zend_Application_Resource_Resou
      * @return void
      * @see Zend_Application_Resource_Resource::init()
      */
-    public function init() 
+    public function init()
     {
-        $options = $this->getOptions();
-        validate()->true(
-            isset($options['name']),
-            "[Fazend.name] should be defined in your app.ini file"
+        // make sure view is initialized
+        $this->_bootstrap->bootstrap('view');
+
+        // save configuration into static class
+        FaZend_Email::config(
+            new Zend_Config($this->getOptions()), 
+            $this->_bootstrap->getResource('view')
         );
-
-        $config = new Zend_Config($options);
-        FaZend_Properties::setOptions($config);
     }
-
+    
 }

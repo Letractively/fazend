@@ -10,7 +10,7 @@
  * to license@fazend.com so we can send you a copy immediately.
  *
  * @copyright Copyright (c) FaZend.com
- * @version $Id$
+ * @version $Id: Fazend.php 1762 2010-03-28 09:32:36Z yegor256@gmail.com $
  * @category FaZend
  */
 
@@ -20,13 +20,13 @@
 require_once 'Zend/Application/Resource/ResourceAbstract.php';
 
 /**
- * Resource for initializing FaZend framework
+ * DB profiler in test environment
  *
  * @uses Zend_Application_Resource_Base
  * @package Application
  * @subpackage Resource
  */
-class FaZend_Application_Resource_Fazend extends Zend_Application_Resource_ResourceAbstract
+class FaZend_Application_Resource_Fazend_Profiler extends Zend_Application_Resource_ResourceAbstract
 {
 
     /**
@@ -35,16 +35,21 @@ class FaZend_Application_Resource_Fazend extends Zend_Application_Resource_Resou
      * @return void
      * @see Zend_Application_Resource_Resource::init()
      */
-    public function init() 
+    protected function _initDbProfiler() 
     {
-        $options = $this->getOptions();
-        validate()->true(
-            isset($options['name']),
-            "[Fazend.name] should be defined in your app.ini file"
-        );
+        // profiler is used ONLY in development environment
+        if (APPLICATION_ENV === 'production') {
+            return;
+        }
 
-        $config = new Zend_Config($options);
-        FaZend_Properties::setOptions($config);
+        // maybe there is no DB in the application, sometimes it happens :)
+        if (!$this->_bootstrap->hasPluginResource('db')) {
+            return;
+        }
+
+        // turn ON the profiler
+        $this->_bootstrap->bootstrap('db');
+        $this->_bootstrap->getResource('db')->setProfiler(true);
     }
 
 }

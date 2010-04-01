@@ -10,7 +10,7 @@
  * to license@fazend.com so we can send you a copy immediately.
  *
  * @copyright Copyright (c) FaZend.com
- * @version $Id$
+ * @version $Id: Fazend.php 1762 2010-03-28 09:32:36Z yegor256@gmail.com $
  * @category FaZend
  */
 
@@ -20,13 +20,14 @@
 require_once 'Zend/Application/Resource/ResourceAbstract.php';
 
 /**
- * Resource for initializing FaZend framework
+ * Initialize ORM
  *
  * @uses Zend_Application_Resource_Base
  * @package Application
  * @subpackage Resource
+ * @see application.ini
  */
-class FaZend_Application_Resource_Fazend extends Zend_Application_Resource_ResourceAbstract
+class FaZend_Application_Resource_Fazend_Orm extends Zend_Application_Resource_ResourceAbstract
 {
 
     /**
@@ -34,17 +35,20 @@ class FaZend_Application_Resource_Fazend extends Zend_Application_Resource_Resou
      *
      * @return void
      * @see Zend_Application_Resource_Resource::init()
+     * @see FaZend_Db_Table_RowLoader
+     * @see FaZend_Db_TableLoader
      */
     public function init() 
     {
-        $options = $this->getOptions();
-        validate()->true(
-            isset($options['name']),
-            "[Fazend.name] should be defined in your app.ini file"
+        $autoloader = Zend_Loader_Autoloader::getInstance();
+        $autoloader->pushAutoloader(
+            new FaZend_Db_Table_RowLoader(), 
+            'FaZend_Db_Table_ActiveRow_'
         );
-
-        $config = new Zend_Config($options);
-        FaZend_Properties::setOptions($config);
+        $autoloader->pushAutoloader(
+            new FaZend_Db_TableLoader(), 
+            'FaZend_Db_ActiveTable_'
+        );
     }
 
 }
