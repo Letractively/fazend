@@ -32,13 +32,7 @@ class Fazend_JsController extends FaZend_Controller_Action
      */
     public function indexAction()
     {
-        // if it's absent
-        //if (!file_exists($script = APPLICATION_PATH . '/views/scripts/js/' . $this->_getParam('script')) &&
-        //    !file_exists($script = FAZEND_PATH . '/View/scripts/js/' . $this->_getParam('script')))
-        //    $this->_redirectFlash('path not found');
-
-        $this->getResponse()
-            ->setHeader('Content-type', 'text/javascript');
+        $this->getResponse()->setHeader('Content-type', 'text/javascript');
 
         // tell browser to cache this content    
         $this->_cacheContent();    
@@ -46,15 +40,13 @@ class Fazend_JsController extends FaZend_Controller_Action
         $this->_helper->viewRenderer
             ->setViewScriptPathSpec(':controller/'.$this->_getParam('script'));
         
+        // no HTML layout!
         $this->_helper->layout->disableLayout();
 
+        // no filters!
         $this->view->setFilter(null);
 
-        try {
-            $this->_helper->viewRenderer($this->_getParam('script'));
-        } catch (Zend_View_Exception $e) {
-            $this->response->setBody('/* ' . $e->getMessage() . ' */');
-        }
+        $this->_helper->viewRenderer($this->_getParam('script'));
     }    
     
 }

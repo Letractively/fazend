@@ -1,3 +1,4 @@
+<?php echo  $this->doctype() ?>
 <!--
  *
  * FaZend Framework
@@ -12,46 +13,38 @@
 -->
 
 <?php
-$this->headMeta()
-    ->appendHttpEquiv('Content-Type', 'text/html; charset=utf-8');
-
-$this->includeCSS('fazend.css');
-
-?><?php echo  $this->doctype() ?>
+    $this->headMeta()->appendHttpEquiv('Content-Type', 'text/html; charset=utf-8');
+    $this->includeCSS('fazend.css');
+?>
 <html xmlns="http://www.w3.org/1999/xhtml"> 
 <head>  
-<?php echo $this->headTitle()?>
-<?php echo $this->headMeta()?>
-<?php echo $this->headLink()?>
-<?php echo $this->headStyle()?>
+    <?php echo $this->headTitle()?>
+    <?php echo $this->headMeta()?>
+    <?php echo $this->headLink()?>
+    <?php echo $this->headStyle()?>
 </head> 
 <body>
 
-<div style='width: auto; padding: 30px;'>
+    <div style='width: auto; padding: 30px;'>
+        <?php echo $this->flashMessage()?>
+        <div style="position: fixed; top: 0; right: 0; padding: 5px;">
+            <?php echo $this->action('login', 'user', 'fazend')?>
+            <?php if (Model_User::isLoggedIn()): ?>
+                <p><a href="<?php echo $this->url(array(), 'adm', true)?>">admin</a></p>    
+            <?php endif; ?>
+        </div>
 
-<?php echo $this->flashMessage()?>
-
-<div style="position: fixed; top: 0; right: 0; padding: 5px;">
+        <div style='min-height: 350px; width: 900px;'>
+            <?php echo $this->layout()->content?>
+        </div>
     
-    <?php echo $this->action('login', 'user', 'fazend')?>
-
-    <?php if (Model_User::isLoggedIn()): ?>
-        <p><a href="<?php echo $this->url(array(), 'adm', true)?>">admin</a></p>    
-    <?php endif; ?>
-</div>
-
-<div style='min-height: 350px; width: 900px;'>
-<?php echo $this->layout()->content?>
-</div>
-    
-<div style="margin-top: 40px; line-height: 1.4em; clear: both; font-size: 0.8em; color: gray;">
-    <span style='padding-top: 3px; border-top: 1px gray solid;'>(c) <?php echo date('Y')?> fazend.com, 
-    rev.<?php echo FaZend_Revision::get()?>,
-    <?php echo $this->pageLoadTime()?></span>
-</div>    
-
-</div>
-
-<?php echo $this->headScript() ?>
+        <div style="margin-top: 40px; line-height: 1.4em; clear: both; font-size: 0.8em; color: gray;">
+            <span style='padding-top: 3px; border-top: 1px gray solid;'>(c) 
+            <?php echo date('Y')?> fazend.com, 
+            rev.<?php echo FaZend_Revision::get()?>,
+            <?php echo $this->pageLoadTime()?></span>
+        </div>    
+    </div>
+    <?php echo $this->headScript() ?>
 </body>
 </html>
