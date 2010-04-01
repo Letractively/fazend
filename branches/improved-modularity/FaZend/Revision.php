@@ -21,6 +21,8 @@
  */
 class FaZend_Revision
 {
+
+    const VERSION = '0.2dev';
     
     /**
      * Cached value
@@ -36,16 +38,19 @@ class FaZend_Revision
      */
     public static function get()
     {
-        if (isset(self::$_revision))
+        if (isset(self::$_revision)) {
             return self::$_revision;
+        }
         
         $revFile = APPLICATION_PATH . '/deploy/subversion/revision.txt';
-        if (file_exists($revFile))
+        if (file_exists($revFile)) {
             return self::$_revision = file_get_contents($revFile);
+        }
         
         $info = shell_exec('svn info ' . APPLICATION_PATH);
-        if (preg_match('/Revision:\s(\d+)/m', $info, $matches))
+        if (preg_match('/Revision:\s(\d+)/m', $info, $matches)) {
             return self::$_revision = $matches[1] . 'L';
+        }
             
         return self::$_revision = 'local';
     }
