@@ -176,12 +176,8 @@
         
         <!-- prepare code coverage db -->
         <if><istrue value="${to.coverage}" /><then>
-            <property name="coverage.dir" value="${project.basedir}/reports/coverage" />
             <property name="coverage.db" value="${coverage.dir}/coverage.xml" />
             
-            <!-- delete previous files, if any -->
-            <delete dir="${coverage.dir}" failonerror="false" verbose="false" includeemptydirs="true" />
-
             <!-- make sure it exists -->
             <mkdir dir="${coverage.dir}" />
             
@@ -246,14 +242,6 @@
                 </phpunit>
             </else></if>
         </else></if>
-
-        <if><istrue value="${to.coverage}" /><then>
-            <!-- create an HTML report about code coverage -->
-            <mkdir dir="${coverage.dir}/report" />
-            <coverage-report outfile="${coverage.db}">
-                <report todir="${coverage.dir}/report" styledir="${project.basedir}/src/library/FaZend/Application/Phing"/>
-            </coverage-report>
-        </then></if>
     </target>    
 
     <target name="phpcs" description="Validate the quality of PHP code with PHPCS utility">
@@ -324,13 +312,10 @@
             <istrue value="${to.deploy}" />
             <isset property="live.home" />
         </and><then>
-            <!-- the Task is defined as PHP class, see phings/UploadByFTP.php -->
-            <taskdef name="pingFaZend" classname="src.library.FaZend.Application.Phing.PingFaZend" />
-
             <if>
                 <isset property="live.home"/>
                 <then>
-                    <pingFaZend url="${live.home}/__fz/ping/backup" />
+                    <http-request url="${live.home}/__fz/ping/backup" />
                 </then>
             </if>
         </then><else>
