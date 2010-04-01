@@ -44,7 +44,7 @@ class FaZend_Application_Resource_Fazend_View extends Zend_Application_Resource_
         // layout reconfigure, if necessary
         $layout = Zend_Layout::getMvcInstance();
         if (!file_exists($layout->getViewScriptPath())) {
-            $layout->setViewScriptPath(FAZEND_PATH . '/Application/modules/fazend/layouts/scripts');
+            $layout->setViewScriptPath(FAZEND_APP_PATH . '/layouts/scripts');
         }
 
         // make sure the view already bootstraped

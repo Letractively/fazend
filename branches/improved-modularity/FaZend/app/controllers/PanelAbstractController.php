@@ -22,7 +22,7 @@ require_once 'Zend/Controller/Action.php';
 /**
  * @see Fazend_LoginController
  */
-require_once 'FaZend/Application/modules/fazend/controllers/LoginController.php';
+require_once FAZEND_APP_PATH . '/controllers/LoginController.php';
 
 /**
  * Action controller for Panel
@@ -47,7 +47,7 @@ abstract class Fazend_PanelAbstractController extends FaZend_Controller_Action
         
         // layout reconfigure to fazend
         $layout = Zend_Layout::getMvcInstance();
-        $layout->setViewScriptPath(FAZEND_PATH . '/Application/modules/fazend/layouts/scripts');
+        $layout->setViewScriptPath(FAZEND_APP_PATH . '/layouts/scripts');
         $layout->setLayout('panel');
     }
     

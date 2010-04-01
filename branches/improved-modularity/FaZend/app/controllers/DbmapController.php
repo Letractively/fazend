@@ -17,7 +17,7 @@
 /**
  * @see Fazend_PanelAbstractController
  */
-require_once 'FaZend/Application/modules/fazend/controllers/PanelAbstractController.php';
+require_once FAZEND_APP_PATH . '/controllers/PanelAbstractController.php';
 
 /**
  * Map of the database
@@ -36,8 +36,13 @@ class Fazend_DbmapController extends Fazend_PanelAbstractController
     public function preDispatch()
     {
         // sanity check
-        if (APPLICATION_ENV == 'production')
-            $this->_redirectFlash('DBMAP controller is not allowed in production environment', 'restrict', 'login');
+        if (APPLICATION_ENV == 'production') {
+            $this->_redirectFlash(
+                'DBMAP controller is not allowed in production environment',
+                'restrict',
+                'login'
+            );
+        }
         
         parent::preDispatch();
     }

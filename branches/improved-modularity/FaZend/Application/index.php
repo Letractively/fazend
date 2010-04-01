@@ -36,6 +36,10 @@ defined('TEMP_PATH')
 defined('FAZEND_PATH')
     || define('FAZEND_PATH', realpath(APPLICATION_PATH . '/../library/FaZend'));
 
+// Define path to FaZend application inside framework
+defined('FAZEND_APP_PATH')
+    || define('FAZEND_APP_PATH', realpath(FAZEND_PATH . '/app'));
+
 // Define path to Zend
 defined('ZEND_PATH')
     || define('ZEND_PATH', realpath(APPLICATION_PATH . '/../library/Zend'));

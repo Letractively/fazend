@@ -17,7 +17,7 @@
 /**
  * @see Fazend_PanelAbstractController
  */
-require_once 'FaZend/Application/modules/fazend/controllers/PanelAbstractController.php';
+require_once FAZEND_APP_PATH . '/controllers/PanelAbstractController.php';
 
 /**
  * User Interface Modeller
