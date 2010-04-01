@@ -14,14 +14,17 @@
  * @category FaZend
  */
 
-require_once 'FaZend/Test/TestCase.php';
+/**
+ * @see FaZend_tests_AbstractTest
+ */
+require_once FAZEND_APP_PATH . '/tests/AbstractTest.php';
 
 /**
  * Test uni-directional traceability between components
  *
  * @package Test
  */
-class FaZend_Test_tests_TraceabilityTest extends FaZend_Test_TestCase
+class FaZend_tests_TraceabilityTest extends FaZend_tests_AbstractTest
 {
     
     /**
@@ -31,6 +34,10 @@ class FaZend_Test_tests_TraceabilityTest extends FaZend_Test_TestCase
      */
     public function testUniDirectionalTraceabilityIsEstablished()
     {
+        if (!$this->_getOption('run')) {
+            $this->markTestSkipped();
+        }
+
         $facade = new FaZend_Pan_Analysis_Facade();
         $list = $facade->getComponentsList();
         

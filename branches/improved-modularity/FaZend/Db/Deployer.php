@@ -40,7 +40,13 @@ class FaZend_Db_Deployer
      *
      * @var Zend_Config
      */
-    protected $_options;
+    protected $_options = array(
+        'load' => true,
+        'deploy' => false,
+        'verbose' => true,
+        'flag' => '/dev/null',
+        'folders' => array(),
+    );
 
     /**
      * Instance of DB deployer
@@ -71,10 +77,19 @@ class FaZend_Db_Deployer
      *
      * @param Zend_Config Configuration parameters
      * @return void
+     * @throws FaZend_Db_Deployer_InvalidOptionException
      */
     protected function __construct(Zend_Config $options) 
     {
-        $this->_options = $options;
+        foreach ($options as $option=>$value) {
+            if (!array_key_exists($option, $this->_options)) {
+                FaZend_Exception::raise(
+                    'FaZend_Db_Deployer_InvalidOptionException', 
+                    "Option '{$option}' is not valid"
+                );
+            }
+            $this->_options[$option] = $value;
+        }
     }
 
     /**
@@ -86,7 +101,7 @@ class FaZend_Db_Deployer
     public function deploy() 
     {
         // if it's turned off
-        if (!$this->_options->deploy) {
+        if (!$this->_options['deploy']) {
             return;
         }
         
@@ -233,7 +248,7 @@ class FaZend_Db_Deployer
      */
     protected function _dirNames() 
     {
-        return $this->_options->folders;
+        return $this->_options['folders'];
     }
 
     /**
@@ -243,7 +258,7 @@ class FaZend_Db_Deployer
      */
     protected function _flagName()
     {
-        return $this->_options->flag;
+        return $this->_options['flag'];
     }
 
     /**
@@ -256,7 +271,7 @@ class FaZend_Db_Deployer
      */
     protected function _create($table, $sql) 
     {
-        if (empty($sql)) {
+        if (empty($sql) && $this->_options['verbose']) {
             logg("DB table '{$table}' was NOT created since SQL is empty");
             return;
         }
@@ -272,8 +287,9 @@ class FaZend_Db_Deployer
         }
         
         // log the operation
-        if ($this->_options->verbose)
+        if ($this->_options['verbose']) {
             logg("DB table '{$table}' was created: {$sql}");
+        }
     }
 
     /**

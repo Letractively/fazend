@@ -36,9 +36,13 @@ class Fazend_AnalysisController extends Fazend_PanelAbstractController
     public function preDispatch()
     {
         // sanity check
-        if (APPLICATION_ENV == 'production')
-            $this->_redirectFlash('Analysis controller is not allowed in production environment', 'restrict', 'login');
-        
+        if (APPLICATION_ENV == 'production') {
+            $this->_redirectFlash(
+                'Analysis controller is not allowed in production environment',
+                'restrict',
+                'login'
+            );
+        }
         parent::preDispatch();
     }
 
@@ -64,8 +68,7 @@ class Fazend_AnalysisController extends Fazend_PanelAbstractController
         $this->_helper->layout->disableLayout();
         $this->view->setFilter(null);
 
-        $this->getResponse()
-            ->setHeader('Content-type', 'text/xml');
+        $this->getResponse()->setHeader('Content-type', 'text/xml');
             
         $this->view->svg = $diagram->svg($this->view);
     }

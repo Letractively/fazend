@@ -14,14 +14,17 @@
  * @category FaZend
  */
 
-require_once 'FaZend/Test/TestCase.php';
+/**
+ * @see FaZend_tests_AbstractTest
+ */
+require_once FAZEND_APP_PATH . '/tests/AbstractTest.php';
 
 /**
  * Test conformance to specified baselines
  *
  * @package Test
  */
-class FaZend_Test_tests_BaselineTest extends FaZend_Test_TestCase
+class FaZend_tests_BaselineTest extends FaZend_tests_AbstractTest
 {
     
     /**
@@ -31,6 +34,10 @@ class FaZend_Test_tests_BaselineTest extends FaZend_Test_TestCase
      */
     public function testCodeConformsToBaselines()
     {
+        if (!$this->_getOption('run')) {
+            $this->markTestSkipped();
+        }
+        
         $validator = new FaZend_Pan_Baseliner_Validator(APPLICATION_PATH, true);
         $dir = FaZend_Pan_Baseliner_Map::getStorageDir(false);
         

@@ -22,7 +22,7 @@ if (defined('APPLICATION_ENV') && APPLICATION_ENV !== 'production') {
             if (in_array($errno, array(E_WARNING))) {
                 return;
             }
-            echo "{$$errno} {$errstr}, file: {$errfile} ({$errline})\n";
+            echo "{$errno} {$errstr}, file: {$errfile} ({$errline})\n";
             '
         )
     );
