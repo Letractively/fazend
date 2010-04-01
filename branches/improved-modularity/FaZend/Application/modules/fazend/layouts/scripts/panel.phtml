@@ -49,9 +49,9 @@ $this->includeCSS('fazend.css');
     </div>
 
     <div class="btm">
-        (c) <?php echo FaZend_Properties::get()->name?>/Zend 
+        (c) <?php echo FaZend_Revision::getName()?>/Zend 
             <?php echo Zend_Version::VERSION?>/FaZend 
-            <?php echo FaZend_Version::VERSION?>, 
+            <?php echo FaZend_Revision::VERSION?>, 
         rev.<?php echo FaZend_Revision::get()?>, <?php echo $this->pageLoadTime()?>
     </div>
 

@@ -61,6 +61,7 @@ require_once 'FaZend/Application/functions.php';
 // Create application, bootstrap, and run
 require_once 'Zend/Application.php';
 $application = new Zend_Application(APPLICATION_ENV);
+Zend_Registry::set('Zend_Application', $application);
 
 // load application-specific options
 $options = new Zend_Config_Ini(FAZEND_PATH . '/Application/application.ini', 'global', true);

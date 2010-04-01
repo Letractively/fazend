@@ -41,12 +41,13 @@ abstract class Fazend_PanelAbstractController extends FaZend_Controller_Action
     public function preDispatch()
     {
         // no login in testing/development environment
-        if ((APPLICATION_ENV === 'production') && !Fazend_LoginController::isLoggedIn())
+        if ((APPLICATION_ENV === 'production') && !Fazend_LoginController::isLoggedIn()) {
             return $this->_forward('login', 'login', 'fazend');
+        }
         
         // layout reconfigure to fazend
         $layout = Zend_Layout::getMvcInstance();
-        $layout->setViewScriptPath(FAZEND_PATH . '/View/layouts/scripts');
+        $layout->setViewScriptPath(FAZEND_PATH . '/Application/modules/fazend/layouts/scripts');
         $layout->setLayout('panel');
     }
     

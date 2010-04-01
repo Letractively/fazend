@@ -31,10 +31,6 @@ class Fazend_CssController extends FaZend_Controller_Action
      */
     public function indexAction()
     {
-        // if it's absent
-        // if (!file_exists(APPLICATION_PATH . '/views/scripts/css/' . $this->_getParam('css')))
-        //    $this->_redirectFlash('path not found');
-
         $this->getResponse()
             ->setHeader('Content-type', 'text/css');
 
@@ -52,7 +48,9 @@ class Fazend_CssController extends FaZend_Controller_Action
         $this->view->setFilter(null);
 
         // inject CSS compressor
-        if (FaZend_Properties::get()->htmlCompression) {
+        $fazendView = Zend_Registry::get('Zend_Application')->getBootstrap()->getResource('Fazend_View');
+        $options = $fazendView->getOptions();
+        if (!empty($options['htmlCompression'])) {
             $this->view->addFilter('CssCompressor');
         }
 

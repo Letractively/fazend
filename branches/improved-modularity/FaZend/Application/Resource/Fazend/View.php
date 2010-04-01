@@ -33,7 +33,7 @@ class FaZend_Application_Resource_Fazend_View extends Zend_Application_Resource_
     /**
      * Initializes the resource
      *
-     * @return void
+     * @return $this
      * @see Zend_Application_Resource_Resource::init()
      */
     public function init() 
@@ -44,7 +44,7 @@ class FaZend_Application_Resource_Fazend_View extends Zend_Application_Resource_
         // layout reconfigure, if necessary
         $layout = Zend_Layout::getMvcInstance();
         if (!file_exists($layout->getViewScriptPath())) {
-            $layout->setViewScriptPath(FAZEND_PATH . '/View/layouts/scripts');
+            $layout->setViewScriptPath(FAZEND_PATH . '/Application/modules/fazend/layouts/scripts');
         }
 
         // make sure the view already bootstraped
@@ -82,6 +82,7 @@ class FaZend_Application_Resource_Fazend_View extends Zend_Application_Resource_
             'FaZend_View_Helper_Forma_Field', 
             FAZEND_PATH . '/View/Helper/Forma'
         );
+        return $this;
     }
 
 }
