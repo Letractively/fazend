@@ -14,7 +14,7 @@
  * @category FaZend
  */
 
-// small simple and nice PHP functions
+// error handler
 require_once realpath(dirname(__FILE__) . '/handler.php');
 
 global $startTime;

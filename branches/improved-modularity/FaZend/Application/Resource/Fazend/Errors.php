@@ -37,7 +37,11 @@ class FaZend_Application_Resource_Fazend_Errors extends Zend_Application_Resourc
      */
     public function init()
     {
-        // tbd
+        /**
+         * @see Fazend_ErrorController
+         */
+        require_once FAZEND_APP_PATH . '/controllers/ErrorController.php';
+        Fazend_ErrorController::setOptions($this->getOptions());
     }
     
 }
