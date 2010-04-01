@@ -44,7 +44,7 @@ class FaZend_Application_Resource_Fazend_Caches extends Zend_Application_Resourc
             array(
                 'caching' => true,
                 'lifetime' => null, // forever 
-                'cache_id_prefix' => FaZend_Properties::get()->name . '_' . FaZend_Revision::get(),
+                'cache_id_prefix' => FaZend_Revision::getName() . '_' . FaZend_Revision::get(),
                 'automatic_serialization' => true
             ),
             array()

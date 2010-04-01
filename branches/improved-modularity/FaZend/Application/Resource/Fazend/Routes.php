@@ -35,7 +35,7 @@ class FaZend_Application_Resource_Fazend_Routes extends Zend_Application_Resourc
      * @return void
      * @see Zend_Application_Resource_Resource::init()
      */
-    protected function _initRoutes() 
+    public function init() 
     {
         $this->_bootstrap->bootstrap('frontController');
         $front = $this->_bootstrap->getResource('frontController');

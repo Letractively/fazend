@@ -2,7 +2,7 @@
 
 require_once 'AbstractTestCase.php';
 
-class FaZend_DeployerTest extends AbstractTestCase
+class FaZend_Db_DeployerTest extends AbstractTestCase
 {
 
     public static function providerSqlSamples()
@@ -44,7 +44,7 @@ class FaZend_DeployerTest extends AbstractTestCase
      */
     public function testEmailsAreRenderedAndSent ($table, $sql)
     {
-        $deployer = FaZend_Deployer::getInstance();
+        $deployer = FaZend_Db_Deployer::getInstance();
 
         $info = $deployer->getSqlInfo($sql);
 
@@ -57,16 +57,16 @@ class FaZend_DeployerTest extends AbstractTestCase
 
     public function testGetTablesWorks()
     {
-        $list = FaZend_Deployer::getInstance()->getTables();
+        $list = FaZend_Db_Deployer::getInstance()->getTables();
         $this->assertTrue(count($list) > 0);
     }
 
     public function testGetTableInfoWorks()
     {
-        $list = FaZend_Deployer::getInstance()->getTables();
+        $list = FaZend_Db_Deployer::getInstance()->getTables();
         $table = array_shift($list);
 
-        $info = FaZend_Deployer::getInstance()->getTableInfo($table);
+        $info = FaZend_Db_Deployer::getInstance()->getTableInfo($table);
     }
 
 }

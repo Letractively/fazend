@@ -37,7 +37,8 @@ class Bootstrap extends FaZend_Application_Bootstrap_Bootstrap
     protected function _initDbData()
     {
         $this->bootstrap('db');
-        $this->bootstrap('Deployer');
+        $this->bootstrap('Fazend_Deployer');
+        $this->bootstrap('Fazend_Orm');
 
         FaZend_Db_Table_ActiveRow::addMapping('/owner\.created/', 'new Zend_Date(${a1})');
 
@@ -48,8 +49,9 @@ class Bootstrap extends FaZend_Application_Bootstrap_Bootstrap
             'insert into boat values (1, "boat", "super 8")',
         );
 
-        foreach ($queries as $query)
+        foreach ($queries as $query) {
             Zend_Db_Table_Abstract::getDefaultAdapter()->query($query);
+        }
     }
     
     /**

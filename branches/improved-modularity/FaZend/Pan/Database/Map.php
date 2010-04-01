@@ -31,7 +31,7 @@ class FaZend_Pan_Database_Map
     /**
      * List of tables
      *
-     * @var FaZend_Deployer_MapTable[]
+     * @var FaZend_Db_Deployer_MapTable[]
      */
     protected $_tables;
     
@@ -75,7 +75,7 @@ class FaZend_Pan_Database_Map
     /**
      * Draw tables in spreadsheet mode
      *
-     * @param FaZend_Deployer_MapTable[]
+     * @param FaZend_Db_Deployer_MapTable[]
      * @return void
      */
     protected function _drawSpreadsheet($tables)
@@ -105,7 +105,7 @@ class FaZend_Pan_Database_Map
     /**
      * Draw tables in a circle mode
      *
-     * @param FaZend_Deployer_MapTable[]
+     * @param FaZend_Db_Deployer_MapTable[]
      * @return void
      */
     protected function _drawCircle($tables)
@@ -162,7 +162,7 @@ class FaZend_Pan_Database_Map
     /**
      * Get the list of tables in collection
      *
-     * @return FaZend_Deployer_MapTable[]
+     * @return FaZend_Db_Deployer_MapTable[]
      */
     protected function _getTables()
     {
@@ -171,7 +171,7 @@ class FaZend_Pan_Database_Map
 
         $tables = array();
 
-        foreach (FaZend_Deployer::getInstance()->getTables() as $table)
+        foreach (FaZend_Db_Deployer::getInstance()->getTables() as $table)
             $tables[] = new FaZend_Pan_Database_MapTable($table, $this->_getImage());
 
         // smaller tables come first

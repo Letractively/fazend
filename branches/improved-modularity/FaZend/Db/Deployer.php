@@ -23,15 +23,15 @@
  * @package Deployer
  * @todo Refactor in order to support other DB servers
  */
-class FaZend_Deployer
+class FaZend_Db_Deployer
 {
 
-    const EXCEPTION_CLASS = 'FaZend_Deployer_Exception';
+    const EXCEPTION_CLASS = 'FaZend_Db_Deployer_Exception';
 
     /**
      * Instance of the class, singleton pattern
      *
-     * @var FaZend_Deployer
+     * @var FaZend_Db_Deployer
      */
     protected static $_instance;
 
@@ -47,20 +47,20 @@ class FaZend_Deployer
      *
      * @param Zend_Config Configuration parameters
      * @return void
-     * @throws FaZend_Deployer_InvalidConfig
+     * @throws FaZend_Db_Deployer_InvalidConfig
      */
     public static function getInstance(Zend_Config $config = null) 
     {
         if (!isset(self::$_instance)) {
             if (is_null($config)) {
                 FaZend_Exception::raise(
-                    'FaZend_Deployer_InvalidConfig', 
+                    'FaZend_Db_Deployer_InvalidConfig', 
                     "First time getInstance() should be called with valid config",
                     self::EXCEPTION_CLASS
                 );
             }
 
-            self::$_instance = new FaZend_Deployer($config);
+            self::$_instance = new FaZend_Db_Deployer($config);
         }
 
         return self::$_instance;
@@ -81,19 +81,21 @@ class FaZend_Deployer
      * Deploy Db schema
      *
      * @return void
-     * @throws FaZend_Deployer_Exception
+     * @throws FaZend_Db_Deployer_Exception
      */
     public function deploy() 
     {
         // if it's turned off
-        if (!$this->_options->deploy)
+        if (!$this->_options->deploy) {
             return;
+        }
         
         // check the existence of the flag
         // it it's absent, we should do anything
         $flagFile = $this->_flagName();
-        if (!file_exists($flagFile) && (APPLICATION_ENV === 'production'))
+        if (!file_exists($flagFile) && (APPLICATION_ENV === 'production')) {
             return;
+        }
 
         // remove it
         // we will never come back here again
@@ -137,7 +139,7 @@ class FaZend_Deployer
                         $this->_create($table, $this->_clearSql($dir . '/' . $file));
                     }
                 }
-            } catch (FaZend_Deployer_Exception $exception) {
+            } catch (FaZend_Db_Deployer_Exception $exception) {
                 // if there is no email - show the error
                 if (FaZend_Properties::get()->errors->email) {
                     // send email to the site admin admin
@@ -179,7 +181,7 @@ class FaZend_Deployer
 
                 try {
                     $this->getTableInfo($matches[1]);
-                } catch (FaZend_Deployer_NotTableButView $e) {
+                } catch (FaZend_Db_Deployer_NotTableButView $e) {
                     continue;
                 }
 
@@ -195,7 +197,7 @@ class FaZend_Deployer
      *
      * @param string Name of the table
      * @return array[]
-     * @throws FaZend_Deployer_SqlFileNotFound
+     * @throws FaZend_Db_Deployer_SqlFileNotFound
      */
     public function getTableInfo($table) 
     {
@@ -208,7 +210,7 @@ class FaZend_Deployer
         }
 
         FaZend_Exception::raise(
-            'FaZend_Deployer_SqlFileNotFound', 
+            'FaZend_Db_Deployer_SqlFileNotFound', 
             "File '<num> {$table}.sql' not found in '{$dir}'", self::EXCEPTION_CLASS
         );
     }
@@ -250,7 +252,7 @@ class FaZend_Deployer
      * @param string Name of the table
      * @param string SQL file content
      * @return void
-     * @throws FaZend_Deployer_Exception
+     * @throws FaZend_Db_Deployer_Exception
      */
     protected function _create($table, $sql) 
     {
@@ -263,7 +265,7 @@ class FaZend_Deployer
             $this->_db()->query($sql);
         } catch (Exception $e) {
             FaZend_Exception::raise(
-                'FaZend_Deployer_CreateFailed', 
+                'FaZend_Db_Deployer_CreateFailed', 
                 $e->getMessage() . ': ' . $sql, 
                 self::EXCEPTION_CLASS
             );
@@ -285,7 +287,7 @@ class FaZend_Deployer
     {
         try {
             $infoSql = $this->_sqlInfo($sql);
-        } catch (FaZend_Deployer_NotTableButView $e) {
+        } catch (FaZend_Db_Deployer_NotTableButView $e) {
             // this is VIEW, not table
             // we just drop and create again
             //$this->_db()->query("DROP VIEW $table");
@@ -329,7 +331,7 @@ class FaZend_Deployer
         // sanity check
         if (!preg_match('/^create (?:table|view)?/i', $sql))
             FaZend_Exception::raise(
-                'FaZend_Deployer_WrongFormat', 
+                'FaZend_Db_Deployer_WrongFormat', 
                 "Every SQL file should start with 'create table' or 'create view', ".
                 "we get this: '" . cutLongLine($sql, 50) . "'",
                 self::EXCEPTION_CLASS
@@ -337,7 +339,7 @@ class FaZend_Deployer
 
         // this is view, we just drop it and create new
         if (preg_match('/^create\s(?:or\sreplace\s)?view/i', $sql))
-            FaZend_Exception::raise('FaZend_Deployer_NotTableButView');
+            FaZend_Exception::raise('FaZend_Db_Deployer_NotTableButView');
 
         // cut out the text between starting and ending brackets
         $columnsText = substr($sql, strpos($sql, '(')+1);

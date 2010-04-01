@@ -10,7 +10,7 @@
  * to license@fazend.com so we can send you a copy immediately.
  *
  * @copyright Copyright (c) FaZend.com
- * @version $Id: Deployer.php 1747 2010-03-17 19:17:38Z yegor256@gmail.com $
+ * @version $Id: Email.php 1747 2010-03-17 19:17:38Z yegor256@gmail.com $
  * @category FaZend
  */
 
@@ -20,13 +20,13 @@
 require_once 'Zend/Application/Resource/ResourceAbstract.php';
 
 /**
- * Deployer of DB
+ * Errors management initialization
  *
  * @uses Zend_Application_Resource_Base
  * @package Application
  * @subpackage Resource
  */
-class FaZend_Application_Resource_Fazend_Deployer extends Zend_Application_Resource_ResourceAbstract
+class FaZend_Application_Resource_Fazend_Errors extends Zend_Application_Resource_ResourceAbstract
 {
 
     /**
@@ -35,14 +35,9 @@ class FaZend_Application_Resource_Fazend_Deployer extends Zend_Application_Resou
      * @return void
      * @see Zend_Application_Resource_Resource::init()
      */
-    public function init() 
+    public function init()
     {
-        // db is mandatory
-        if (!$this->getBootstrap()->hasPluginResource('db')) {
-            return;
-        }
-        $this->_bootstrap->bootstrap('db');
-        // configure deployer and deploy DB schema
-        FaZend_Db_Deployer::getInstance(new Zend_Config($this->getOptions()))->deploy();
+        // tbd
     }
+    
 }

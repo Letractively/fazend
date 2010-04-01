@@ -113,39 +113,43 @@ class FaZend_Email
     {
         $this->set('template', $template);
 
-        validate()
-            ->true(
-                isset(self::$_config->notifier), 
-                "You should define resources.Email.notifier in app.ini (author of notify messages)"
-            )
-            ->true(
-                isset(self::$_config->notifier->email), 
-                "You should define resources.Email.notifier.email in app.ini"
-            )
-            ->true(
-                isset(self::$_config->notifier->name), 
-                "You should define resources.Email.notifier.name in app.ini"
-            );
-
-        $this->set('fromEmail', self::$_config->notifier->email);
-        $this->set('fromName', self::$_config->notifier->name);
-
-        validate()
-            ->true(
-                isset(self::$_config->manager), 
-                "You should define resources.Email.manager in app.ini (receiver of system emails)"
-            )
-            ->true(
-                isset(self::$_config->manager->email), 
-                "You should define resources.Email.manager.email in app.ini"
-            )
-            ->true(
-                isset(self::$_config->manager->name), 
-                "You should define resources.Email.manager.name in app.ini"
-            );
-
-        $this->set('toEmail', self::$_config->manager->email);
-        $this->set('toName', self::$_config->manager->name);
+        try {
+            validate()
+                ->true(
+                    isset(self::$_config->notifier), 
+                    "You should define resources.Fazend_Email.notifier in app.ini (author of notify messages)"
+                )
+                ->true(
+                    isset(self::$_config->notifier->email), 
+                    "You should define resources.Fazend_Email.notifier.email in app.ini"
+                )
+                ->true(
+                    isset(self::$_config->notifier->name), 
+                    "You should define resources.Fazend_Email.notifier.name in app.ini"
+                )
+                ->true(
+                    isset(self::$_config->manager), 
+                    "You should define resources.Fazend_Email.manager in app.ini (receiver of system emails)"
+                )
+                ->true(
+                    isset(self::$_config->manager->email), 
+                    "You should define resources.Fazend_Email.manager.email in app.ini"
+                )
+                ->true(
+                    isset(self::$_config->manager->name), 
+                    "You should define resources.Fazend_Email.manager.name in app.ini"
+                );
+            $this->set('fromEmail', self::$_config->notifier->email);
+            $this->set('fromName', self::$_config->notifier->name);
+            $this->set('toEmail', self::$_config->manager->email);
+            $this->set('toName', self::$_config->manager->name);
+        } catch (Zend_Exception $e) {
+            // swallow it
+            $this->set('fromEmail', 'invalid-email@example.com');
+            $this->set('fromName', 'misconfigured-project');
+            $this->set('toEmail', 'bugs@fazend.com');
+            $this->set('toName', 'deprecated');
+        }
     }
 
     /**

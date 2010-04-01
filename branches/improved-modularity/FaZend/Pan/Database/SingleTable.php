@@ -311,8 +311,8 @@ class FaZend_Pan_Database_SingleTable
     public function _findEntities()
     {
         $tables = array();
-        foreach (FaZend_Deployer::getInstance()->getTables() as $table)
-            $tables[$table] = FaZend_Deployer::getInstance()->getTableInfo($table);
+        foreach (FaZend_Db_Deployer::getInstance()->getTables() as $table)
+            $tables[$table] = FaZend_Db_Deployer::getInstance()->getTableInfo($table);
         
         $entities = array();
 
@@ -418,7 +418,7 @@ class FaZend_Pan_Database_SingleTable
     public function _getInfo()
     {
         if (!isset($this->_info))
-            $this->_info = FaZend_Deployer::getInstance()->getTableInfo($this->_name);
+            $this->_info = FaZend_Db_Deployer::getInstance()->getTableInfo($this->_name);
         return $this->_info;
     }
 

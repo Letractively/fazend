@@ -25,6 +25,15 @@ class FaZend_Revision
     const VERSION = '0.2dev';
     
     /**
+     * Name of the project
+     *
+     * @var string
+     * @see FaZend_Application_Resource_Fazend::init()
+     * @see setName()
+     */
+    protected static $_name;
+    
+    /**
      * Cached value
      *
      * @var string|integer
@@ -53,6 +62,28 @@ class FaZend_Revision
         }
             
         return self::$_revision = 'local';
+    }
+    
+    /**
+     * Set name of the project
+     *
+     * @param string Name of the project
+     * @return void
+     * @see FaZend_Application_Resource_Fazend::init()
+     */
+    public static function setName($name) 
+    {
+        self::$_name = $name;
+    }
+
+    /**
+     * Get name of the project
+     *
+     * @return string Name of the project
+     */
+    public static function getName() 
+    {
+        return self::$_name;
     }
 
 }

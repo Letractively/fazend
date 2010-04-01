@@ -163,7 +163,7 @@ class FaZend_Pan_Database_MapTable
     public function _getInfo()
     {
         if (!isset($this->_info))
-            $this->_info = FaZend_Deployer::getInstance()->getTableInfo($this->_name);
+            $this->_info = FaZend_Db_Deployer::getInstance()->getTableInfo($this->_name);
         return $this->_info;
     }
 

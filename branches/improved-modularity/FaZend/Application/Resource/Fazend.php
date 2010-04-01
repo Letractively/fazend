@@ -38,13 +38,12 @@ class FaZend_Application_Resource_Fazend extends Zend_Application_Resource_Resou
     public function init() 
     {
         $options = $this->getOptions();
+        $name = $options['name'];
         validate()->true(
-            isset($options['name']),
+            isset($name),
             "[Fazend.name] should be defined in your app.ini file"
         );
-
-        $config = new Zend_Config($options);
-        FaZend_Properties::setOptions($config);
+        FaZend_Revision::setName($name);
     }
 
 }
