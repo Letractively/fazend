@@ -5,7 +5,7 @@
 
 require_once 'AbstractTestCase.php';
 
-class FaZend_Controller_AdmControllerTest extends AbstractTestCase
+class FaZend_app_controllers_AdmControllerTest extends AbstractTestCase
 {
 
     public function testAllUrlsWork()

@@ -37,11 +37,19 @@ class FaZend_Application_Resource_fz_view extends Zend_Application_Resource_Reso
      * @see init()
      */
     protected $_view;
+    
+    /**
+     * Shall we compress output streams? (HTML and CSS)
+     *
+     * @var boolean
+     * @see isCompressed()
+     */
+    protected $_compressed = true;
 
     /**
      * Initializes the resource
      *
-     * @return void
+     * @return $this
      * @see Zend_Application_Resource_Resource::init()
      */
     public function init() 
@@ -78,6 +86,7 @@ class FaZend_Application_Resource_fz_view extends Zend_Application_Resource_Reso
 
         // turn compression ON
         if (!empty($options['htmlCompression'])) {
+            $this->_compressed = true;
             $this->_view->addFilter('HtmlCompressor');
         }
 
@@ -95,7 +104,17 @@ class FaZend_Application_Resource_fz_view extends Zend_Application_Resource_Reso
             FAZEND_PATH . '/View/Helper/Forma'
         );
         
-        return $this->_view;
+        return $this;
+    }
+    
+    /**
+     * Output is compressed?
+     *
+     * @return boolean
+     */
+    public function isCompressed() 
+    {
+        return $this->_compressed;
     }
 
 }

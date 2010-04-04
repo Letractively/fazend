@@ -5,7 +5,7 @@
 
 require_once 'AbstractTestCase.php';
 
-class FaZend_Controller_UserControllerTest extends AbstractTestCase
+class FaZend_app_controllers_UserControllerTest extends AbstractTestCase
 {
 
     public function setUp()

@@ -48,9 +48,9 @@ class Fazend_CssController extends FaZend_Controller_Action
         $this->view->setFilter(null);
 
         // inject CSS compressor
-        $fazendView = Zend_Registry::get('Zend_Application')->getBootstrap()->getResource('Fazend_View');
-        $options = $fazendView->getOptions();
-        if (!empty($options['htmlCompression'])) {
+        $fzView = Zend_Registry::get('Zend_Application')
+            ->getBootstrap()->getResource('fz_view');
+        if ($fzView->isCompressed()) {
             $this->view->addFilter('CssCompressor');
         }
 
