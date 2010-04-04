@@ -32,7 +32,8 @@ abstract class FaZend_tests_AbstractTest extends FaZend_Test_TestCase
      */
     protected function _getOption($name) 
     {
-        $options = Zend_Registry::get('Zend_Application')->getBootstrap()->getResource('Fazend_Tests');
+        $options = Zend_Registry::get('Zend_Application')
+            ->getBootstrap()->getResource('fz_tests');
 
         $key = preg_replace('/Test$/', '', get_class($this));
         if (!isset($options[$key])) {

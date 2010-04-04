@@ -66,8 +66,13 @@ class FaZend_tests_TraceabilityTest extends FaZend_tests_AbstractTest
         }
         
         if (!empty($list)) {
-            logg('%d components miss uplinks', count($list));
-            $this->markTestIncomplete();
+            $message = '%d components miss uplinks', count($list);
+            if ($this->_getOption('fatal')) {
+                $this->fail($message);
+            } else {
+                logg($message);
+                $this->markTestIncomplete();
+            }
         }
     }
 
