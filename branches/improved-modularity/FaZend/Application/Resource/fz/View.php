@@ -59,6 +59,9 @@ class FaZend_Application_Resource_fz_view extends Zend_Application_Resource_Reso
         }
         
         // make sure it is loaded already
+        $this->_bootstrap->bootstrap('fazend');
+
+        // make sure it is loaded already
         $this->_bootstrap->bootstrap('layout');
 
         // layout reconfigure, if necessary

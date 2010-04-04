@@ -53,6 +53,8 @@ class FaZend_Application_Resource_fz_deployer extends Zend_Application_Resource_
             return $this->_deployer;
         }
         
+        // make sure it is loaded already
+        $this->_bootstrap->bootstrap('fazend');
         $this->_bootstrap->bootstrap('db');
 
         /**

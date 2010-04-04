@@ -53,6 +53,9 @@ class FaZend_Application_Resource_fz_injector extends Zend_Application_Resource_
             return $this->_injector;
         }
 
+        // make sure it is loaded already
+        $this->_bootstrap->bootstrap('fazend');
+
         $this->_bootstrap->bootstrap('fz_front');
         $this->_bootstrap->bootstrap('fz_view');
         $this->_bootstrap->bootstrap('fz_routes');

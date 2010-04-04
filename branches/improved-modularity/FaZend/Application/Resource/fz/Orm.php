@@ -45,6 +45,9 @@ class FaZend_Application_Resource_fz_orm extends Zend_Application_Resource_Resou
             return null;
         }
 
+        // make sure it is loaded already
+        $this->_bootstrap->bootstrap('fazend');
+
         // deploy the DB schema first
         $this->_bootstrap->bootstrap('fz_deployer');
         

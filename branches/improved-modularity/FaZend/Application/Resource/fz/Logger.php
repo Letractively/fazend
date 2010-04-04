@@ -37,6 +37,8 @@ class FaZend_Application_Resource_fz_logger extends Zend_Application_Resource_Re
      */
     public function init()
     {
+        // make sure it is loaded already
+        $this->_bootstrap->bootstrap('fazend');
         $this->_bootstrap->bootstrap('fz_email');
 
         // remove all writers

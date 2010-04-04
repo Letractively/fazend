@@ -50,6 +50,9 @@ class FaZend_Application_Resource_fz_email extends Zend_Application_Resource_Res
             return $this->_email;
         }
         
+        // make sure it is loaded already
+        $this->_bootstrap->bootstrap('fazend');
+
         /**
          * @see FaZend_Email
          */

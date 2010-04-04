@@ -40,6 +40,9 @@ class FaZend_Application_Resource_fz_routes extends Zend_Application_Resource_Re
         $this->_bootstrap->bootstrap('frontController');
         $front = $this->_bootstrap->getResource('frontController');
 
+        // make sure it is loaded already
+        $this->_bootstrap->bootstrap('fazend');
+
         // configure global routes for all
         $router = new Zend_Controller_Router_Rewrite();
 

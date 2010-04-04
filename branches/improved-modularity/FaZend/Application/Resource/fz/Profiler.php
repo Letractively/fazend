@@ -47,6 +47,9 @@ class FaZend_Application_Resource_fz_profiler extends Zend_Application_Resource_
             return;
         }
 
+        // make sure it is loaded already
+        $this->_bootstrap->bootstrap('fazend');
+
         // turn ON the profiler
         $this->_bootstrap->bootstrap('db');
         $this->_bootstrap->getResource('db')->setProfiler(true);

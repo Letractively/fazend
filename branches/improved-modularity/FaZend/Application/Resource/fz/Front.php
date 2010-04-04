@@ -41,6 +41,9 @@ class FaZend_Application_Resource_fz_front extends Zend_Application_Resource_Res
         $this->_bootstrap->bootstrap('frontController');
         $front = $this->_bootstrap->getResource('frontController');
 
+        // make sure it is loaded already
+        $this->_bootstrap->bootstrap('fazend');
+
         // throw exceptions if failed
         // only in development/testing environment
         // or in CLI execution

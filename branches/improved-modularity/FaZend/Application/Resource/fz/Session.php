@@ -38,7 +38,9 @@ class FaZend_Application_Resource_fz_session extends Zend_Application_Resource_R
      */
     public function init() 
     {
+        // make sure it is loaded already
         $this->_bootstrap->bootstrap('fazend');
+
         $options = $this->getOptions();
 
         // if there is NO session - ignore

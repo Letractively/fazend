@@ -38,6 +38,9 @@ class FaZend_Application_Resource_fz_tests extends Zend_Application_Resource_Res
      */
     public function init()
     {
+        // make sure it is loaded already
+        $this->_bootstrap->bootstrap('fazend');
+
         return $this->getOptions();
     }
     
