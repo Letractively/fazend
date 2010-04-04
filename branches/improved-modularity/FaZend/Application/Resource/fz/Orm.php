@@ -40,6 +40,14 @@ class FaZend_Application_Resource_fz_orm extends Zend_Application_Resource_Resou
      */
     public function init() 
     {
+        // if there is NO db resource - skip the ORM loading
+        if (!$this->getBootstrap()->hasPluginResource('db')) {
+            return null;
+        }
+
+        // deploy the DB schema first
+        $this->_bootstrap->bootstrap('fz_deployer');
+        
         $autoloader = Zend_Loader_Autoloader::getInstance();
         $autoloader->pushAutoloader(
             new FaZend_Db_Table_RowLoader(), 
