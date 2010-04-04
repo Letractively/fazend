@@ -37,6 +37,9 @@ class FaZend_Application_Resource_fazend extends Zend_Application_Resource_Resou
      */
     public function init() 
     {
+        // test injector goes first, if necessary
+        $this->_bootstrap->bootstrap('fz_injector');
+        
         $options = $this->getOptions();
         $name = $options['name'];
         validate()->true(
@@ -44,8 +47,6 @@ class FaZend_Application_Resource_fazend extends Zend_Application_Resource_Resou
             "[Fazend.name] should be defined in your app.ini file"
         );
         FaZend_Revision::setName($name);
-        
-        
     }
 
 }

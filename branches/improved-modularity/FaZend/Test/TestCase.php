@@ -58,7 +58,7 @@ class FaZend_Test_TestCase extends Zend_Test_PHPUnit_ControllerTestCase
 
         // create local view, since it's a controller
         $this->view = Zend_Registry::get('Zend_Application')
-            ->getBootstrap()->getResource('fz_view');
+            ->getBootstrap()->getResource('view');
         
         // clean all instances of all formas
         FaZend_View_Helper_Forma::cleanInstances();

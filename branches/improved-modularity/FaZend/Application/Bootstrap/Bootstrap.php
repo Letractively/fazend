@@ -39,6 +39,7 @@ class FaZend_Application_Bootstrap_Bootstrap extends Zend_Application_Bootstrap_
      */
     protected function _executeResource($resource)
     {
+        return parent::_executeResource($resource);
         try {
             return parent::_executeResource($resource);
         } catch (Zend_Application_Bootstrap_Exception $e) {

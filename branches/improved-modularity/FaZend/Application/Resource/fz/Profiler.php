@@ -37,6 +37,13 @@ class FaZend_Application_Resource_fz_profiler extends Zend_Application_Resource_
      */
     public function init() 
     {
+        // it is important to keep this line as first line in the 
+        // method, because requiring a FAZEND resource will automatically
+        // require FZ_INJECTOR resource to load. Thus, bootstrapping any
+        // of FZ_* resources from your bootstrap you will automatically
+        // request INJECTOR to be bootstrapped first.
+        $this->_bootstrap->bootstrap('fazend');
+
         // profiler is used ONLY in development environment
         if (APPLICATION_ENV === 'production') {
             return;
@@ -46,9 +53,6 @@ class FaZend_Application_Resource_fz_profiler extends Zend_Application_Resource_
         if (!$this->_bootstrap->hasPluginResource('db')) {
             return;
         }
-
-        // make sure it is loaded already
-        $this->_bootstrap->bootstrap('fazend');
 
         // turn ON the profiler
         $this->_bootstrap->bootstrap('db');

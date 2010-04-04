@@ -111,7 +111,7 @@ class FaZend_User extends FaZend_Db_Table_ActiveRow_user
         
         // We should not allow to change the name of the class
         // when the user is logged in
-        if (!is_null(self::$_loggedIn)) {
+        if (self::$_loggedIn) {
             FaZend_Exception::raise(
                 'FaZend_User_InvalidRequestException', 
                 'You cannot set rowClass when user is logged in'

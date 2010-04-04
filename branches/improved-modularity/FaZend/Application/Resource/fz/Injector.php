@@ -53,24 +53,9 @@ class FaZend_Application_Resource_fz_injector extends Zend_Application_Resource_
             return $this->_injector;
         }
 
-        // make sure it is loaded already
-        $this->_bootstrap->bootstrap('fazend');
-
-        $this->_bootstrap->bootstrap('fz_front');
-        $this->_bootstrap->bootstrap('fz_view');
-        $this->_bootstrap->bootstrap('fz_routes');
-        $this->_bootstrap->bootstrap('fz_profiler');
-        $this->_bootstrap->bootstrap('fz_caches');
-        $this->_bootstrap->bootstrap('fz_orm');
-            
         // run it, if required in build.xml
         if (defined('RUN_TEST_STARTER')) {
             FaZend_Test_Starter::run();
-        }
-
-        // make sure it's deployed
-        if ($this->_bootstrap->hasPluginResource('fz_deployer')) {
-            $this->_bootstrap->bootstrap('fz_deployer');
         }
 
         // objects in 'test/Mocks' directory
