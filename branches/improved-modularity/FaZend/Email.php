@@ -142,7 +142,12 @@ class FaZend_Email
      */
     public static function create($template = null)
     {
-        $email = clone Zend_Registry::get('Zend_Application')->getBootstrap()->getResource('fazend_email');
+        // pre-configured email object is created inside
+        // this resource. here we just get it from there, and clone
+        // it in order to configure for this particular template
+        $email = clone Zend_Registry::get('Zend_Application')
+            ->getBootstrap()->getResource('fz_email');
+            
         $email->setTemplate($template);
         return $email;
     }
@@ -202,16 +207,16 @@ class FaZend_Email
      */
     public function send($force = false) 
     {
-        $this->_fillMailer();
+        $mailer = $this->_fillMailer();
         if ($this->_isSending || $force) {
-            $this->_mailer->send();
+            $mailer->send();
         } else {
             logg(
                 "Email sending skipped:\n" 
-                . "\tFrom: " . $this->_mailer->getFrom() . "\n"
-                . "\tTo: " . implode('; ', $this->_mailer->getRecipients()) . "\n"
-                . "\tSubject: " . $this->_mailer->getSubject() . "\n"
-                . "\tMessage (from new line):\n" . $this->_mailer->getBodyText(true)
+                . "\tFrom: " . $mailer->getFrom() . "\n"
+                . "\tTo: " . implode('; ', $mailer->getRecipients()) . "\n"
+                . "\tSubject: " . $mailer->getSubject() . "\n"
+                . "\tMessage (from new line):\n" . $mailer->getBodyText(true)
             );
         }
         return $this;
@@ -232,12 +237,21 @@ class FaZend_Email
      * Get filled mailer, with parsed data
      *
      * @return void
+     * @throws FaZend_Email_NoTemplateException
      */
     protected function _fillMailer() 
     {
+        $mailer = clone $this->_mailer;
         // if the template was specified
         if ($this->_template) {
-            $body = $this->_view->render($this->_template);
+            try {
+                $body = $this->_view->render($this->_template);
+            } catch (Zend_View_Exception $e) {
+                FaZend_Exception::raise(
+                    'FaZend_Email_NoTemplateException', 
+                    "Template '{$this->_template}' not found: {$e->getMessage()}"
+                );
+            }
         
             // replace old-styled new lines with \n
             $body = preg_replace("/\r\n|\n\r|\r/", "\n", $body);
@@ -266,23 +280,31 @@ class FaZend_Email
             $body .= file_get_contents($signatureFile);
         }
             
-        $this->_mailer->setBodyText($body);
+        $mailer->setBodyText($body);
 
         // set from user
-        $this->_mailer->setFrom($this->_view->fromEmail, $this->_view->fromName);
+        $mailer->setFrom(
+            $this->_view->fromEmail,
+            $this->_view->fromName
+        );
+
+        // set recepient
+        $mailer->addTo(
+            $this->_view->toEmail,
+            $this->_view->toName
+        );
 
         // set CC, if required
-        if (is_array($this->view->cc)) {
-            foreach ($this->view->cc as $email=>$name) {
-                $this->_mailer->addCc($email, $name);
+        if (is_array($this->_view->cc)) {
+            foreach ($this->_view->cc as $email=>$name) {
+                $mailer->addCc($email, $name);
             }
         }
 
         // set subject
-        $this->_mailer->setSubject($this->_view->subject);
-
-        // set recepient
-        $this->_mailer->addTo($this->_view->toEmail, $this->_view->toName);
+        $mailer->setSubject($this->_view->subject);
+        
+        return $mailer;
     }
 
 }

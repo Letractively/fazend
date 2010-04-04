@@ -37,14 +37,14 @@ class FaZend_Application_Bootstrap_Bootstrap extends Zend_Application_Bootstrap_
      * @param string Name of resource
      * @return void
      */
-    protected function _executeResource($resource)
-    {
-        try {
-            return parent::_executeResource($resource);
-        } catch (Zend_Application_Bootstrap_Exception $e) {
-            // swallow it...
-        }
-    }
+    // protected function _executeResource($resource)
+    // {
+    //     try {
+    //         return parent::_executeResource($resource);
+    //     } catch (Zend_Application_Bootstrap_Exception $e) {
+    //         // swallow it...
+    //     }
+    // }
     
 }
 

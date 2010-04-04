@@ -22,7 +22,7 @@
  *
  * @package Deployer
  * @todo Refactor in order to support other DB servers
- * @see FaZend_Application_Resource_Fazend_Deployer
+ * @see FaZend_Application_Resource_fz_deployer
  */
 class FaZend_Db_Deployer
 {
@@ -57,7 +57,7 @@ class FaZend_Db_Deployer
      *
      * @param string Absolute file name
      * @return $this
-     * @see FaZend_Application_Resource_Fazend_Deployer::init()
+     * @see FaZend_Application_Resource_fz_deployer::init()
      */
     public function setFlag($flag) 
     {
@@ -71,7 +71,7 @@ class FaZend_Db_Deployer
      * @param string[] List of directories
      * @return $this
      * @throws FaZend_Db_Deployer_InvalidFolderException
-     * @see FaZend_Application_Resource_Fazend_Deployer::init()
+     * @see FaZend_Application_Resource_fz_deployer::init()
      */
     public function setFolders(array $folders) 
     {
@@ -92,7 +92,7 @@ class FaZend_Db_Deployer
      *
      * @param boolean Shall this class use LOG for create/update events notification?
      * @return $this
-     * @see FaZend_Application_Resource_Fazend_Deployer::init()
+     * @see FaZend_Application_Resource_fz_deployer::init()
      */
     public function setVerbose($verbose) 
     {

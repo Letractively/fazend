@@ -27,7 +27,7 @@ require_once 'Zend/Application/Resource/ResourceAbstract.php';
  * @subpackage Resource
  * @see FaZend_Test_Injector
  */
-class FaZend_Application_Resource_Fazend_Injector extends Zend_Application_Resource_ResourceAbstract
+class FaZend_Application_Resource_fz_injector extends Zend_Application_Resource_ResourceAbstract
 {
     
     /**
@@ -53,11 +53,12 @@ class FaZend_Application_Resource_Fazend_Injector extends Zend_Application_Resou
             return $this->_injector;
         }
 
-        $this->_bootstrap->bootstrap('Fazend_Front');
-        $this->_bootstrap->bootstrap('Fazend_View');
-        $this->_bootstrap->bootstrap('Fazend_Routes');
-        $this->_bootstrap->bootstrap('Fazend_Profiler');
-        $this->_bootstrap->bootstrap('Fazend_Caches');
+        $this->_bootstrap->bootstrap('fz_front');
+        $this->_bootstrap->bootstrap('fz_view');
+        $this->_bootstrap->bootstrap('fz_routes');
+        $this->_bootstrap->bootstrap('fz_profiler');
+        $this->_bootstrap->bootstrap('fz_caches');
+        $this->_bootstrap->bootstrap('fz_orm');
             
         // run it, if required in build.xml
         if (defined('RUN_TEST_STARTER')) {
@@ -65,8 +66,8 @@ class FaZend_Application_Resource_Fazend_Injector extends Zend_Application_Resou
         }
 
         // make sure it's deployed
-        if ($this->_bootstrap->hasPluginResource('Fazend_Deployer')) {
-            $this->_bootstrap->bootstrap('Fazend_Deployer');
+        if ($this->_bootstrap->hasPluginResource('fz_deployer')) {
+            $this->_bootstrap->bootstrap('fz_deployer');
         }
 
         // objects in 'test/Mocks' directory

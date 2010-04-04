@@ -20,6 +20,9 @@ defined('APPLICATION_PATH') or define('APPLICATION_PATH', realpath(dirname(__FIL
 defined('CLI_ENVIRONMENT') or define('CLI_ENVIRONMENT', true);
 defined('TESTING_RUNNING') or define('TESTING_RUNNING', true);
 
+/**
+ * @see Zend_Test_PHPUnit_ControllerTestCase
+ */
 require_once 'Zend/Test/PHPUnit/ControllerTestCase.php';
 
 /**
@@ -54,7 +57,8 @@ class FaZend_Test_TestCase extends Zend_Test_PHPUnit_ControllerTestCase
         parent::setUp();
 
         // create local view, since it's a controller
-        $this->view = Zend_Registry::get('view');
+        $this->view = Zend_Registry::get('Zend_Application')
+            ->getBootstrap()->getResource('fz_view');
         
         // clean all instances of all formas
         FaZend_View_Helper_Forma::cleanInstances();

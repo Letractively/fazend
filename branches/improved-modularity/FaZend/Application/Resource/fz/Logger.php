@@ -26,7 +26,7 @@ require_once 'Zend/Application/Resource/ResourceAbstract.php';
  * @package Application
  * @subpackage Resource
  */
-class FaZend_Application_Resource_Fazend_Logger extends Zend_Application_Resource_ResourceAbstract
+class FaZend_Application_Resource_fz_logger extends Zend_Application_Resource_ResourceAbstract
 {
 
     /**
@@ -37,7 +37,7 @@ class FaZend_Application_Resource_Fazend_Logger extends Zend_Application_Resourc
      */
     public function init()
     {
-        $this->_bootstrap->bootstrap('Fazend_Email');
+        $this->_bootstrap->bootstrap('fz_email');
 
         // remove all writers
         FaZend_Log::getInstance()->clean();

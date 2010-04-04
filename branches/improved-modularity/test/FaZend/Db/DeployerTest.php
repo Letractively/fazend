@@ -1,4 +1,7 @@
 <?php
+/**
+ * @version $Id$
+ */
 
 require_once 'AbstractTestCase.php';
 
@@ -9,7 +12,7 @@ class FaZend_Db_DeployerTest extends AbstractTestCase
     {
         parent::setUp();
         $this->_deployer = Zend_Registry::get('Zend_Application')
-            ->getBootstrap()->getResource('fazend_deployer');
+            ->getBootstrap()->getResource('fz_deployer');
     }
 
     public static function providerSqlSamples()

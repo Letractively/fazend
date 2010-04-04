@@ -27,8 +27,16 @@ require_once 'Zend/Application/Resource/ResourceAbstract.php';
  * @subpackage Resource
  * @see application.ini
  */
-class FaZend_Application_Resource_Fazend_View extends Zend_Application_Resource_ResourceAbstract
+class FaZend_Application_Resource_fz_view extends Zend_Application_Resource_ResourceAbstract
 {
+    
+    /**
+     * View instance to use
+     *
+     * @var Zend_View
+     * @see init()
+     */
+    protected $_view;
 
     /**
      * Initializes the resource
@@ -38,6 +46,10 @@ class FaZend_Application_Resource_Fazend_View extends Zend_Application_Resource_
      */
     public function init() 
     {
+        if (isset($this->_view)) {
+            return $this->_view;
+        }
+        
         // make sure it is loaded already
         $this->_bootstrap->bootstrap('layout');
 
@@ -49,24 +61,24 @@ class FaZend_Application_Resource_Fazend_View extends Zend_Application_Resource_
 
         // make sure the view already bootstraped
         $this->_bootstrap->bootstrap('view');
-        $view = $this->_bootstrap->getResource('view');
+        $this->_view = $this->_bootstrap->getResource('view');
         
         $options = $this->getOptions();
 
         // save View into registry
-        Zend_Registry::getInstance()->view = $view;
+        Zend_Registry::getInstance()->view = $this->_view;
 
         // set the type of docs
-        $view->doctype(Zend_View_Helper_Doctype::XHTML1_STRICT);
+        $this->_view->doctype(Zend_View_Helper_Doctype::XHTML1_STRICT);
 
         // set proper paths for view helpers and filters
-        $view->addHelperPath(APPLICATION_PATH . '/helpers', 'Helper');
-        $view->addHelperPath(FAZEND_PATH . '/View/Helper', 'FaZend_View_Helper');
-        $view->addFilterPath(FAZEND_PATH . '/View/Filter', 'FaZend_View_Filter');
+        $this->_view->addHelperPath(APPLICATION_PATH . '/helpers', 'Helper');
+        $this->_view->addHelperPath(FAZEND_PATH . '/View/Helper', 'FaZend_View_Helper');
+        $this->_view->addFilterPath(FAZEND_PATH . '/View/Filter', 'FaZend_View_Filter');
 
         // turn compression ON
         if (!empty($options['htmlCompression'])) {
-            $view->addFilter('HtmlCompressor');
+            $this->_view->addFilter('HtmlCompressor');
         }
 
         // view paginator
@@ -82,6 +94,8 @@ class FaZend_Application_Resource_Fazend_View extends Zend_Application_Resource_
             'FaZend_View_Helper_Forma_Field', 
             FAZEND_PATH . '/View/Helper/Forma'
         );
+        
+        return $this->_view;
     }
 
 }

@@ -27,7 +27,7 @@ require_once 'Zend/Application/Resource/ResourceAbstract.php';
  * @subpackage Resource
  * @see FaZend_Email
  */
-class FaZend_Application_Resource_Fazend_Emailer extends Zend_Application_Resource_ResourceAbstract
+class FaZend_Application_Resource_fz_email extends Zend_Application_Resource_ResourceAbstract
 {
 
     /**
@@ -46,7 +46,6 @@ class FaZend_Application_Resource_Fazend_Emailer extends Zend_Application_Resour
      */
     public function init()
     {
-        bug($this->getOptions());        
         if (isset($this->_email)) {
             return $this->_email;
         }

@@ -26,8 +26,24 @@ require_once 'Zend/Application/Resource/ResourceAbstract.php';
  * @package Application
  * @subpackage Resource
  */
-class FaZend_Application_Resource_Fazend_Errors extends Zend_Application_Resource_ResourceAbstract
+class FaZend_Application_Resource_fz_errors extends Zend_Application_Resource_ResourceAbstract
 {
+
+    /**
+     * Email of admin, who should receive errors
+     *
+     * @var string
+     * @see setAdminEmail()
+     */
+    protected $_adminEmail = null;
+
+    /**
+     * Errors should be visible to users?
+     *
+     * @var boolean
+     * @see setIsVisible()
+     */
+    protected $_isVisible = false;
 
     /**
      * Initializes the resource
@@ -37,11 +53,49 @@ class FaZend_Application_Resource_Fazend_Errors extends Zend_Application_Resourc
      */
     public function init()
     {
-        /**
-         * @see Fazend_ErrorController
-         */
-        require_once FAZEND_APP_PATH . '/controllers/ErrorController.php';
-        Fazend_ErrorController::setOptions($this->getOptions());
+        return $this;
+    }
+    
+    /**
+     * Shall we make errors visible to end user?
+     *
+     * @param boolean
+     * @return $this
+     */
+    public function setIsVisible($isVisible) 
+    {
+        $this->_isVisible = $isVisible;
+    }
+    
+    /**
+     * Email of the admin
+     *
+     * @param string
+     * @return $this
+     */
+    public function setAdminEmail($adminEmail) 
+    {
+        $this->_adminEmail = $adminEmail;
+    }
+    
+    /**
+     * Errors shall be visible to end user?
+     *
+     * @return boolean
+     */
+    public function getIsVisible() 
+    {
+        return $this->_isVisible;
+    }
+    
+    /**
+     * Email to send errors to
+     *
+     * @return string|null
+     */
+    public function getAdminEmail() 
+    {
+        return $this->_adminEmail;
     }
     
 }

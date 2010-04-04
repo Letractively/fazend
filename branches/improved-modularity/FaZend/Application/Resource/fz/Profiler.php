@@ -26,7 +26,7 @@ require_once 'Zend/Application/Resource/ResourceAbstract.php';
  * @package Application
  * @subpackage Resource
  */
-class FaZend_Application_Resource_Fazend_Profiler extends Zend_Application_Resource_ResourceAbstract
+class FaZend_Application_Resource_fz_profiler extends Zend_Application_Resource_ResourceAbstract
 {
 
     /**
@@ -35,7 +35,7 @@ class FaZend_Application_Resource_Fazend_Profiler extends Zend_Application_Resou
      * @return void
      * @see Zend_Application_Resource_Resource::init()
      */
-    protected function _initDbProfiler() 
+    public function init() 
     {
         // profiler is used ONLY in development environment
         if (APPLICATION_ENV === 'production') {

@@ -26,7 +26,7 @@ require_once 'Zend/Application/Resource/ResourceAbstract.php';
  * @package Application
  * @subpackage Resource
  */
-class FaZend_Application_Resource_Fazend_Caches extends Zend_Application_Resource_ResourceAbstract
+class FaZend_Application_Resource_fz_caches extends Zend_Application_Resource_ResourceAbstract
 {
 
     /**
@@ -38,7 +38,7 @@ class FaZend_Application_Resource_Fazend_Caches extends Zend_Application_Resourc
     public function init()
     {
         // make sure it is loaded already
-        $this->_bootstrap->bootstrap('Fazend');
+        $this->_bootstrap->bootstrap('fazend');
 
         //@todo when this ticket is resolved: http://framework.zend.com/issues/browse/ZF-8991
         $cache = Zend_Cache::factory(

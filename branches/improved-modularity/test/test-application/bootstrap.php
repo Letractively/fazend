@@ -37,8 +37,8 @@ class Bootstrap extends FaZend_Application_Bootstrap_Bootstrap
     protected function _initDbData()
     {
         $this->bootstrap('db');
-        $this->bootstrap('Fazend_Deployer');
-        $this->bootstrap('Fazend_Orm');
+        $this->bootstrap('fz_deployer');
+        $this->bootstrap('fz_orm');
 
         FaZend_Db_Table_ActiveRow::addMapping('/owner\.created/', 'new Zend_Date(${a1})');
 

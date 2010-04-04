@@ -1,6 +1,6 @@
 <?php
 /**
- * @version $Id: TraceabilityTestTest.php 1791 2010-04-01 15:52:35Z yegor256@gmail.com $
+ * @version $Id$
  */
 
 require_once 'AbstractTestCase.php';

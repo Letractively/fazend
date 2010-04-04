@@ -173,7 +173,7 @@ class FaZend_Pan_Database_Map
         $tables = array();
 
         $deployer = Zend_Registry::get('Zend_Application')
-            ->getBootstrap()->getResource('fazend_deployer');
+            ->getBootstrap()->getResource('fz_deployer');
         foreach ($deployer->getTables() as $table) {
             $tables[] = new FaZend_Pan_Database_MapTable($table, $this->_getImage());
         }

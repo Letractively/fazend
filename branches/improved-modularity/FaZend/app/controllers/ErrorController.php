@@ -25,37 +25,6 @@ class Fazend_ErrorController extends FaZend_Controller_Action
 {
 
     /**
-     * undocumented class variable
-     *
-     * @var string
-     */
-    protected static $_options = array(
-        'display' => false,
-        'email' => 'bugs@fazend.com',
-    );
-    
-    /**
-     * Set options, if necessary
-     *
-     * @param array
-     * @return void
-     * @see FaZend_Application_Resource_Fazend_Errors::init()
-     * @throws Fazend_ErrorController_InvalidOptionException
-     */
-    public static function setOptions(array $options) 
-    {
-        foreach ($options as $option=>$value) {
-            if (!array_key_exists($option, self::$_options)) {
-                FaZend_Exception::raise(
-                    'Fazend_ErrorController_InvalidOptionException', 
-                    "Option '{$option}' is not valid in error controller"
-                );
-            }
-            self::$_options[$option] = $value;
-        }
-    }
-
-    /**
      * Not found action
      *
      * @return void
@@ -64,7 +33,6 @@ class Fazend_ErrorController extends FaZend_Controller_Action
     {
         // 404 error -- controller or action not found
         $this->getResponse()->setHttpResponseCode(404);
-
         $this->_forward('index', 'index', 'default');
     }
 
@@ -77,7 +45,6 @@ class Fazend_ErrorController extends FaZend_Controller_Action
      * specifically, the "error" action.  These options are configurable. 
      * 
      * @see http://framework.zend.com/manual/en/zend.controller.plugins.html
-     *
      * @return void
      */
     public function errorAction()
@@ -121,11 +88,14 @@ class Fazend_ErrorController extends FaZend_Controller_Action
         // pass the request to the view
         $this->view->request = $errors->request; 
 
+        $fzErrors = Zend_Registry::get('Zend_Application')
+            ->getBootstrap()->getResource('fz_errors');
+
         // shall we show this error to the user?
-        $this->view->showError = self::$_options['display'];
+        $this->view->showError = $fzErrors->getIsVisible();
 
         // notify admin by email
-        if (self::$_options['email'] && !defined('TESTING_RUNNING')) {
+        if ($fzErrors->getAdminEmail() && !defined('TESTING_RUNNING')) {
             $lines = array();
             foreach (debug_backtrace() as $line) {
                 $lines[] = isset($line['file']) ? "{$line['file']} ({$line['line']})" : false;
@@ -134,8 +104,8 @@ class Fazend_ErrorController extends FaZend_Controller_Action
             $siteName = parse_url(WEBSITE_URL, PHP_URL_HOST);
             // send email to the site admin admin
             FaZend_Email::create('fazendException.tmpl')
-                ->set('toEmail', self::$_options['email'])
-                ->set('toName', 'Admin of ' . $siteName)
+                ->set('toEmail', $fzErrors->getAdminEmail())
+                ->set('toName', 'admin')
                 ->set(
                     'subject', 
                     $siteName . ' internal PHP error, rev.' . 

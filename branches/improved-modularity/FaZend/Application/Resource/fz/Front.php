@@ -26,7 +26,7 @@ require_once 'Zend/Application/Resource/ResourceAbstract.php';
  * @package Application
  * @subpackage Resource
  */
-class FaZend_Application_Resource_Fazend_Front extends Zend_Application_Resource_ResourceAbstract
+class FaZend_Application_Resource_fz_front extends Zend_Application_Resource_ResourceAbstract
 {
 
     /**
