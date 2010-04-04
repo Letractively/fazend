@@ -162,8 +162,11 @@ class FaZend_Pan_Database_MapTable
      */
     public function _getInfo()
     {
-        if (!isset($this->_info))
-            $this->_info = FaZend_Db_Deployer::getInstance()->getTableInfo($this->_name);
+        if (!isset($this->_info)) {
+            $deployer = Zend_Registry::get('Zend_Application')
+                ->getBootstrap()->getResource('fazend_deployer');
+            $this->_info = $deployer->getTableInfo($this->_name);
+        }
         return $this->_info;
     }
 

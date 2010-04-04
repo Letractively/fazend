@@ -34,6 +34,8 @@ class FaZend_Test_TestCase extends Zend_Test_PHPUnit_ControllerTestCase
      * List of variables
      *
      * @var array
+     * @see __set()
+     * @see __get()
      */
     protected static $_variables = array();
 
@@ -41,6 +43,7 @@ class FaZend_Test_TestCase extends Zend_Test_PHPUnit_ControllerTestCase
      * Setup test
      *
      * @return void
+     * @see Zend_Test_PHPUnit_ControllerTestCase::setUp()
      */
     public function setUp()
     {
@@ -61,6 +64,7 @@ class FaZend_Test_TestCase extends Zend_Test_PHPUnit_ControllerTestCase
      * Bootstrap as usual
      *
      * @return void
+     * @see setUp()
      */
     public function fazendTestBootstrap()
     {
@@ -72,6 +76,7 @@ class FaZend_Test_TestCase extends Zend_Test_PHPUnit_ControllerTestCase
      * Close-out the test
      *
      * @return void
+     * @see Zend_Test_PHPUnit_ControllerTestCase::tearDown()
      */
     public function tearDown()
     {
@@ -101,8 +106,9 @@ class FaZend_Test_TestCase extends Zend_Test_PHPUnit_ControllerTestCase
      */
     public function __get($name)
     {
-        if (isset(self::$_variables[$name]))
+        if (isset(self::$_variables[$name])) {
             return self::$_variables[$name];
+        }
         return parent::__get($name);
     }
 

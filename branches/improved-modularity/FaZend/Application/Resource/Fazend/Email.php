@@ -27,8 +27,16 @@ require_once 'Zend/Application/Resource/ResourceAbstract.php';
  * @subpackage Resource
  * @see FaZend_Email
  */
-class FaZend_Application_Resource_Fazend_Email extends Zend_Application_Resource_ResourceAbstract
+class FaZend_Application_Resource_Fazend_Emailer extends Zend_Application_Resource_ResourceAbstract
 {
+
+    /**
+     * Default email template
+     *
+     * @var FaZend_Email
+     * @see init()
+     */
+    protected $_email;
 
     /**
      * Initializes the resource
@@ -38,14 +46,93 @@ class FaZend_Application_Resource_Fazend_Email extends Zend_Application_Resource
      */
     public function init()
     {
+        bug($this->getOptions());        
+        if (isset($this->_email)) {
+            return $this->_email;
+        }
+        
+        /**
+         * @see FaZend_Email
+         */
+        require_once 'FaZend/Email.php';
+
+        // configure default email message
+        $this->_email = new FaZend_Email();
+
         // make sure view is initialized
         $this->_bootstrap->bootstrap('view');
+        $this->_email->setView($this->_bootstrap->getResource('view'));
+        $charset = 'utf-8';
+        foreach ($this->getOptions() as $option=>$value) {
+            switch (strtolower($option)) {
+                case 'send':
+                    $this->_email->setIsSending((bool)$value);
+                    break;
+                    
+                case 'encoding':
+                    $charset = $value;
+                    break;
+                    
+                case 'folders':
+                    $this->_email->setFolders($value);
+                    break;
+                    
+                case 'folder':
+                    $this->_email->setFolders(array($value));
+                    break;
 
-        // save configuration into static class
-        FaZend_Email::config(
-            new Zend_Config($this->getOptions()), 
-            $this->_bootstrap->getResource('view')
-        );
+                case 'notifier':
+                    $this->_email->set('fromEmail', $value['email']);
+                    $this->_email->set('fromName', $value['name']);
+                    break;
+                    
+                case 'manager':
+                    $this->_email->set('toEmail', $value['email']);
+                    $this->_email->set('toName', $value['name']);
+                    break;
+                    
+                case 'transport':
+                    $this->_setDefaultTransport($value);
+                    break;
+                    
+                default:
+                    // ignore this options since it's unknown
+            }
+        }
+        
+        $this->_email->setMailer(new Zend_Mail($charset));
+        return $this->_email;
+    }
+
+    /**
+     * Compute transport and return it
+     *
+     * @param array List of options
+     * @return void
+     * @see init()
+     * @throws FaZend_Application_Resource_Fazend_Email_TransportUnknownException
+     */
+    protected function _setDefaultTransport($option) 
+    {
+        switch ($option['name']) {
+            case 'Zend_Mail_Transport_Smtp':
+                Zend_Mail::setDefaultTransport(
+                    new Zend_Mail_Transport_Smtp($option['host'], $option['params'])
+                );
+                break;
+                
+            case 'Zend_Mail_Transport_Sendmail':
+                Zend_Mail::setDefaultTransport(
+                    new Zend_Mail_Transport_Sendmail()
+                );
+                break;
+                
+            default:
+                FaZend_Exception::raise(
+                    'FaZend_Application_Resource_Fazend_Email_TransportUnknownException', 
+                    "Transport '{$option['name']}' is unknown"
+                );
+        }
     }
     
 }

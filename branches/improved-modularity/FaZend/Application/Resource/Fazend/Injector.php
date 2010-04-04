@@ -29,34 +29,28 @@ require_once 'Zend/Application/Resource/ResourceAbstract.php';
  */
 class FaZend_Application_Resource_Fazend_Injector extends Zend_Application_Resource_ResourceAbstract
 {
-
+    
     /**
-     * Injector has been executed already?
+     * Injector object (policy)
      *
-     * I don't know why we need this validation, but looks like the resource
-     * is initialized many times, once per each test case. Anyway, this variable resolves
-     * the problem, as I see.
-     *
-     * @var boolean
+     * @var FaZend_Test_Injector
      */
-    protected static $_injectedAlready = false;
+    protected $_injector;
 
     /**
      * Initializes the resource
      *
-     * @return void
+     * @return FaZend_Test_Injector|null
      * @see Zend_Application_Resource_Resource::init()
      */
     public function init() 
     {
-        if (self::$_injectedAlready) {
-            return;
-        } else {
-            self::$_injectedAlready = true;
-        }            
-
         if (APPLICATION_ENV == 'production') {
-            return;
+            return null;
+        }
+
+        if (isset($this->_injector)) {
+            return $this->_injector;
         }
 
         $this->_bootstrap->bootstrap('Fazend_Front');
@@ -64,14 +58,6 @@ class FaZend_Application_Resource_Fazend_Injector extends Zend_Application_Resou
         $this->_bootstrap->bootstrap('Fazend_Routes');
         $this->_bootstrap->bootstrap('Fazend_Profiler');
         $this->_bootstrap->bootstrap('Fazend_Caches');
-        // $this->_boot('FrontControllerOptions');
-        // $this->_boot('ViewOptions');
-        // $this->_boot('Routes');
-        // $this->_boot('DbAutoloader');
-        // $this->_boot('DbProfiler');
-        // $this->_boot('Logger');
-        // $this->_boot('PluginCache');
-        // $this->_boot('TableCache');
             
         // run it, if required in build.xml
         if (defined('RUN_TEST_STARTER')) {
@@ -102,12 +88,13 @@ class FaZend_Application_Resource_Fazend_Injector extends Zend_Application_Resou
         
         $injectorPhp = APPLICATION_PATH . '/../../test/injector/Injector.php';
         if (!file_exists($injectorPhp)) {
-            return;
+            return $this->_injector = false;
         }
 
         require_once $injectorPhp;
-        $injector = new Injector();
-        $injector->inject();
+        $this->_injector = new Injector();
+        $this->_injector->inject();
+        return $this->_injector;
     }
     
 }

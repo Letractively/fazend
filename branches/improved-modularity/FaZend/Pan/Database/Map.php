@@ -166,13 +166,17 @@ class FaZend_Pan_Database_Map
      */
     protected function _getTables()
     {
-        if (isset($this->_tables))
+        if (isset($this->_tables)) {
             return $this->_tables;
+        }
 
         $tables = array();
 
-        foreach (FaZend_Db_Deployer::getInstance()->getTables() as $table)
+        $deployer = Zend_Registry::get('Zend_Application')
+            ->getBootstrap()->getResource('fazend_deployer');
+        foreach ($deployer->getTables() as $table) {
             $tables[] = new FaZend_Pan_Database_MapTable($table, $this->_getImage());
+        }
 
         // smaller tables come first
         usort($tables, create_function('$a, $b', 'return $a->size > $b->size;'));

@@ -25,26 +25,6 @@ abstract class FaZend_tests_AbstractTest extends FaZend_Test_TestCase
 {
     
     /**
-     * List of options
-     *
-     * @var string
-     * @see setOptions()
-     */
-    protected static $_options = null;
-    
-    /**
-     * Set options
-     *
-     * @param array Options
-     * @return void
-     * @see FaZend_Application_Resource_Fazend_Tests::init()
-     */
-    public static function setOptions(array $options) 
-    {
-        self::$_options = $options;
-    }
-    
-    /**
      * Get option by the name
      *
      * @param string Name of the option
@@ -52,14 +32,16 @@ abstract class FaZend_tests_AbstractTest extends FaZend_Test_TestCase
      */
     protected function _getOption($name) 
     {
+        $options = Zend_Registry::get('Zend_Application')->getBootstrap()->getResource('Fazend_Tests');
+
         $key = preg_replace('/Test$/', '', get_class($this));
-        if (!isset(self::$_options[$key])) {
+        if (!isset($options[$key])) {
             return null;
         }
-        if (!array_key_exists($name, self::$_options[$key])) {
+        if (!array_key_exists($name, $options[$key])) {
             return null;
         }
-        return self::$_options[$key][$name];
+        return $options[$key][$name];
     }
     
 }

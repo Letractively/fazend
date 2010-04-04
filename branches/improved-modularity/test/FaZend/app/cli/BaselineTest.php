@@ -3,6 +3,9 @@
  * @version $Id: TraceabilityTestTest.php 1791 2010-04-01 15:52:35Z yegor256@gmail.com $
  */
 
+/**
+ * @see AbstractTestCase
+ */
 require_once 'AbstractTestCase.php';
 
 class FaZend_Cli_cli_BaselineTest extends AbstractTestCase

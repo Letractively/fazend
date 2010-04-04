@@ -33,7 +33,7 @@ class FaZend_Application_Resource_Fazend_View extends Zend_Application_Resource_
     /**
      * Initializes the resource
      *
-     * @return $this
+     * @return void
      * @see Zend_Application_Resource_Resource::init()
      */
     public function init() 
@@ -82,7 +82,6 @@ class FaZend_Application_Resource_Fazend_View extends Zend_Application_Resource_
             'FaZend_View_Helper_Forma_Field', 
             FAZEND_PATH . '/View/Helper/Forma'
         );
-        return $this;
     }
 
 }

@@ -5,6 +5,13 @@ require_once 'AbstractTestCase.php';
 class FaZend_Db_DeployerTest extends AbstractTestCase
 {
 
+    public function setUp()
+    {
+        parent::setUp();
+        $this->_deployer = Zend_Registry::get('Zend_Application')
+            ->getBootstrap()->getResource('fazend_deployer');
+    }
+
     public static function providerSqlSamples()
     {
         return array(
@@ -44,10 +51,7 @@ class FaZend_Db_DeployerTest extends AbstractTestCase
      */
     public function testEmailsAreRenderedAndSent ($table, $sql)
     {
-        $deployer = FaZend_Db_Deployer::getInstance();
-
-        $info = $deployer->getSqlInfo($sql);
-
+        $info = $this->_deployer->getSqlInfo($sql);
         $this->assertTrue(count($info) > 0, 'No information about the table, why?');
 
         foreach ($info as $column) {
@@ -57,16 +61,15 @@ class FaZend_Db_DeployerTest extends AbstractTestCase
 
     public function testGetTablesWorks()
     {
-        $list = FaZend_Db_Deployer::getInstance()->getTables();
+        $list = $this->_deployer->getTables();
         $this->assertTrue(count($list) > 0);
     }
 
     public function testGetTableInfoWorks()
     {
-        $list = FaZend_Db_Deployer::getInstance()->getTables();
+        $list = $this->_deployer->getTables();
         $table = array_shift($list);
-
-        $info = FaZend_Db_Deployer::getInstance()->getTableInfo($table);
+        $info = $this->_deployer->getTableInfo($table);
     }
 
 }

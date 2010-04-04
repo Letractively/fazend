@@ -37,6 +37,9 @@ class FaZend_Application_Resource_Fazend_Caches extends Zend_Application_Resourc
      */
     public function init()
     {
+        // make sure it is loaded already
+        $this->_bootstrap->bootstrap('Fazend');
+
         //@todo when this ticket is resolved: http://framework.zend.com/issues/browse/ZF-8991
         $cache = Zend_Cache::factory(
             'Core', 
@@ -62,9 +65,8 @@ class FaZend_Application_Resource_Fazend_Caches extends Zend_Application_Resourc
         // plugin cache
         // see: http://framework.zend.com/manual/en/zend.loader.pluginloader.html
         $classFileIncCache = TEMP_PATH . '/'. 
-        FaZend_Properties::get()->name . '-r' .
-        FaZend_Revision::get() . 
-        '-includeCache.php';
+        FaZend_Revision::getName() . '-r' .
+        FaZend_Revision::get() . '-includeCache.php';
 
         // this may happen if we start from a different process
         if (file_exists($classFileIncCache) && !is_writable($classFileIncCache)) {
@@ -75,6 +77,7 @@ class FaZend_Application_Resource_Fazend_Caches extends Zend_Application_Resourc
             include_once $classFileIncCache;
         }
 
+        // set cache for "included" files
         Zend_Loader_PluginLoader::setIncludeFileCache($classFileIncCache);
     }
     

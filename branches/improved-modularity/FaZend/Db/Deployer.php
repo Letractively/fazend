@@ -22,112 +22,98 @@
  *
  * @package Deployer
  * @todo Refactor in order to support other DB servers
+ * @see FaZend_Application_Resource_Fazend_Deployer
  */
 class FaZend_Db_Deployer
 {
 
-    const EXCEPTION_CLASS = 'FaZend_Db_Deployer_Exception';
+    /**
+     * Absolute name of the file with flag
+     *
+     * @var string
+     * @see deploy()
+     */
+    protected $_flag;
+    
+    /**
+     * List of absolute directory names with .SQL files
+     *
+     * @var string[]
+     * @see deploy()
+     */
+    protected $_folders = array();
+    
+    /**
+     * Shall this class be LOG-verbose (add messages to log)
+     *
+     * @var string
+     * @see _create()
+     * @see _update()
+     */
+    protected $_verbose = false;
 
     /**
-     * Instance of the class, singleton pattern
+     * Set flag (absolute file name of the flag)
      *
-     * @var FaZend_Db_Deployer
+     * @param string Absolute file name
+     * @return $this
+     * @see FaZend_Application_Resource_Fazend_Deployer::init()
      */
-    protected static $_instance;
-
-    /**
-     * Configuration options
-     *
-     * @var Zend_Config
-     */
-    protected $_options = array(
-        'load' => true,
-        'deploy' => false,
-        'verbose' => true,
-        'flag' => '/dev/null',
-        'folders' => array(),
-    );
-
-    /**
-     * Instance of DB deployer
-     *
-     * @param Zend_Config Configuration parameters
-     * @return void
-     * @throws FaZend_Db_Deployer_InvalidConfig
-     */
-    public static function getInstance(Zend_Config $config = null) 
+    public function setFlag($flag) 
     {
-        if (!isset(self::$_instance)) {
-            if (is_null($config)) {
-                FaZend_Exception::raise(
-                    'FaZend_Db_Deployer_InvalidConfig', 
-                    "First time getInstance() should be called with valid config",
-                    self::EXCEPTION_CLASS
-                );
-            }
-
-            self::$_instance = new FaZend_Db_Deployer($config);
-        }
-
-        return self::$_instance;
+        $this->_flag = $flag;
+        return $this;
     }
 
     /**
-     * Constructor
+     * Set list of directories with .SQL files
      *
-     * @param Zend_Config Configuration parameters
-     * @return void
-     * @throws FaZend_Db_Deployer_InvalidOptionException
+     * @param string[] List of directories
+     * @return $this
+     * @throws FaZend_Db_Deployer_InvalidFolderException
+     * @see FaZend_Application_Resource_Fazend_Deployer::init()
      */
-    protected function __construct(Zend_Config $options) 
+    public function setFolders(array $folders) 
     {
-        foreach ($options as $option=>$value) {
-            if (!array_key_exists($option, $this->_options)) {
+        foreach ($folders as $dir) {
+            if (!file_exists($dir) || !is_dir($dir)) {
                 FaZend_Exception::raise(
-                    'FaZend_Db_Deployer_InvalidOptionException', 
-                    "Option '{$option}' is not valid"
+                    'FaZend_Db_Deployer_InvalidFolderException', 
+                    "Directory '{$dir}' is absent or is not a directory"
                 );
             }
-            $this->_options[$option] = $value;
         }
+        $this->_folders = $folders;
+        return $this;
+    }
+
+    /**
+     * Set verbose option
+     *
+     * @param boolean Shall this class use LOG for create/update events notification?
+     * @return $this
+     * @see FaZend_Application_Resource_Fazend_Deployer::init()
+     */
+    public function setVerbose($verbose) 
+    {
+        $this->_verbose = $verbose;
+        return $this;
     }
 
     /**
      * Deploy Db schema
      *
      * @return void
-     * @throws FaZend_Db_Deployer_Exception
      */
     public function deploy() 
     {
-        // if it's turned off
-        if (!$this->_options['deploy']) {
+        // shall we deploy?
+        if (!$this->_isNecessary()) {
             return;
         }
         
-        // check the existence of the flag
-        // it it's absent, we should do anything
-        $flagFile = $this->_flagName();
-        if (!file_exists($flagFile) && (APPLICATION_ENV === 'production')) {
-            return;
-        }
-
-        // remove it
-        // we will never come back here again
-        if ((@unlink($flagFile) === false) && (APPLICATION_ENV === 'production')) {
-            FaZend_Log::err('Failed to remove flag file: ' . $flagFile);
-            return;
-        }
-
-        // if we can't get a list of tables in DB - we stop
-        if (!method_exists($this->_db(), 'listTables'))
-            return;
-    
         // go through ALL deployment directories
-        foreach ($this->_dirNames() as $dir) {
-            if (!file_exists($dir) || !is_dir($dir))
-                continue;
-
+        foreach ($this->_folders as $dir) {
             try {
                 // get full list of existing(!) tables in Db
                 $tables = array_map(
@@ -154,25 +140,9 @@ class FaZend_Db_Deployer
                         $this->_create($table, $this->_clearSql($dir . '/' . $file));
                     }
                 }
-            } catch (FaZend_Db_Deployer_Exception $exception) {
-                // if there is no email - show the error
-                if (FaZend_Properties::get()->errors->email) {
-                    // send email to the site admin admin
-                    FaZend_Email::create('fazendDeployerException.tmpl')
-                        ->set('toEmail', FaZend_Properties::get()->errors->email)
-                        ->set('toName', 'admin')
-                        ->set(
-                            'subject', 
-                            parse_url(WEBSITE_URL, PHP_URL_HOST) . 
-                            ' database deployment exception, rev.' . FaZend_Revision::get()
-                        )
-                        ->set('text', $exception->getMessage())
-                        ->send()
-                        ->logError();
-                }
-
-                // throw it to the application
-                throw $exception;
+            } catch (FaZend_Db_Deployer_Exception $e) {
+                // swallow it and report in log
+                FaZend_Log::err("Deployment exception: {$e->getMessage()}");
             } 
         }
     }
@@ -184,26 +154,23 @@ class FaZend_Db_Deployer
      */
     public function getTables() 
     {
-        $list = array();
-
-        foreach ($this->_dirNames() as $dir) {
-            if (!file_exists($dir) || !is_dir($dir))
-                continue;
-            
+        $list = $matches = array();
+        foreach ($this->_folders as $dir) {
             foreach (scandir($dir) as $file) {
-                if (!preg_match('/^\d+\s(.*?)\.sql$/', $file, $matches))
+                if (!preg_match('/^\d+\s(.*?)\.sql$/', $file, $matches)) {
                     continue;
+                }
 
                 try {
                     $this->getTableInfo($matches[1]);
                 } catch (FaZend_Db_Deployer_NotTableButView $e) {
+                    assert($e instanceof Exception); // for ZCA only
                     continue;
                 }
 
                 $list[] = $matches[1];
             }
         }
-        
         return $list;
     }
 
@@ -216,18 +183,19 @@ class FaZend_Db_Deployer
      */
     public function getTableInfo($table) 
     {
-        foreach ($this->_dirNames() as $dir) {
-            if (!file_exists($dir) || !is_dir($dir))
-                continue;
-            foreach (scandir($dir) as $file)
-                if (preg_match('/^\d+\s' . preg_quote($table) . '\.sql$/i', $file))
+        foreach ($this->_folders as $dir) {
+            foreach (scandir($dir) as $file) {
+                if (preg_match('/^\d+\s' . preg_quote($table) . '\.sql$/i', $file)) {
                     return $this->_sqlInfo(file_get_contents($dir . '/' . $file));
+                }
+            }
         }
-
         FaZend_Exception::raise(
             'FaZend_Db_Deployer_SqlFileNotFound', 
-            "File '<num> {$table}.sql' not found in '{$dir}'", self::EXCEPTION_CLASS
+            "File '<num> {$table}.sql' not found in '{$dir}'",
+            'FaZend_Db_Deployer_Exception'
         );
+        return null; // for ZCA only
     }
 
     /**
@@ -242,23 +210,32 @@ class FaZend_Db_Deployer
     }
 
     /**
-     * Location of .SQL files, returns list of directories
+     * Deployment is required right now?
      *
-     * @return array List of directories
+     * @see deploy()
+     * @return boolean
      */
-    protected function _dirNames() 
+    protected function _isNecessary() 
     {
-        return $this->_options['folders'];
-    }
+        // check the existence of the flag
+        // it it's absent, we should do NOT anything
+        if (!file_exists($this->_flag) && (APPLICATION_ENV === 'production')) {
+            return false;
+        }
 
-    /**
-     * Location of the flag
-     *
-     * @return string
-     */
-    protected function _flagName()
-    {
-        return $this->_options['flag'];
+        // remove it
+        // we will never come back here again
+        if ((@unlink($this->_flag) === false) && (APPLICATION_ENV === 'production')) {
+            FaZend_Log::err("Failed to remove deployer flag file: '{$this->_flag}'");
+            return false;
+        }
+
+        // if we can't get a list of tables in DB - we stop
+        if (!method_exists($this->_db(), 'listTables')) {
+            return false;
+        }
+
+        return true;
     }
 
     /**
@@ -271,7 +248,7 @@ class FaZend_Db_Deployer
      */
     protected function _create($table, $sql) 
     {
-        if (empty($sql) && $this->_options['verbose']) {
+        if (empty($sql) && $this->_verbose) {
             logg("DB table '{$table}' was NOT created since SQL is empty");
             return;
         }
@@ -282,12 +259,12 @@ class FaZend_Db_Deployer
             FaZend_Exception::raise(
                 'FaZend_Db_Deployer_CreateFailed', 
                 $e->getMessage() . ': ' . $sql, 
-                self::EXCEPTION_CLASS
+                'FaZend_Db_Deployer_Exception'
             );
         }
         
         // log the operation
-        if ($this->_options['verbose']) {
+        if ($this->_verbose) {
             logg("DB table '{$table}' was created: {$sql}");
         }
     }
@@ -298,25 +275,28 @@ class FaZend_Db_Deployer
      * @param string Name of the table
      * @param string SQL file content
      * @return void
+     * @todo this method is not implemented yet
      */
     protected function _update($table, $sql) 
     {
-        try {
-            $infoSql = $this->_sqlInfo($sql);
-        } catch (FaZend_Db_Deployer_NotTableButView $e) {
+        assert(is_string($table)); // for ZCA only
+        assert(is_string($sql)); // for ZCA only
+        // try {
+            // $infoSql = $this->_sqlInfo($sql);
+        // } catch (FaZend_Db_Deployer_NotTableButView $e) {
             // this is VIEW, not table
             // we just drop and create again
             //$this->_db()->query("DROP VIEW $table");
 
             // create this VIEW again
             //$this->_create($table, $sql);
-            return;
-        }
+        //     return;
+        // }
 
-        $infoDb = $this->_db()->describeTable($table);
+        // $infoDb = $this->_db()->describeTable($table);
 
         // tbd
-        foreach ($infoSql as $column);
+        // foreach ($infoSql as $column);
 
         // log the operation
         // FaZend_Log::info("DB table '{$table}' was updated: {$sql}");
@@ -350,12 +330,15 @@ class FaZend_Db_Deployer
                 'FaZend_Db_Deployer_WrongFormat', 
                 "Every SQL file should start with 'create table' or 'create view', ".
                 "we get this: '" . cutLongLine($sql, 50) . "'",
-                self::EXCEPTION_CLASS
+                'FaZend_Db_Deployer_Exception'
             );
 
         // this is view, we just drop it and create new
-        if (preg_match('/^create\s(?:or\sreplace\s)?view/i', $sql))
-            FaZend_Exception::raise('FaZend_Db_Deployer_NotTableButView');
+        if (preg_match('/^create\s(?:or\sreplace\s)?view/i', $sql)) {
+            FaZend_Exception::raise(
+                'FaZend_Db_Deployer_NotTableButView'
+            );
+        }
 
         // cut out the text between starting and ending brackets
         $columnsText = substr($sql, strpos($sql, '(')+1);
@@ -370,9 +353,7 @@ class FaZend_Db_Deployer
 
         $info = array();
         foreach ($matches[0] as $id=>$column) {
-
             $key = array();
-
             // primary key
             if (preg_match('/^primary\skey\s?.*?\(\s?([^\,]*?)\s?\)/i', $column, $key)) {
                 $info[$key[1]]['PRIMARY'] = 1;
@@ -391,9 +372,9 @@ class FaZend_Db_Deployer
                 $info[$key[1]]['FK_TABLE'] = trim($key[2]);
                 $info[$key[1]]['FK_COLUMN'] = trim($key[3]);
 
-                if (strpos(strtolower($key[4]), 'on delete cascade') !== false)
+                if (strpos(strtolower($key[4]), 'on delete cascade') !== false) {
                     $info[$key[1]]['FK_COMPOSITION'] = true;
-                    
+                }
                 continue;
             }
 
@@ -404,8 +385,9 @@ class FaZend_Db_Deployer
             }
 
             // other special mnemos, if not parsed above - skip them
-            if (preg_match('/^(index|key|primary\skey|constraint|foreign\skey|unique|unique\skey)\s?\(/i', $column))
+            if (preg_match('/^(index|key|primary\skey|constraint|foreign\skey|unique|unique\skey)\s?\(/i', $column)) {
                 continue;
+            }
 
             $info[$matches[1][$id]] = array(
                 'COLUMN_NAME' => $matches[1][$id],
@@ -415,7 +397,6 @@ class FaZend_Db_Deployer
             );
                 
         }
-
         return $info;
     }
 
@@ -425,6 +406,7 @@ class FaZend_Db_Deployer
      * @param string File name 1
      * @param string File name 2
      * @return int
+     * @see deploy()
      */
     protected function _sorter($file1, $file2) 
     {
@@ -435,6 +417,9 @@ class FaZend_Db_Deployer
      * Db adapter
      *
      * @return Zend_Db_Adapter
+     * @see deploy()
+     * @see _create()
+     * @see _update()
      */
     protected function _db() 
     {
@@ -446,6 +431,7 @@ class FaZend_Db_Deployer
      *
      * @param string Name of the SQL file
      * @return string
+     * @see deploy()
      */
     protected function _clearSql($file) 
     {

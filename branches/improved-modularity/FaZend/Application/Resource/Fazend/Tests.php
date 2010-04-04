@@ -34,14 +34,11 @@ class FaZend_Application_Resource_Fazend_Tests extends Zend_Application_Resource
      *
      * @return void
      * @see Zend_Application_Resource_Resource::init()
+     * @see FaZend_tests_AbstractTest::_getOption()
      */
     public function init()
     {
-        /**
-         * @see FaZend_tests_AbstractTest
-         */
-        require_once FAZEND_APP_PATH . "/tests/AbstractTest.php";
-        FaZend_tests_AbstractTest::setOptions($this->getOptions());
+        return $this->getOptions();
     }
     
 }

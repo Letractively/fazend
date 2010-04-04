@@ -98,7 +98,7 @@ class FaZend_Image
         $this->imagerectangle(0, 0, $width-1, $height-1, $this->getColor('border'));
 
         // label image
-        $label = imagecreatefrompng(FAZEND_PATH . '/Image/images/label.png');
+        $label = imagecreatefrompng(FAZEND_APP_PATH . '/views/files/images/label.png');
 
         // put the label onto the image
         $this->imagecopy(
@@ -215,7 +215,7 @@ class FaZend_Image
      */
     public static function getFont($mnemo)
     {
-        return FAZEND_PATH . '/Image/fonts/arial.ttf';
+        return FAZEND_APP_PATH . '/views/fonts/arial.ttf';
     }
     
     /**
