@@ -33,8 +33,9 @@ class Polish extends FaZend_Cli_Abstract
     {
         $dry = (bool)$this->_get('dry-run', false);
         $path = $this->_get('dir', false);
-        if (!$path)
+        if (!$path) {
             $path = APPLICATION_PATH;
+        }
 
         // application files
         $polisher = new FaZend_Pan_Polisher_Facade($path, $dry, true);

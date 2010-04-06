@@ -38,13 +38,15 @@ class Baseline extends FaZend_Cli_Abstract
         $map = $collector->collect(APPLICATION_PATH);
 
         $validator = new FaZend_Pan_Baseliner_Validator(APPLICATION_PATH, true);
-        if (!$validator->validate($map))
+        if (!$validator->validate($map)) {
             return self::RETURNCODE_ERROR;
+        }
 
-        if ($dry)
+        if ($dry) {
             $path = 'php://stdout';
-        else
+        }else {
             $path = FaZend_Pan_Baseliner_Map::getStorageDir(true) . '/' . $email . '.xml';
+        }
         $map->save($path);
         
         echo "\nBaseline XML report saved into: {$path}\nDon't forget to commit it to SVN repository\n";
