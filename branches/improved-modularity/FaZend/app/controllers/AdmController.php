@@ -15,17 +15,17 @@
  */
 
 /**
- * @see Fazend_PanelAbstractController
- */
-require_once FAZEND_APP_PATH . '/controllers/PanelAbstractController.php';
-
-/**
  * Admin controller
  *
  * @package controllers
  */
-class Fazend_AdmController extends Fazend_PanelAbstractController
+class Fazend_AdmController extends FaZend_Controller_Action
 {
+
+    /**
+     * Session cache
+     */
+    protected $_session;
 
     /**
      * Get action name
@@ -34,6 +34,16 @@ class Fazend_AdmController extends Fazend_PanelAbstractController
      */
     public function preDispatch() 
     {
+        // no login in testing/development environment
+        if ((APPLICATION_ENV === 'production') && !self::_isLoggedIn()) {
+            return $this->_forward('login');
+        }
+
+        // layout reconfigure to fazend
+        $layout = Zend_Layout::getMvcInstance();
+        $layout->setViewScriptPath(FAZEND_APP_PATH . '/layouts/scripts');
+        $layout->setLayout('panel');
+
         $this->view->action = $this->getRequest()->getActionName();    
         parent::preDispatch();
     }
@@ -45,8 +55,9 @@ class Fazend_AdmController extends Fazend_PanelAbstractController
      */
     public function squeezeAction() 
     {
-        if ($this->_hasParam('reload'))
+        if ($this->_hasParam('reload')) {
             $this->view->squeezePNG()->startOver();
+        }
     }
 
     /**
@@ -56,12 +67,134 @@ class Fazend_AdmController extends Fazend_PanelAbstractController
      */
     public function posAction()
     {
-        if (!FaZend_Pos_Root::exists())
+        if (!FaZend_Pos_Root::exists()) {
             return $this->_redirectFlash('POS does not exist', 'index');
+        }
             
-        if ($this->_hasParam('object'))
+        if ($this->_hasParam('object')) {
             $this->view->node = FaZend_Pos_Properties::root()->ps()->findById($this->_getParam('object'));
+        }
     }
     
+    /**
+     * Login
+     *
+     * @return void
+     */
+    public function loginAction()
+    {
+        $form = $this->view->form = new FaZend_Form();
+        
+        $email = new Zend_Form_Element_Text('email');
+        $email->setLabel('Email:')        
+            ->setRequired();
+        $form->addElement($email);
+        
+        $pwd = new Zend_Form_Element_Password('password');
+        $pwd->setLabel('Password:')
+            ->setRequired();
+        $form->addElement($pwd);
+        
+        $form->addElement('submit', 'Login');
+
+        if (!$form->isFilled())
+            return;
+            
+        try {
+            $this->_logIn($email->getValue(), $pwd->getValue());
+        } catch (LoginException $e) {   
+            $email->addError($e->getMessage());
+            return;
+        }
+        return $this->_forward('index');
+    }
+
+    /**
+     * Restrict access to certain areas
+     *
+     * @return void
+     */
+    public function restrictAction()
+    {
+    }
+
+    /**
+     * The admin is logged in?
+     *
+     * @return boolean
+     */
+    protected function _isLoggedIn()
+    {
+        return !empty($this->_session()->user);
+    }
+
+    /**
+     * Log in the admin
+     *
+     * If login matches with password - will login. Otherwise won't do anything.
+     *
+     * @param string Email to log in
+     * @param string Password
+     * @return boolean
+     * @throws LoginException If fails
+     */
+    protected function _logIn($email, $password)
+    {
+        $accessFile = APPLICATION_PATH . '/deploy/access.txt';
+        if (!@file_exists($accessFile)) {
+            FaZend_Exception::raise(
+                'LoginException', 
+                "Access control file is absent, refer to admin"
+            );
+        }
+     
+        $count = 0;
+        $lines = @file($accessFile);
+        foreach ($lines as $line) {
+            $matches = array();
+            if (!preg_match('/^([@\.\-\w\d]+):([\w\d]+)$/', $line, $matches)) {
+                continue;
+            }
+                
+            // calculate the number of users in the file
+            $count++;
+                
+            // if this is not the required email (another user)
+            if ($matches[1] != $email) {
+                continue;
+            }
+                    
+            // wrong password?
+            if ($matches[2] != md5($password)) {
+                FaZend_Exception::raise(
+                    'LoginException', 
+                    "Wrong password (" . str_repeat('*', strlen($password)) . "), try again"
+                );
+            }
+
+            // everything is fine, we should log him in
+            $this->_session()->user = $email;
+            return true;
+        }
+
+        FaZend_Exception::raise(
+            'LoginException', 
+            "The email is not found in ACL ($count)"
+        );
+    }
+
+    /**
+     * Get session
+     *
+     * @return Zend_Session_Namespace
+     */
+    protected function _session()
+    {
+        if (!isset($this->_session)) {
+            $this->_session = new Zend_Session_Namespace('fz');
+        }
+        return $this->_session;
+    }
+
 }
             
