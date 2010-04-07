@@ -19,17 +19,17 @@
 
 <?php if ($this->showError): ?> 
 
-        <p>Exception information (<?php echo get_class($this->exception)?>):</p> 
+    <p>Exception information (<?php echo get_class($this->exception)?>):</p> 
 
-        <p>Error: <?php echo $this->exception->getMessage() ?></p> 
+    <p>Error: <?php echo $this->exception->getMessage() ?></p> 
 
-        <p>Stack:</p> 
+    <p>Stack:</p> 
 
-        <pre><?php echo $this->exception->getTraceAsString() ?></pre> 
+    <pre><?php echo $this->exception->getTraceAsString() ?></pre> 
 
-        <p>Request:</p> 
+    <p>Request:</p> 
 
-        <pre><?php var_dump($this->request->getParams()) ?></pre> 
+    <pre><?php var_dump($this->request->getParams()) ?></pre> 
 
 <?php else: ?>
 
