@@ -64,7 +64,7 @@ class FaZend_Application_Resource_fz_view extends Zend_Application_Resource_Reso
         // layout reconfigure, if necessary
         $layout = Zend_Layout::getMvcInstance();
         if (!file_exists($layout->getViewScriptPath())) {
-            $layout->setViewScriptPath(FAZEND_APP_PATH . '/layouts/scripts');
+            $layout->setViewScriptPath(FAZEND_APP_PATH . '/views/layouts');
         }
 
         // make sure the view already bootstraped
@@ -80,7 +80,7 @@ class FaZend_Application_Resource_fz_view extends Zend_Application_Resource_Reso
         $this->_view->doctype(Zend_View_Helper_Doctype::XHTML1_STRICT);
 
         // set proper paths for view helpers and filters
-        $this->_view->addHelperPath(APPLICATION_PATH . '/helpers', 'Helper');
+        $this->_view->addHelperPath(APPLICATION_PATH . '/views/helpers', 'Helper');
         $this->_view->addHelperPath(FAZEND_PATH . '/View/Helper', 'FaZend_View_Helper');
         $this->_view->addFilterPath(FAZEND_PATH . '/View/Filter', 'FaZend_View_Filter');
 
