@@ -40,13 +40,6 @@ class FaZend_Application_Resource_fz_orm extends Zend_Application_Resource_Resou
      */
     public function init() 
     {
-        // it is important to keep this line as first line in the 
-        // method, because requiring a FAZEND resource will automatically
-        // require FZ_INJECTOR resource to load. Thus, bootstrapping any
-        // of FZ_* resources from your bootstrap you will automatically
-        // request INJECTOR to be bootstrapped first.
-        $this->_bootstrap->bootstrap('fazend');
-
         $autoloader = Zend_Loader_Autoloader::getInstance();
         $autoloader->pushAutoloader(
             new FaZend_Db_Table_RowLoader(), 

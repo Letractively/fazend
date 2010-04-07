@@ -46,13 +46,6 @@ class FaZend_Application_Resource_fz_email extends Zend_Application_Resource_Res
      */
     public function init()
     {
-        // it is important to keep this line as first line in the 
-        // method, because requiring a FAZEND resource will automatically
-        // require FZ_INJECTOR resource to load. Thus, bootstrapping any
-        // of FZ_* resources from your bootstrap you will automatically
-        // request INJECTOR to be bootstrapped first.
-        $this->_bootstrap->bootstrap('fazend');
-
         if (isset($this->_email)) {
             return $this->_email;
         }
@@ -61,7 +54,6 @@ class FaZend_Application_Resource_fz_email extends Zend_Application_Resource_Res
          * @see FaZend_Email
          */
         require_once 'FaZend/Email.php';
-
         // configure default email message
         $this->_email = new FaZend_Email();
 

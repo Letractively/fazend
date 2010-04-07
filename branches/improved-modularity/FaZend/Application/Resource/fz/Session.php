@@ -38,15 +38,7 @@ class FaZend_Application_Resource_fz_session extends Zend_Application_Resource_R
      */
     public function init() 
     {
-        // it is important to keep this line as first line in the 
-        // method, because requiring a FAZEND resource will automatically
-        // require FZ_INJECTOR resource to load. Thus, bootstrapping any
-        // of FZ_* resources from your bootstrap you will automatically
-        // request INJECTOR to be bootstrapped first.
-        $this->_bootstrap->bootstrap('fazend');
-
         $options = $this->getOptions();
-
         // if there is NO session - ignore
         if (!$this->_bootstrap->hasPluginResource('session')) {
             return;
