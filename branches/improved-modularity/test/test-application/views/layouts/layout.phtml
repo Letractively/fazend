@@ -32,21 +32,16 @@
 <body>
 
     <div class="logo">
-
         <a href='<?php echo $this->url(array('controller'=>'index', 'action'=>'index'), 'default', true)?>'
             class="logo"
             style="<?php echo $this->squeezePNG('logo.png')?>"></a><br/>
 
-        <?php echo $this->action('login', 'user')?>
-
+        <?php echo $this->action('login', 'user', 'fazend')?>
     </div>
     
     <div class="wrapper">
-
         <?php echo $this->flashMessage()?>
-
         <?php echo $this->layout()->content?>
-
     </div>
 
     <?php echo $this->googleAnalytics()?>

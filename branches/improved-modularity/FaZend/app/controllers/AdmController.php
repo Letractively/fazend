@@ -39,11 +39,6 @@ class Fazend_AdmController extends FaZend_Controller_Action
             return $this->_forward('login');
         }
 
-        // layout reconfigure to fazend
-        $layout = Zend_Layout::getMvcInstance();
-        $layout->setViewScriptPath(FAZEND_APP_PATH . '/layouts/scripts');
-        $layout->setLayout('panel');
-
         $this->view->action = $this->getRequest()->getActionName();    
         parent::preDispatch();
     }

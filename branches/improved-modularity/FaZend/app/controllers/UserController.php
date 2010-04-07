@@ -43,8 +43,9 @@ class Fazend_UserController extends FaZend_Controller_Action
      */
     public function registerAction()
     {
-        if (FaZend_User::isLoggedIn())
+        if (FaZend_User::isLoggedIn()) {
             return $this->_redirectFlash('You are already logged in', 'notfound', 'error');
+        }
 
         // if the RegisterAccount.ini file is missed
         // we should not raise the exception, but indicate about it
@@ -57,16 +58,18 @@ class Fazend_UserController extends FaZend_Controller_Action
         }
 
         // if not yet filled - wait for it
-        if (!$form->isFilled())
+        if (!$form->isFilled()) {
             return;
+        }
 
         // try to register this new user
         $data = array();
         foreach ($form->getElements() as $element) {
             $name = $element->getName();
 
-            if (!($element instanceof Zend_Form_Element_Text))
+            if (!($element instanceof Zend_Form_Element_Text)) {
                 continue;
+            }
 
             $data[$name] = $element->getValue();
         }    
@@ -78,10 +81,8 @@ class Fazend_UserController extends FaZend_Controller_Action
                 $data
             );
         } catch (Zend_Db_Statement_Exception $e) {
-
             $form->email->addError("The user is already registered, try another email ({$e->getMessage()})");
             return;
-
         }    
 
         // login the found user
@@ -90,8 +91,9 @@ class Fazend_UserController extends FaZend_Controller_Action
         // kill the form
         $this->view->form = false;
 
-        if (method_exists($this, 'registeredAction'))
+        if (method_exists($this, 'registeredAction')) {
             $this->_helper->redirector->gotoSimple('registered');
+        }
     }
         
     /**
@@ -101,12 +103,14 @@ class Fazend_UserController extends FaZend_Controller_Action
      */
     public function remindAction()
     {
-        if (FaZend_User::isLoggedIn()) 
+        if (FaZend_User::isLoggedIn()) {
             return $this->_redirectFlash('You are already logged in', 'notfound', 'error');
+        }
 
         $form = FaZend_Form::create('RemindPassword', $this->view);
-        if (!$form->isFilled())
+        if (!$form->isFilled()) {
             return;
+        }
 
         try {
             $user = FaZend_User::findByEmail($form->email->getValue());
@@ -122,10 +126,11 @@ class Fazend_UserController extends FaZend_Controller_Action
             ->set('password', $user->password)
             ->send();
 
-        if (method_exists($this, 'remindedAction'))
+        if (method_exists($this, 'remindedAction')) {
             $this->_helper->redirector->gotoSimple('reminded');
+        }
 
-        $this->_redirectFlash('Password was sent by email', 'remind');
+        $this->_redirectFlash(_t('Password was sent by email'), 'remind');
 
     }
         
@@ -136,8 +141,9 @@ class Fazend_UserController extends FaZend_Controller_Action
      */
     public function logoutAction()
     {
-        if (!FaZend_User::isLoggedIn())
-            return $this->_redirectFlash('You are not logged in yet', 'notfound', 'error');
+        if (!FaZend_User::isLoggedIn()) {
+            return $this->_redirectFlash(_t('You are not logged in yet'), 'notfound', 'error');
+        }
 
         FaZend_User::logOut();
 
@@ -160,19 +166,21 @@ class Fazend_UserController extends FaZend_Controller_Action
         $form->pwd->setLabel($pwdLabel . "&#32;(<a href='{$remindUrl}' title='remind password'>?</a>)");
 
         $form->pwd->getDecorator('label')->setOption('escape', false);
-        if (!$form->isFilled())
+        if (!$form->isFilled()) {
             return;
+        }
 
         try {
             $user = FaZend_User::findByEmail($form->email->getValue());
 
             if (!$user->isGoodPassword($form->pwd->getValue())) {
-                $form->pwd->addError('Incorrect password, try again');
+                $form->pwd->addError(_t('Incorrect password, try again'));
             } else {
                 $user->logIn();
                 $this->view->form = false;
-                if (method_exists($this, 'loggedAction'))
+                if (method_exists($this, 'loggedAction')) {
                     $this->_helper->redirector->gotoSimple('logged');
+                }
             }
         } catch (FaZend_User_NotFoundException $e) {
             $form->email->addError('The user is not found');
