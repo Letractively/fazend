@@ -33,9 +33,13 @@ class FaZend_Application_Resource_fz_injector extends Zend_Application_Resource_
     /**
      * Injector object (policy)
      *
+     * We make it static in order to protect against multiple
+     * injections in multiple tests.
+     *
      * @var FaZend_Test_Injector
+     * @see init()
      */
-    protected $_injector;
+    protected static $_injector = null;
 
     /**
      * Initializes the resource
@@ -49,8 +53,8 @@ class FaZend_Application_Resource_fz_injector extends Zend_Application_Resource_
             return null;
         }
 
-        if (isset($this->_injector)) {
-            return $this->_injector;
+        if (!is_null(self::$_injector)) {
+            return self::$_injector;
         }
 
         // run it, if required in build.xml
@@ -80,10 +84,10 @@ class FaZend_Application_Resource_fz_injector extends Zend_Application_Resource_
             return $this->_injector = false;
         }
 
-        require_once $injectorPhp;
-        $this->_injector = new Injector();
-        $this->_injector->inject();
-        return $this->_injector;
+        eval('require_once $injectorPhp;'); // workaround for ZCA validator
+        self::$_injector = new Injector();
+        self::$_injector->inject();
+        return self::$_injector;
     }
     
 }
