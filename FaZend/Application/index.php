@@ -14,7 +14,7 @@
  * @category FaZend
  */
 
-// small simple and nice PHP functions
+// error handler
 require_once realpath(dirname(__FILE__) . '/handler.php');
 
 global $startTime;
@@ -35,6 +35,10 @@ defined('TEMP_PATH')
 // Define path to FaZend
 defined('FAZEND_PATH')
     || define('FAZEND_PATH', realpath(APPLICATION_PATH . '/../library/FaZend'));
+
+// Define path to FaZend application inside framework
+defined('FAZEND_APP_PATH')
+    || define('FAZEND_APP_PATH', realpath(FAZEND_PATH . '/app'));
 
 // Define path to Zend
 defined('ZEND_PATH')
@@ -61,6 +65,7 @@ require_once 'FaZend/Application/functions.php';
 // Create application, bootstrap, and run
 require_once 'Zend/Application.php';
 $application = new Zend_Application(APPLICATION_ENV);
+Zend_Registry::set('Zend_Application', $application);
 
 // load application-specific options
 $options = new Zend_Config_Ini(FAZEND_PATH . '/Application/application.ini', 'global', true);

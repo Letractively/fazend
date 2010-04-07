@@ -14,6 +14,9 @@
  * @category FaZend
  */
 
+/**
+ * @see Zend_Application_Bootstrap_Bootstrap
+ */
 require_once 'Zend/Application/Bootstrap/Bootstrap.php';
 
 /**
@@ -24,5 +27,29 @@ require_once 'Zend/Application/Bootstrap/Bootstrap.php';
  */
 class FaZend_Application_Bootstrap_Bootstrap extends Zend_Application_Bootstrap_Bootstrap
 {
+    
+    /**
+     * Execute a resource
+     *
+     * This method protects us in migration from version to version. If 
+     * resource is not found, we just ignore this situation.
+     *
+     * @param string Name of resource
+     * @return void
+     */
+    protected function _executeResource($resource)
+    {
+        return parent::_executeResource($resource);
+        try {
+            return parent::_executeResource($resource);
+        } catch (Zend_Application_Bootstrap_Exception $e) {
+            // swallow it...
+            trigger_error(
+                "Resource '{$resource}' is deprecated", 
+                E_USER_WARNING
+            );
+        }
+    }
+    
 }
 

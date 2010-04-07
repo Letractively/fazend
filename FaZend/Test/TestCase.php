@@ -20,6 +20,9 @@ defined('APPLICATION_PATH') or define('APPLICATION_PATH', realpath(dirname(__FIL
 defined('CLI_ENVIRONMENT') or define('CLI_ENVIRONMENT', true);
 defined('TESTING_RUNNING') or define('TESTING_RUNNING', true);
 
+/**
+ * @see Zend_Test_PHPUnit_ControllerTestCase
+ */
 require_once 'Zend/Test/PHPUnit/ControllerTestCase.php';
 
 /**
@@ -34,6 +37,8 @@ class FaZend_Test_TestCase extends Zend_Test_PHPUnit_ControllerTestCase
      * List of variables
      *
      * @var array
+     * @see __set()
+     * @see __get()
      */
     protected static $_variables = array();
 
@@ -41,6 +46,7 @@ class FaZend_Test_TestCase extends Zend_Test_PHPUnit_ControllerTestCase
      * Setup test
      *
      * @return void
+     * @see Zend_Test_PHPUnit_ControllerTestCase::setUp()
      */
     public function setUp()
     {
@@ -51,7 +57,8 @@ class FaZend_Test_TestCase extends Zend_Test_PHPUnit_ControllerTestCase
         parent::setUp();
 
         // create local view, since it's a controller
-        $this->view = Zend_Registry::get('view');
+        $this->view = Zend_Registry::get('Zend_Application')
+            ->getBootstrap()->getResource('view');
         
         // clean all instances of all formas
         FaZend_View_Helper_Forma::cleanInstances();
@@ -61,6 +68,7 @@ class FaZend_Test_TestCase extends Zend_Test_PHPUnit_ControllerTestCase
      * Bootstrap as usual
      *
      * @return void
+     * @see setUp()
      */
     public function fazendTestBootstrap()
     {
@@ -72,6 +80,7 @@ class FaZend_Test_TestCase extends Zend_Test_PHPUnit_ControllerTestCase
      * Close-out the test
      *
      * @return void
+     * @see Zend_Test_PHPUnit_ControllerTestCase::tearDown()
      */
     public function tearDown()
     {
@@ -101,8 +110,9 @@ class FaZend_Test_TestCase extends Zend_Test_PHPUnit_ControllerTestCase
      */
     public function __get($name)
     {
-        if (isset(self::$_variables[$name]))
+        if (isset(self::$_variables[$name])) {
             return self::$_variables[$name];
+        }
         return parent::__get($name);
     }
 
