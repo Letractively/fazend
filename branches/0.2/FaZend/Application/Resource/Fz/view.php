@@ -94,11 +94,6 @@ class FaZend_Application_Resource_fz_view extends Zend_Application_Resource_Reso
         Zend_Paginator::setDefaultScrollingStyle('Sliding');
         Zend_View_Helper_PaginationControl::setDefaultViewPartial('paginationControl.phtml');
 
-        // session
-        if (defined('CLI_ENVIRONMENT')) {
-            Zend_Session::$_unitTestEnabled = true;
-        }
-
         FaZend_View_Helper_Forma_Field::addPluginDir(
             'FaZend_View_Helper_Forma_Field', 
             FAZEND_PATH . '/View/Helper/Forma'

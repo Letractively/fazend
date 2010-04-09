@@ -40,11 +40,7 @@ class FaZend_Application_Resource_fz_session extends Zend_Application_Resource_R
     {
         // if in testing mode - ignore this
         if (defined('CLI_ENVIRONMENT')) {
-            return;
-        }
-
-        // if in testing mode - ignore this
-        if (Zend_Session::$_unitTestEnabled) {
+            Zend_Session::$_unitTestEnabled = true;
             return;
         }
 
