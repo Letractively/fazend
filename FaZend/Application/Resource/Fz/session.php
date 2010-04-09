@@ -43,19 +43,12 @@ class FaZend_Application_Resource_fz_session extends Zend_Application_Resource_R
             return;
         }
 
-        $options = $this->getOptions();
-        // if there is NO session - ignore
-        if (!$this->_bootstrap->hasPluginResource('session')) {
-            return;
-        }
-            
         // if in testing mode - ignore this
         if (Zend_Session::$_unitTestEnabled) {
             return;
         }
 
         $dir = TEMP_PATH . '/' . FaZend_Revision::getName() . '-sessions';
-        
         // create this directory if necessary
         if (!file_exists($dir)) {
             if (@mkdir($dir) === false) {
