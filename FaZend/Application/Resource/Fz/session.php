@@ -48,6 +48,7 @@ class FaZend_Application_Resource_fz_session extends Zend_Application_Resource_R
             return;
         }
 
+        $this->_bootstrap->bootstrap('fazend');
         $dir = TEMP_PATH . '/' . FaZend_Revision::getName() . '-sessions';
         // create this directory if necessary
         if (!file_exists($dir)) {
