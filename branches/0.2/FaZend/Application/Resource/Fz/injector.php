@@ -27,7 +27,7 @@ require_once 'Zend/Application/Resource/ResourceAbstract.php';
  * @subpackage Resource
  * @see FaZend_Test_Injector
  */
-class FaZend_Application_Resource_fz_Injector extends Zend_Application_Resource_ResourceAbstract
+class FaZend_Application_Resource_fz_injector extends Zend_Application_Resource_ResourceAbstract
 {
     
     /**

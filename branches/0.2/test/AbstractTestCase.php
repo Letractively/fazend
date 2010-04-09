@@ -3,23 +3,24 @@
  * @version $Id$
  */
 
+// these settings are specific for the testing environment in FaZend
+define('APPLICATION_PATH', realpath(dirname(__FILE__) . '/test-application'));
+define('FAZEND_PATH', realpath(dirname(__FILE__) . '/../FaZend'));
+
 // you should have Zend checked out from truck
 // in the directory ../../zend-trunk
+define('ZEND_PATH', realpath(dirname(__FILE__) . '/../../zend-trunk/Zend'));
+
 set_include_path(
     implode(
         PATH_SEPARATOR, 
         array(
-            realpath(dirname(__FILE__) . '/../../zend-trunk'),
+            realpath(ZEND_PATH . '/..'),
             realpath(dirname(__FILE__) . '/..'),
             get_include_path()
         )
     )
 );
-
-// these settings are specific for the testing environment in FaZend
-define('APPLICATION_PATH', realpath(dirname(__FILE__) . '/test-application'));
-define('FAZEND_PATH', realpath(dirname(__FILE__) . '/../FaZend'));
-define('ZEND_PATH', realpath(dirname(__FILE__) . '/../../zend-trunk/Zend'));
 
 /**
  * @see FaZend_Test_TestCase
