@@ -47,6 +47,13 @@ class FaZend_Application_Resource_fz_view extends Zend_Application_Resource_Reso
     protected $_compressed = true;
 
     /**
+     * Google analytics name
+     *
+     * @var string
+     */
+    protected $_ga;
+
+    /**
      * Initializes the resource
      *
      * @return $this
@@ -90,6 +97,11 @@ class FaZend_Application_Resource_fz_view extends Zend_Application_Resource_Reso
             $this->_view->addFilter('HtmlCompressor');
         }
 
+        // turn compression ON
+        if (!empty($options['GoogleAnalytics'])) {
+            $this->_ga = $options['GoogleAnalytics'];
+        }
+
         // view paginator
         Zend_Paginator::setDefaultScrollingStyle('Sliding');
         Zend_View_Helper_PaginationControl::setDefaultViewPartial('paginationControl.phtml');
@@ -100,6 +112,16 @@ class FaZend_Application_Resource_fz_view extends Zend_Application_Resource_Reso
         );
         
         return $this;
+    }
+    
+    /**
+     * Get google analytics name
+     *
+     * @return string
+     */
+    public function getGa() 
+    {
+        return $this->_ga;
     }
     
     /**
