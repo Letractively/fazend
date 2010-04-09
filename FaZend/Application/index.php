@@ -21,32 +21,39 @@ global $startTime;
 $startTime = microtime(true);
 
 // whether it's CLI?
-defined('CLI_ENVIRONMENT')
-    || (empty($_SERVER['DOCUMENT_ROOT']) && define('CLI_ENVIRONMENT', true));
+if (!defined('CLI_ENVIRONMENT')) {
+    define('CLI_ENVIRONMENT', empty($_SERVER['DOCUMENT_ROOT']));
+}
 
 // Define path to application directory
-defined('APPLICATION_PATH')
-    || define('APPLICATION_PATH', realpath(dirname(__FILE__) . '/../../../application'));
+if (!defined('APPLICATION_PATH')) {
+    define('APPLICATION_PATH', realpath(dirname(__FILE__) . '/../../../application'));
+}
 
 // temp files location
-defined('TEMP_PATH')
-    || define('TEMP_PATH', realpath(sys_get_temp_dir()));
+if (!defined('TEMP_PATH')) {
+    define('TEMP_PATH', realpath(sys_get_temp_dir()));
+}
 
 // Define path to FaZend
-defined('FAZEND_PATH')
-    || define('FAZEND_PATH', realpath(APPLICATION_PATH . '/../library/FaZend'));
+if (!defined('FAZEND_PATH')) {
+    define('FAZEND_PATH', realpath(APPLICATION_PATH . '/../library/FaZend'));
+}
 
 // Define path to FaZend application inside framework
-defined('FAZEND_APP_PATH')
-    || define('FAZEND_APP_PATH', realpath(FAZEND_PATH . '/app'));
+if (!defined('FAZEND_APP_PATH')) {
+    define('FAZEND_APP_PATH', realpath(FAZEND_PATH . '/app'));
+}
 
 // Define path to Zend
-defined('ZEND_PATH')
-    || define('ZEND_PATH', realpath(APPLICATION_PATH . '/../library/Zend'));
+if (!defined('ZEND_PATH')) {
+    define('ZEND_PATH', realpath(APPLICATION_PATH . '/../library/Zend'));
+}
 
 // Define application environment
-defined('APPLICATION_ENV')
-    || define('APPLICATION_ENV', (getenv('APPLICATION_ENV') ? getenv('APPLICATION_ENV') : 'production'));
+if (!defined('APPLICATION_ENV')) {
+    define('APPLICATION_ENV', (getenv('APPLICATION_ENV') ? getenv('APPLICATION_ENV') : 'production'));
+}
 
 set_include_path(
     implode(
