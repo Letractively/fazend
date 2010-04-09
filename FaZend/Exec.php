@@ -384,7 +384,7 @@ class FaZend_Exec extends FaZend_StdObject
      */
     protected static function _uniqueId($name)
     {
-        return FaZend_Properties::get()->name . '-' . preg_replace('/[^\w\d]/', '-', $name);
+        return FaZend_Revision::getName() . '-' . preg_replace('/[^\w\d]/', '-', $name);
     }
 
     /**
