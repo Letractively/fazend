@@ -38,6 +38,11 @@ class FaZend_Application_Resource_fz_session extends Zend_Application_Resource_R
      */
     public function init() 
     {
+        // if in testing mode - ignore this
+        if (defined('CLI_ENVIRONMENT')) {
+            return;
+        }
+
         $options = $this->getOptions();
         // if there is NO session - ignore
         if (!$this->_bootstrap->hasPluginResource('session')) {
@@ -46,11 +51,6 @@ class FaZend_Application_Resource_fz_session extends Zend_Application_Resource_R
             
         // if in testing mode - ignore this
         if (Zend_Session::$_unitTestEnabled) {
-            return;
-        }
-
-        // if in testing mode - ignore this
-        if (defined('CLI_ENVIRONMENT')) {
             return;
         }
 
