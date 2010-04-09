@@ -40,6 +40,9 @@ class FaZend_Application_Resource_fazend extends Zend_Application_Resource_Resou
         // test injector goes first, if necessary
         $this->_bootstrap->bootstrap('fz_injector');
         
+        // translation is mandatory, if it exists in the project
+        $this->_bootstrap->bootstrap('fz_translate');
+
         $options = $this->getOptions();
         $name = $options['name'];
         validate()->true(
