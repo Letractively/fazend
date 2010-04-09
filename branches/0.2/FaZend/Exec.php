@@ -303,7 +303,7 @@ class FaZend_Exec extends FaZend_StdObject
             $files .= 
                 "{$suffix}: '{$fileName}': " . 
                 (file_exists($fileName) ? filesize($fileName) . 'bytes, ' . 
-                FaZend_Date::make(filemtime($fileName)) : 'no file') .
+                Zend_Date::now()->set(filemtime($fileName)) : 'no file') .
                 "\n";
         }
         
