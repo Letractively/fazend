@@ -32,9 +32,12 @@ class FaZend_Application_Resource_fz_deployer extends Zend_Application_Resource_
     /**
      * Deployer of DB schema
      *
+     * This variable is static in order to avoid multiple DB deployments
+     * during one session (mostly in unit testing)
+     * 
      * @var FaZend_Db_Deployer
      */
-    protected $_deployer;
+    protected static $_deployer = null;
 
     /**
      * Initializes the resource
@@ -49,8 +52,8 @@ class FaZend_Application_Resource_fz_deployer extends Zend_Application_Resource_
             return null;
         }
         
-        if (isset($this->_deployer)) {
-            return $this->_deployer;
+        if (!is_null(self::$_deployer)) {
+            return self::$_deployer;
         }
         
         // make sure it is loaded already
@@ -62,7 +65,7 @@ class FaZend_Application_Resource_fz_deployer extends Zend_Application_Resource_
         require_once 'FaZend/Db/Deployer.php';
 
         // configure deployer and deploy DB schema
-        $this->_deployer = new FaZend_Db_Deployer();
+        self::$_deployer = new FaZend_Db_Deployer();
         $toDeploy = false;
         foreach ($this->getOptions() as $option=>$value) {
             switch (strtolower($option)) {
@@ -70,13 +73,13 @@ class FaZend_Application_Resource_fz_deployer extends Zend_Application_Resource_
                     $toDeploy = $value;
                     break;
                 case 'folders':
-                    $this->_deployer->setFolders($value);
+                    self::$_deployer->setFolders($value);
                     break;
                 case 'verbose':
-                    $this->_deployer->setVerbose((bool)$value);
+                    self::$_deployer->setVerbose((bool)$value);
                     break;
                 case 'flag':
-                    $this->_deployer->setFlag($value);
+                    self::$_deployer->setFlag($value);
                     break;
                 default:
                     // ignore this options since it's unknown
@@ -84,8 +87,8 @@ class FaZend_Application_Resource_fz_deployer extends Zend_Application_Resource_
         }
         
         if ($toDeploy) {
-            $this->_deployer->deploy();
+            self::$_deployer->deploy();
         }
-        return $this->_deployer;
+        return self::$_deployer;
     }
 }
