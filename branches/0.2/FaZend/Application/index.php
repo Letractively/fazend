@@ -17,12 +17,22 @@
 // error handler
 require_once realpath(dirname(__FILE__) . '/handler.php');
 
+/**
+ * Global variable in order to calculate total page building time
+ * @see FaZend_View_Helper_PageLoadTime::pageLoadTime()
+ */
 global $startTime;
 $startTime = microtime(true);
 
-// whether it's CLI?
+/**
+ * @see FaZend_Application_Resource_fz_session::init()
+ * @see FaZend_Application_Resource_fz_front::init()
+ * @see FaZend_Test_TestCase
+ */
 if (!defined('CLI_ENVIRONMENT')) {
-    define('CLI_ENVIRONMENT', empty($_SERVER['DOCUMENT_ROOT']));
+    if (empty($_SERVER['DOCUMENT_ROOT'])) {
+        define('CLI_ENVIRONMENT', true);
+    }
 }
 
 // Define path to application directory
