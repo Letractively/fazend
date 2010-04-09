@@ -40,20 +40,11 @@ class Fazend_PingController extends FaZend_Controller_Action
     }
 
     /**
-     * Shows the list of all available actions
-     *
-     * @return void
-     */
-    public function indexAction()
-    {
-    }
-
-    /**
      * Backup all live data and save them
      *
      * @return void
      */
-    public function backupAction()
+    public function indexAction()
     {
         $backup = new FaZend_Backup();
         $backup->execute();
