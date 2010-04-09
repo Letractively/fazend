@@ -303,7 +303,7 @@
             <if>
                 <isset property="live.home"/>
                 <then>
-                    <http-request url="${live.home}/__fz/ping/backup" />
+                    <http-request url="${live.home}/__fz/ping" responseRegex="/.*/" />
                 </then>
             </if>
         </then><else>
