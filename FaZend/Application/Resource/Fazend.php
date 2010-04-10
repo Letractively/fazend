@@ -37,9 +37,6 @@ class FaZend_Application_Resource_Fazend extends Zend_Application_Resource_Resou
      */
     public function init() 
     {
-        // test injector goes first, if necessary
-        $this->_bootstrap->bootstrap('fz_injector');
-        
         // translation is mandatory, if it exists in the project
         $this->_bootstrap->bootstrap('fz_translate');
 
