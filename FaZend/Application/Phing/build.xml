@@ -192,7 +192,7 @@
 
         <if><istrue value="${to.coverage}" /><then>
             <mkdir dir="${project.basedir}/reports/tests" />
-            <phpunit printsummary="yes" haltonerror="yes" haltonfailure="yes" codecoverage="true">
+            <phpunit haltonerror="yes" haltonfailure="yes" codecoverage="true">
                 <formatter type="xml" usefile="true" todir="${project.basedir}/reports/tests" />
                 <formatter type="plain" usefile="no" />
                 <batchtest>
@@ -207,7 +207,7 @@
         </then><else>
             <!-- one individual test, specified in -Dto.unit=... -->
             <if><isset property="to.unit" /><then>
-                <phpunit printsummary="yes" haltonerror="yes" haltonfailure="yes">
+                <phpunit haltonerror="yes" haltonfailure="yes">
                     <formatter type="plain" usefile="no" />
                     <batchtest>
                         <fileset dir="${project.basedir}">
@@ -217,7 +217,7 @@
                     </batchtest>
                 </phpunit>
             </then><else>
-                <phpunit printsummary="yes" haltonerror="yes" haltonfailure="yes">
+                <phpunit haltonerror="yes" haltonfailure="yes">
                     <formatter type="plain" usefile="no" />
                     <batchtest>
                         <fileset dir="${project.basedir}/test">
