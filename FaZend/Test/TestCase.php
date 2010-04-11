@@ -45,6 +45,12 @@ class FaZend_Test_TestCase extends Zend_Test_PHPUnit_ControllerTestCase
     /**
      * Setup test
      *
+     * It is very important to note that we DO NOT use default Zend 
+     * {@link Zend_Test_PHPUnit_ControllerTestCase::setUp()} method. Mostly because
+     * in Zend Framework front controller is completely reset every time
+     * setUp() is called. We don't need this behavior, because we initialize
+     * application only once, not every run of the test.
+     *
      * @return void
      * @see Zend_Test_PHPUnit_ControllerTestCase::setUp()
      */
@@ -58,10 +64,11 @@ class FaZend_Test_TestCase extends Zend_Test_PHPUnit_ControllerTestCase
 
         // run this method before everything else
         $this->bootstrap = Zend_Registry::get('Zend_Application');
-        $this->_frontController = $this->bootstrap->getBootstrap()->getResource('fz_front');
 
-        // perform normal operations of the test case
-        parent::setUp();
+        $this->_frontController = $this->bootstrap->getBootstrap()->getResource('fz_front');
+        $this->frontController
+             ->setRequest($this->getRequest())
+             ->setResponse($this->getResponse());
 
         // create local view, since it's a controller
         $this->view = $this->bootstrap->getBootstrap()->getResource('view');
