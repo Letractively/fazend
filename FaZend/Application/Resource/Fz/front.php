@@ -32,7 +32,7 @@ class FaZend_Application_Resource_fz_front extends Zend_Application_Resource_Res
     /**
      * Initializes the resource
      *
-     * @return void
+     * @return Zend_Controller_Front
      * @see Zend_Application_Resource_Resource::init()
      */
     public function init() 
@@ -58,6 +58,7 @@ class FaZend_Application_Resource_fz_front extends Zend_Application_Resource_Res
                 )
             )
         );
+        return $front;
     }
         
 }
