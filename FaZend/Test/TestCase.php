@@ -58,6 +58,7 @@ class FaZend_Test_TestCase extends Zend_Test_PHPUnit_ControllerTestCase
 
         // run this method before everything else
         $this->bootstrap = Zend_Registry::get('Zend_Application');
+        $this->bootstrap->getBootstrap()->bootstrap('fz_front');
 
         // perform normal operations of the test case
         parent::setUp();
