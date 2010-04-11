@@ -234,7 +234,6 @@ class FaZend_Db_Deployer
         if (!method_exists($this->_db(), 'listTables')) {
             return false;
         }
-
         return true;
     }
 
