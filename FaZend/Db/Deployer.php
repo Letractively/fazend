@@ -26,6 +26,14 @@
  */
 class FaZend_Db_Deployer
 {
+    
+    /**
+     * Database adapter to use
+     *
+     * @var Zend_Db_Adapter_Abstract
+     * @see setAdapter()
+     */
+    protected $_adapter;
 
     /**
      * Absolute name of the file with flag
@@ -99,6 +107,18 @@ class FaZend_Db_Deployer
         $this->_verbose = $verbose;
         return $this;
     }
+    
+    /**
+     * Set adapter to use
+     *
+     * @param Zend_Db_Adapter_Abstract Adapter to use
+     * @return $this
+     */
+    public function setAdapter(Zend_Db_Adapter_Abstract $adapter) 
+    {
+        $this->_adapter = $adapter;
+        return $this;
+    }
 
     /**
      * Deploy Db schema
@@ -118,7 +138,7 @@ class FaZend_Db_Deployer
                 // get full list of existing(!) tables in Db
                 $tables = array_map(
                     create_function('$a', 'return strtolower($a);'), 
-                    $this->_db()->listTables()
+                    $this->_adapter->listTables()
                 );
             
                 // get full list of files
@@ -231,7 +251,7 @@ class FaZend_Db_Deployer
         }
 
         // if we can't get a list of tables in DB - we stop
-        if (!method_exists($this->_db(), 'listTables')) {
+        if (!method_exists($this->_adapter, 'listTables')) {
             return false;
         }
         return true;
@@ -253,7 +273,7 @@ class FaZend_Db_Deployer
         }
         
         try {
-            $this->_db()->query($sql);
+            $this->_adapter->query($sql);
         } catch (Exception $e) {
             FaZend_Exception::raise(
                 'FaZend_Db_Deployer_CreateFailed', 
@@ -285,14 +305,14 @@ class FaZend_Db_Deployer
         // } catch (FaZend_Db_Deployer_NotTableButView $e) {
             // this is VIEW, not table
             // we just drop and create again
-            //$this->_db()->query("DROP VIEW $table");
+            //$this->_adapter->query("DROP VIEW $table");
 
             // create this VIEW again
             //$this->_create($table, $sql);
         //     return;
         // }
 
-        // $infoDb = $this->_db()->describeTable($table);
+        // $infoDb = $this->_adapter->describeTable($table);
 
         // tbd
         // foreach ($infoSql as $column);
@@ -410,19 +430,6 @@ class FaZend_Db_Deployer
     protected function _sorter($file1, $file2) 
     {
         return (int)$file1 > (int)$file2;
-    }
-
-    /**
-     * Db adapter
-     *
-     * @return Zend_Db_Adapter
-     * @see deploy()
-     * @see _create()
-     * @see _update()
-     */
-    protected function _db() 
-    {
-        return Zend_Db_Table::getDefaultAdapter();
     }
 
     /**
