@@ -80,8 +80,7 @@ class FaZend_Application_Resource_fz_deployer extends Zend_Application_Resource_
         
         if ($toDeploy) {
             // make sure it is loaded already
-            $this->_bootstrap->bootstrap('db');
-            self::$_deployer->deploy();
+            self::$_deployer->deploy($this->_bootstrap->getResource('db'));
         }
         return self::$_deployer;
     }
