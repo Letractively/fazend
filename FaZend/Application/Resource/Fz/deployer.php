@@ -20,6 +20,11 @@
 require_once 'Zend/Application/Resource/ResourceAbstract.php';
 
 /**
+ * @see FaZend_Db_Deployer
+ */
+require_once 'FaZend/Db/Deployer.php';
+
+/**
  * Deployer of DB
  *
  * @uses Zend_Application_Resource_Base
@@ -51,11 +56,6 @@ class FaZend_Application_Resource_fz_deployer extends Zend_Application_Resource_
             return self::$_deployer;
         }
         
-        /**
-         * @see FaZend_Db_Deployer
-         */
-        require_once 'FaZend/Db/Deployer.php';
-
         // configure deployer and deploy DB schema
         self::$_deployer = new FaZend_Db_Deployer();
         $toDeploy = false;
