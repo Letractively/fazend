@@ -47,11 +47,6 @@ class FaZend_Application_Resource_fz_deployer extends Zend_Application_Resource_
      */
     public function init() 
     {
-        // db is mandatory, otherwise we just return NULL
-        if (!$this->getBootstrap()->hasPluginResource('db')) {
-            return null;
-        }
-        
         if (!is_null(self::$_deployer)) {
             return self::$_deployer;
         }
