@@ -50,35 +50,25 @@ class FaZend_Test_TestCase extends Zend_Test_PHPUnit_ControllerTestCase
      */
     public function setUp()
     {
-        // run this method before everything else
-        $this->bootstrap = array($this, 'fazendTestBootstrap');
-
-        // perform normal operations of the test case
-        parent::setUp();
-
-        // create local view, since it's a controller
-        $this->view = Zend_Registry::get('Zend_Application')
-            ->getBootstrap()->getResource('view');
-        
-        // clean all instances of all formas
-        FaZend_View_Helper_Forma::cleanInstances();
-    }
-    
-    /**
-     * Bootstrap as usual
-     *
-     * @return void
-     * @see setUp()
-     */
-    public function fazendTestBootstrap()
-    {
         // bootstrap the application
         // we include this bootstrap script only ONCE, in order
         // to avoid multiple initialization of the application, in the
         // same PHP environment
         include_once 'FaZend/Application/index.php';
-    }    
 
+        // run this method before everything else
+        $this->bootstrap = Zend_Registry::get('Zend_Application');
+
+        // perform normal operations of the test case
+        parent::setUp();
+
+        // create local view, since it's a controller
+        $this->view = $this->bootstrap->getBootstrap()->getResource('view');
+        
+        // clean all instances of all formas
+        FaZend_View_Helper_Forma::cleanInstances();
+    }
+    
     /**
      * Close-out the test
      *
