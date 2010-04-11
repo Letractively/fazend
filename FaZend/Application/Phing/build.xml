@@ -190,9 +190,20 @@
             </coverage-setup>
         </then></if>
 
-        <if><istrue value="${to.coverage}" /><then>
+        <!-- one individual test, specified in -Dto.unit=... -->
+        <if><isset property="to.unit" /><then>
+            <phpunit haltonerror="yes" haltonfailure="yes">
+                <formatter type="plain" usefile="no" />
+                <batchtest>
+                    <fileset dir="${project.basedir}">
+                        <include name="${to.unit}"/>
+                        <include name="test/${to.unit}"/>
+                    </fileset>
+                </batchtest>
+            </phpunit>
+        </then><else>
             <mkdir dir="${project.basedir}/reports/tests" />
-            <phpunit haltonerror="yes" haltonfailure="yes" codecoverage="true">
+            <phpunit haltonerror="yes" haltonfailure="yes">
                 <formatter type="xml" usefile="true" todir="${project.basedir}/reports/tests" />
                 <formatter type="plain" usefile="no" />
                 <batchtest>
@@ -204,31 +215,6 @@
                     </fileset>
                 </batchtest>
             </phpunit>
-        </then><else>
-            <!-- one individual test, specified in -Dto.unit=... -->
-            <if><isset property="to.unit" /><then>
-                <phpunit haltonerror="yes" haltonfailure="yes">
-                    <formatter type="plain" usefile="no" />
-                    <batchtest>
-                        <fileset dir="${project.basedir}">
-                            <include name="${to.unit}"/>
-                            <include name="test/${to.unit}"/>
-                        </fileset>
-                    </batchtest>
-                </phpunit>
-            </then><else>
-                <phpunit haltonerror="yes" haltonfailure="yes">
-                    <formatter type="plain" usefile="no" />
-                    <batchtest>
-                        <fileset dir="${project.basedir}/test">
-                            <include name="**/*Test.php"/>
-                            <exclude name="**/Abstract*.php"/>
-                            <exclude name="**/_*.php"/>
-                            <exclude name=".svn/**"/>
-                        </fileset>
-                    </batchtest>
-                </phpunit>
-            </else></if>
         </else></if>
     </target>    
 
