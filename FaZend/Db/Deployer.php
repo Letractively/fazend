@@ -50,7 +50,7 @@ class FaZend_Db_Deployer
      * @see _create()
      * @see _update()
      */
-    protected $_verbose = false;
+    protected $_verbose = true;
 
     /**
      * Set flag (absolute file name of the flag)
