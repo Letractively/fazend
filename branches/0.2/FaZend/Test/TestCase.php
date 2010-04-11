@@ -73,7 +73,10 @@ class FaZend_Test_TestCase extends Zend_Test_PHPUnit_ControllerTestCase
     public function fazendTestBootstrap()
     {
         // bootstrap the application
-        include 'FaZend/Application/index.php';
+        // we include this bootstrap script only ONCE, in order
+        // to avoid multiple initialization of the application, in the
+        // same PHP environment
+        include_once 'FaZend/Application/index.php';
     }    
 
     /**
