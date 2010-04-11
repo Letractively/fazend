@@ -51,9 +51,6 @@ class FaZend_Application_Resource_fz_deployer extends Zend_Application_Resource_
             return self::$_deployer;
         }
         
-        // make sure it is loaded already
-        $this->_bootstrap->bootstrap('db');
-
         /**
          * @see FaZend_Db_Deployer
          */
@@ -82,6 +79,8 @@ class FaZend_Application_Resource_fz_deployer extends Zend_Application_Resource_
         }
         
         if ($toDeploy) {
+            // make sure it is loaded already
+            $this->_bootstrap->bootstrap('db');
             self::$_deployer->deploy();
         }
         return self::$_deployer;
