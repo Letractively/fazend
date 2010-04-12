@@ -65,6 +65,14 @@ class FaZend_Test_TestCase extends Zend_Test_PHPUnit_ControllerTestCase
         // run this method before everything else
         $this->bootstrap = Zend_Registry::get('Zend_Application');
 
+        // reset them all in order to start from scratch
+        $_SESSION = array();
+        $_GET     = array();
+        $_POST    = array();
+        $_COOKIE  = array();
+        $this->resetRequest();
+        $this->resetResponse();
+
         $this->_frontController = $this->bootstrap->getBootstrap()->getResource('fz_front');
         $this->frontController
              ->setRequest($this->getRequest())
