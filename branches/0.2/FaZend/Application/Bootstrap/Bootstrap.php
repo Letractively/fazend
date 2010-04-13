@@ -20,6 +20,16 @@
 require_once 'Zend/Application/Bootstrap/Bootstrap.php';
 
 /**
+ * @see Zend_Application
+ */
+require_once 'Zend/Application.php';
+
+/**
+ * @see Zend_Registry
+ */
+require_once 'Zend/Registry.php';
+
+/**
  * Bootstrap
  *
  * @package Application
@@ -36,10 +46,6 @@ class FaZend_Application_Bootstrap_Bootstrap extends Zend_Application_Bootstrap_
      */
     public static function getBootstrappedApplication() 
     {
-        /**
-         * Create application, bootstrap, and run
-         */
-        require_once 'Zend/Application.php';
         $application = new Zend_Application(APPLICATION_ENV);
         Zend_Registry::set('Zend_Application', $application);
 
