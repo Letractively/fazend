@@ -15,6 +15,11 @@
  */
 
 /**
+ * @see Zend_Application_Bootstrap_ResourceBootstrapper
+ */
+require_once 'Zend/Application/Bootstrap/ResourceBootstrapper.php';
+
+/**
  * @see Zend_Application_Bootstrap_Bootstrapper
  */
 require_once 'Zend/Application/Bootstrap/Bootstrapper.php';
