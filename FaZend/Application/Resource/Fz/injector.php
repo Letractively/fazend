@@ -33,13 +33,10 @@ class FaZend_Application_Resource_fz_injector extends Zend_Application_Resource_
     /**
      * Injector object (policy)
      *
-     * We make it static in order to protect against multiple
-     * injections in multiple tests.
-     *
      * @var FaZend_Test_Injector
      * @see init()
      */
-    protected static $_injector = null;
+    protected $_injector = null;
 
     /**
      * Initializes the resource
@@ -53,14 +50,12 @@ class FaZend_Application_Resource_fz_injector extends Zend_Application_Resource_
             return null;
         }
 
-        if (!is_null(self::$_injector)) {
-            return self::$_injector;
+        if (!is_null($this->_injector)) {
+            return $this->_injector;
         }
 
-        // run it, if required in build.xml
-        if (defined('RUN_TEST_STARTER')) {
-            FaZend_Test_Starter::run();
-        }
+        // start test session
+        $this->_bootstrap->bootstrap('fz_starter');
 
         // objects in 'test/Mocks' directory
         $mocks = APPLICATION_PATH . '/../../test/Mocks';
@@ -68,26 +63,15 @@ class FaZend_Application_Resource_fz_injector extends Zend_Application_Resource_
             Zend_Loader_Autoloader::getInstance()->registerNamespace('Mocks_');
         }
 
-        // make sure that directory with test is includeable
-        set_include_path(
-            implode(
-                PATH_SEPARATOR, 
-                array(
-                    realpath(APPLICATION_PATH . '/../../test'),
-                    get_include_path(),
-                )
-            )
-        );
-        
         $injectorPhp = APPLICATION_PATH . '/../../test/injector/Injector.php';
         if (!file_exists($injectorPhp)) {
             return $this->_injector = false;
         }
 
         eval('require_once $injectorPhp;'); // workaround for ZCA validator
-        self::$_injector = new Injector();
-        self::$_injector->inject();
-        return self::$_injector;
+        $this->_injector = new Injector();
+        $this->_injector->inject();
+        return $this->_injector;
     }
     
 }
