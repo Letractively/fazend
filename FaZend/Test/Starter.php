@@ -38,22 +38,6 @@ abstract class FaZend_Test_Starter
 {
 
     /**
-     * Run it from build.xml
-     *
-     * @return void
-     */
-    public static function run()
-    {
-        $starterPhp = APPLICATION_PATH . '/../../test/starter/Starter.php';
-        if (!file_exists($starterPhp))
-            return;
-
-        require_once $starterPhp;
-        $starter = new Starter();
-        $starter->start();
-    }
-
-    /**
      * Make all initializations before tests
      *
      * @return void
