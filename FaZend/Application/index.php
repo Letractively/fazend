@@ -76,33 +76,10 @@ set_include_path(
     )
 );
 
-// small simple and nice PHP functions
-require_once 'FaZend/Application/functions.php';
-
-// Create application, bootstrap, and run
-require_once 'Zend/Application.php';
-$application = new Zend_Application(APPLICATION_ENV);
-Zend_Registry::set('Zend_Application', $application);
-
-// load application-specific options
-$options = new Zend_Config_Ini(FAZEND_PATH . '/Application/application.ini', 'global', true);
-$options->merge(new Zend_Config_Ini(APPLICATION_PATH . '/config/app.ini', APPLICATION_ENV));
-
-// if the application doesn't have a bootstrap file
-if (!file_exists($options->bootstrap->path)) {
-    $options->bootstrap->path = FAZEND_PATH . '/Application/Bootstrap/Bootstrap.php';
-    $options->bootstrap->class = 'FaZend_Application_Bootstrap_Bootstrap';
-}                                             
-
-// load system options
-$application->setOptions($options->toArray());
-unset($options);        
-
-// bootstrap the application
-$application->bootstrap();
-
-// you can redefine it later, if you wish
-// now we define the site URL, without the leading WWW
+/**
+ * you can redefine it later, if you wish
+ * now we define the site URL, without the leading WWW
+ */
 if (!defined('WEBSITE_URL')) {
     define(
         'WEBSITE_URL', 
@@ -114,6 +91,17 @@ if (!defined('WEBSITE_URL')) {
     );
 }  
 
+/**
+ * small simple and nice PHP functions
+ */
+require_once 'FaZend/Application/functions.php';
+
+/**
+ * @see FaZend_Application_Bootstrap_Bootstrap
+ */
+require_once 'FaZend/Application/Bootstrap/Bootstrap.php';
+$application = FaZend_Application_Bootstrap_Bootstrap::getBootstrappedApplication();
+
 // this flag could disable application execution
 if (!defined('FAZEND_DONT_RUN')) {
     // we're working from the command line?
@@ -124,4 +112,3 @@ if (!defined('FAZEND_DONT_RUN')) {
         $application->run();
     }
 }
-
