@@ -33,7 +33,7 @@ class FaZend_Db_Deployer
      * @var Zend_Db_Adapter_Abstract
      * @see setAdapter()
      */
-    protected $_adapter;
+    protected $_adapter = null;
 
     /**
      * Absolute name of the file with flag

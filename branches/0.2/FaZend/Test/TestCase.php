@@ -63,20 +63,23 @@ class FaZend_Test_TestCase extends Zend_Test_PHPUnit_ControllerTestCase
         include_once 'FaZend/Application/index.php';
 
         // run this method before everything else
-        $this->bootstrap = Zend_Registry::get('Zend_Application');
+        require_once 'FaZend/Application/Bootstrap/Bootstrap.php';
+        $this->bootstrap = FaZend_Application_Bootstrap_Bootstrap::getBootstrappedApplication();
+        
+        parent::setUp();
 
-        // reset them all in order to start from scratch
-        $_SESSION = array();
-        $_GET     = array();
-        $_POST    = array();
-        $_COOKIE  = array();
-        $this->resetRequest();
-        $this->resetResponse();
-
-        $this->_frontController = $this->bootstrap->getBootstrap()->getResource('fz_front');
-        $this->frontController
-             ->setRequest($this->getRequest())
-             ->setResponse($this->getResponse());
+        // // reset them all in order to start from scratch
+        // $_SESSION = array();
+        // $_GET     = array();
+        // $_POST    = array();
+        // $_COOKIE  = array();
+        // $this->resetRequest();
+        // $this->resetResponse();
+        // 
+        // $this->_frontController = $this->bootstrap->getBootstrap()->getResource('fz_front');
+        // $this->frontController
+        //      ->setRequest($this->getRequest())
+        //      ->setResponse($this->getResponse());
 
         // create local view, since it's a controller
         $this->view = $this->bootstrap->getBootstrap()->getResource('view');

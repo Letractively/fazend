@@ -29,6 +29,39 @@ class FaZend_Application_Bootstrap_Bootstrap extends Zend_Application_Bootstrap_
 {
     
     /**
+     * Create and return a bootstrapped instance of Zend_Application
+     *
+     * @return Zend_Application
+     * @see index.php
+     */
+    public static function getBootstrappedApplication() 
+    {
+        /**
+         * Create application, bootstrap, and run
+         */
+        require_once 'Zend/Application.php';
+        $application = new Zend_Application(APPLICATION_ENV);
+        Zend_Registry::set('Zend_Application', $application);
+
+        // load application-specific options
+        $options = new Zend_Config_Ini(FAZEND_PATH . '/Application/application.ini', 'global', true);
+        $options->merge(new Zend_Config_Ini(APPLICATION_PATH . '/config/app.ini', APPLICATION_ENV));
+
+        // if the application doesn't have a bootstrap file
+        if (!file_exists($options->bootstrap->path)) {
+            $options->bootstrap->path = FAZEND_PATH . '/Application/Bootstrap/Bootstrap.php';
+            $options->bootstrap->class = 'FaZend_Application_Bootstrap_Bootstrap';
+        }                                             
+
+        // load system options
+        $application->setOptions($options->toArray());
+
+        // bootstrap the application
+        $application->bootstrap();
+        return $application;
+    }
+    
+    /**
      * Execute a resource
      *
      * This method protects us in migration from version to version. If 
