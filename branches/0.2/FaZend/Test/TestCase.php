@@ -66,6 +66,9 @@ class FaZend_Test_TestCase extends Zend_Test_PHPUnit_ControllerTestCase
         require_once 'FaZend/Application/Bootstrap/Bootstrap.php';
         $this->bootstrap = FaZend_Application_Bootstrap_Bootstrap::prepareApplication();
         
+        // run the normal setup of a test case, which will reset everything,
+        // including front controoler, layout, loaders, etc. and THEN will bootstrap
+        // the application provided.
         parent::setUp();
 
         // create local view, since it's a controller
@@ -73,20 +76,6 @@ class FaZend_Test_TestCase extends Zend_Test_PHPUnit_ControllerTestCase
         
         // clean all instances of all formas
         FaZend_View_Helper_Forma::cleanInstances();
-    }
-    
-    /**
-     * Close-out the test
-     *
-     * @return void
-     * @see Zend_Test_PHPUnit_ControllerTestCase::tearDown()
-     */
-    public function tearDown()
-    {
-        $this->resetRequest();
-        $this->resetResponse();
-
-        parent::tearDown();
     }
     
     /**
