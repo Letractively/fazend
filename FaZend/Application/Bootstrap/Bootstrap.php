@@ -20,6 +20,11 @@
 require_once 'Zend/Application/Bootstrap/Bootstrap.php';
 
 /**
+ * @see Zend_Application_Bootstrap_BootstrapAbstract
+ */
+require_once 'Zend/Application/Bootstrap/BootstrapAbstract.php';
+
+/**
  * @see Zend_Application
  */
 require_once 'Zend/Application.php';
