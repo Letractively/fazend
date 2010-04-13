@@ -54,12 +54,12 @@ class FaZend_Application_Bootstrap_Bootstrap extends Zend_Application_Bootstrap_
 {
     
     /**
-     * Create and return a bootstrapped instance of Zend_Application
+     * Create and return an instance of Zend_Application
      *
      * @return Zend_Application
      * @see index.php
      */
-    public static function getBootstrappedApplication() 
+    public static function prepareApplication() 
     {
         $application = new Zend_Application(APPLICATION_ENV);
         Zend_Registry::set('Zend_Application', $application);
@@ -76,9 +76,6 @@ class FaZend_Application_Bootstrap_Bootstrap extends Zend_Application_Bootstrap_
 
         // load system options
         $application->setOptions($options->toArray());
-
-        // bootstrap the application
-        $application->bootstrap();
         return $application;
     }
     
