@@ -64,7 +64,7 @@ class FaZend_Test_TestCase extends Zend_Test_PHPUnit_ControllerTestCase
 
         // run this method before everything else
         require_once 'FaZend/Application/Bootstrap/Bootstrap.php';
-        $this->bootstrap = FaZend_Application_Bootstrap_Bootstrap::getBootstrappedApplication();
+        $this->bootstrap = FaZend_Application_Bootstrap_Bootstrap::prepareApplication();
         
         parent::setUp();
 

@@ -100,10 +100,11 @@ require_once 'FaZend/Application/functions.php';
  * @see FaZend_Application_Bootstrap_Bootstrap
  */
 require_once 'FaZend/Application/Bootstrap/Bootstrap.php';
-$application = FaZend_Application_Bootstrap_Bootstrap::getBootstrappedApplication();
+$application = FaZend_Application_Bootstrap_Bootstrap::prepareApplication();
 
 // this flag could disable application execution
 if (!defined('FAZEND_DONT_RUN')) {
+    $application->bootstrap();
     // we're working from the command line?
     if (defined('CLI_ENVIRONMENT') && (APPLICATION_ENV !== 'testing') && !defined('TESTING_RUNNING')) {
         $router = new FaZend_Cli_Router();
