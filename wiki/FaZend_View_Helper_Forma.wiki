@@ -1,4 +1,5 @@
 #summary Controller-less forma
+#labels Featured
 
 = Sample Usage =
 
