@@ -1,4 +1,5 @@
 #summary Simple way of working with exceptions
+#labels Featured
 
 = Dynamic Exception Classes, Usage Example =
 
