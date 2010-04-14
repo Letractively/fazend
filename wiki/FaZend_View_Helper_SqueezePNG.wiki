@@ -1,4 +1,5 @@
 #summary Effective way of small static images delivery
+#labels Featured
 
 = Usage examples =
 
