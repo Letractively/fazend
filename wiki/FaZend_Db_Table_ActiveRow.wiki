@@ -1,4 +1,5 @@
 #summary Zend Object-Relational Mapping (ORM)
+#labels Featured
 
 Read more in php|Architect, February 2010, article named "[http://www.phparch.com/magazine/2010/february/ FaZend: Object Relational Mapping]"
 
