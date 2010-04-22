@@ -19,7 +19,7 @@ if (defined('APPLICATION_ENV') && APPLICATION_ENV !== 'production') {
         create_function(
             '$errno, $errstr, $errfile, $errline',
             '
-            if (in_array($errno, array(E_WARNING))) {
+            if (in_array($errno, array(E_WARNING)) && error_reporting() == 0) {
                 return;
             }
             echo "{$errno} {$errstr}, file: {$errfile} ({$errline})\n";
