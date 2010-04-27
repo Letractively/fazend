@@ -81,6 +81,7 @@ class FaZend_Application_Resource_fz_deployer extends Zend_Application_Resource_
         if ($toDeploy) {
             // make sure it is loaded already
             $this->_bootstrap->bootstrap('db');
+            $this->_bootstrap->bootstrap('fz_profiler');
             self::$_deployer->setAdapter($this->_bootstrap->getResource('db'));
             self::$_deployer->deploy();
         }
