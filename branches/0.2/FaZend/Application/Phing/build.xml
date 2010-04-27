@@ -296,7 +296,12 @@
             <istrue value="${to.deploy}" />
             <isset property="phprack.url" />
         </and><then>
-            <http-request url="${phprack.url}" responseRegex="/PHPRACK SUITE: OK/" />
+            <http-request 
+                url="${phprack.url}" 
+                responseRegex="/PHPRACK SUITE: OK/" 
+                observerEvents="connect, receivedBody, disconnect"
+                verbose="true"
+            />
         </then><else>
             <echo msg="Skipped, since it's not a continuous integration environment" />    
         </else></if>
