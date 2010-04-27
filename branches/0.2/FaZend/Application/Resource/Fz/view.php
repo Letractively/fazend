@@ -115,6 +115,16 @@ class FaZend_Application_Resource_fz_view extends Zend_Application_Resource_Reso
     }
     
     /**
+     * Get instance of view
+     *
+     * @return Zend_View
+     */
+    public function getView() 
+    {
+        return $this->_view;
+    }
+    
+    /**
      * Get google analytics name
      *
      * @return string
