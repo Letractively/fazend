@@ -49,6 +49,9 @@ class FaZend_Application_Resource_fz_orm extends Zend_Application_Resource_Resou
             new FaZend_Db_TableLoader(), 
             'FaZend_Db_ActiveTable_'
         );
+
+        // caches are mandatory for proper functioning of ORM
+        $this->_bootstrap->bootstrap('fz_caches');
     }
 
 }

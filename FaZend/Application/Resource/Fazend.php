@@ -37,9 +37,6 @@ class FaZend_Application_Resource_Fazend extends Zend_Application_Resource_Resou
      */
     public function init() 
     {
-        // translation is mandatory, if it exists in the project
-        $this->_bootstrap->bootstrap('fz_translate');
-
         $options = $this->getOptions();
         $name = $options['name'];
         validate()->true(
@@ -47,6 +44,12 @@ class FaZend_Application_Resource_Fazend extends Zend_Application_Resource_Resou
             "[Fazend.name] should be defined in your app.ini file"
         );
         FaZend_Revision::setName($name);
+
+        // translation is mandatory, if it exists in the project
+        $this->_bootstrap->bootstrap('fz_translate');
+
+        // caches are mandatory
+        $this->_bootstrap->bootstrap('fz_caches');
     }
 
 }
