@@ -49,13 +49,11 @@ class FaZend_Application_Resource_fz_starter extends Zend_Application_Resource_R
      */
     public function init() 
     {
-        // we execute starter ONLY in CLI and during testing
-        if (!defined('CLI_ENVIRONMENT') || (APPLICATION_ENV !== 'testing')) {
-            return;
-        }
-        
         if (!is_null(self::$_starter)) {
             return self::$_starter;
+        } else {
+            // something, to prevent multiple calls here
+            self::$_starter = true;
         }
 
         // make sure that directory with test is includeable
@@ -69,9 +67,14 @@ class FaZend_Application_Resource_fz_starter extends Zend_Application_Resource_R
             )
         );
         
+        // we execute starter ONLY in CLI and during testing
+        if (!defined('CLI_ENVIRONMENT') || (APPLICATION_ENV !== 'testing')) {
+            return false;
+        }
+    
         $starterPhp = APPLICATION_PATH . '/../../test/starter/Starter.php';
         if (!file_exists($starterPhp)) {
-            return;
+            return false;
         }
 
         eval('require_once $starterPhp;');
