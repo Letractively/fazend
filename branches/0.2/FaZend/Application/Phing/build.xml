@@ -32,7 +32,7 @@
 
     <!-- main task, executed by the project -->
     <target name="main" 
-        depends="svn, lint, phpcs, phpmd, test, deploy, ping, clean"
+        depends="svn, lint, phpcs, phpmd, test, deploy, ping, phprack, clean"
         description="Validate, compile, deploy and clean">
     </target>
 
@@ -285,12 +285,18 @@
             <istrue value="${to.deploy}" />
             <isset property="live.home" />
         </and><then>
-            <if>
-                <isset property="live.home"/>
-                <then>
-                    <http-request url="${live.home}/__fz/ping" responseRegex="/.*/" />
-                </then>
-            </if>
+            <http-request url="${live.home}/__fz/ping" responseRegex="/.*/" />
+        </then><else>
+            <echo msg="Skipped, since it's not a continuous integration environment" />    
+        </else></if>
+    </target>
+
+    <target name="phprack" description="Ping phpRack URL in order to run integration tests">
+        <if><and>
+            <istrue value="${to.deploy}" />
+            <isset property="phprack.url" />
+        </and><then>
+            <http-request url="${phprack.url}" responseRegex="/PHPRACK SUITE: OK/" />
         </then><else>
             <echo msg="Skipped, since it's not a continuous integration environment" />    
         </else></if>
