@@ -19,7 +19,7 @@
  *
  * You should inherit this class and place your starter into
  * /test/starter/Starter.php. Your class should be called "Starter".
- * Method Starter::run() will be executed in building process, before
+ * Method Starter::start() will be executed in building process, before
  * all unit tests.
  *
  * In your class you should define _start*() methods. All of them will
