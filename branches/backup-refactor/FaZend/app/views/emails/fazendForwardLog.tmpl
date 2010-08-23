@@ -1,0 +1,11 @@
+ATTN <?php echo $this->toName?>,
+
+<?php echo implode('. ', $this->reasons)?>.
+
+Log file: <?php echo $this->file?>.
+
+That's why you receive its content by email. The file itself
+was removed from the production server. Please, review the
+list of errors from the list below and try to fix them ASAP:
+
+<?php echo $this->log?>
