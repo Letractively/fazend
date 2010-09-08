@@ -129,7 +129,9 @@ In you bootstrap add this line:
 {{{
 FaZend_Db_Table_ActiveRow::addMapping(
     '/^product\.created$/', 
-    'new Zend_Date(${a1})'
+    FaZend_Callback::factory(
+        'new Zend_Date(${a1}, Zend_Date::ISO_8601);'
+    )
 );
 }}}
 
