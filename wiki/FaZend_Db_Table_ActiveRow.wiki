@@ -139,3 +139,59 @@ Now you will get `Zend_Date` directly from DB, i.e.:
 $product = new Model_Product(23); // get object from DB by primary key ID
 echo $product->created->get(Zend_Date::DATE_MEDIUM);
 }}}
+
+= More examples =
+
+There are a few examples of complex queries (we recommend to format them like in the examples):
+
+{{{
+/**
+ * Retrieve all messages for the given user.
+ *
+ * @param Model_User The user to match
+ * @return  
+ */
+public static function retrieveByUser(Model_User $user)
+{
+    $db = self::retrieve()->table()->getDefaultAdapter();
+    $query = self::retrieve()
+        ->columns(
+            array(
+                'attachments' => new Zend_Db_Expr(SUM(attachment.*))
+            )
+        )
+        ->joinLeft(
+            'attachment', 
+            $db->quoteInto(
+                'attachment.message = message.id AND message.user = ?', $user
+            ),
+            array()
+        )
+        ->having('attachments > 0');
+    if ($user->isAdmin()) {
+        $query
+            ->reset(Zend_Db_Select::HAVING)
+            ->where('priority > 3');
+    }
+    return $query->fetchAll();
+}}}
+
+Another example:
+
+{{{
+/**
+ * Retrieve full list of user names, that match the pattern.
+ *
+ * @param string The pattern to match
+ * @return string[]
+ */
+public static function retrieveNamesByPattern($pattern)
+{
+    return self::retrieve()
+        ->reset(Zend_Db_Select::COLUMNS)
+        ->columns('name')
+        ->where('name LIKE ?', '%' . $pattern . '%')
+        ->limit(5)
+        ->fetchCol();
+}
+}}}
