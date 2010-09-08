@@ -149,7 +149,7 @@ There are a few examples of complex queries (we recommend to format them like in
  * Retrieve all messages for the given user.
  *
  * @param Model_User The user to match
- * @return  
+ * @return Model_Message[]
  */
 public static function retrieveByUser(Model_User $user)
 {
@@ -167,7 +167,8 @@ public static function retrieveByUser(Model_User $user)
             ),
             array()
         )
-        ->having('attachments > 0');
+        ->having('attachments > 0')
+        ->setRowClass('Model_Message');
     if ($user->isAdmin()) {
         $query
             ->reset(Zend_Db_Select::HAVING)
