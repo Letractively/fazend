@@ -12,36 +12,38 @@ We assume that:
 
 = Active Record =
 
-For example, you have two tables in the DB:
+For example, you have two tables in the DB (Sqlite):
 
 {{{
-create table Owner (
-  id integer not null primary key autoincrement, 
-  name varchar(50) not null)
+CREATE TABLE owner (
+  id INT NOT NULL PRIMARY KEY AUTOINCREMENT, 
+  name VARCHAR(50) NOT NULL
+)
 
-create table Product (
-  id integer not null primary key autoincrement, 
-  text varchar(1024) not null, 
-  owner integer not null constraint fk_product_owner references owner(id))
+CREATE TABLE product (
+  id INT NOT NULL PRIMARY KEY AUTOINCREMENT, 
+  text VARCHAR(1024) NOT NULL, 
+  owner INT NOT NULL CONSTRAINT fk_product_owner REFERENCES owner(id)
+)
 }}}
 
 You declare two PHP classes (text after `FaZend_Db_Table_ActiveRow_` is the name of your table):
 
 {{{
-class Owner extends FaZend_Db_Table_ActiveRow_Owner {}
-class Product extends FaZend_Db_Table_ActiveRow_Product {}
+class Model_Owner extends FaZend_Db_Table_ActiveRow_owner {}
+class Model_Product extends FaZend_Db_Table_ActiveRow_product {}
 }}}
 
 Now, in order to get an active row from the table:
 
 {{{
-$owner = new Owner(13);
+$owner = new Model_Owner(13);
 }}}
 
 To work with it, save, update, etc:
 
 {{{
-$product = new Product();
+$product = new Model_Product();
 $product->text = 'just test';
 $product->owner = $owner;
 $product->save();
@@ -50,17 +52,17 @@ $product->save();
 You can get other active rows from this row:
 
 {{{
-$product = new Product(10);
+$product = new Model_Product(10);
 $name = $product->owner->name;
 }}}
 
 Or you can find a new row with `retrieve()` method:
 
 {{{
-$product = Product::retrieve()
+$product = Model_Product::retrieve()
     ->where('owner = ?', $owner)
     ->setSilenceIfEmpty() // don't throw exception if not found, just return FALSE
-    ->setRowClass('Product') // returned rows will be instances of this class
+    ->setRowClass('Model_Product') // returned rows will be instances of this class
     ->fetchRow();
 }}}
 
@@ -69,16 +71,16 @@ $product = Product::retrieve()
 You can get a row set in a convenient way:
 
 {{{
-$list = Owner::retrieve()
-  ->where('name is not null')
-  ->order('id desc')
+$list = Model_Owner::retrieve()
+  ->where('name IS NOT NULL')
+  ->order('id DESC')
   ->fetchAll();
 }}}
 
 Or, for example:
 
 {{{
-FaZend_Db_ActiveTable_OtherTable::retrieve()
+FaZend_Db_ActiveTable_otherTable::retrieve()
   ->table()
   ->update('time = NOW()');
 }}}
@@ -86,23 +88,25 @@ FaZend_Db_ActiveTable_OtherTable::retrieve()
 More extended example:
 
 {{{
-$list = Owner::retrieve(false) // don't use default FROM clause
+$list = Model_Owner::retrieve(false) // don't use default FROM clause
     ->from('owner', array('name')) // specify where to select FROM
     ->where('name > ?', new Zend_Db_Expr('NOW()')) // use Zend syntax
-    ->setRowClass('OwnerName') // set class name of each returned row
+    ->setRowClass('Model_OwnerName') // set class name of each returned row
     ->fetchOne(); // select just one column
 }}}
 
 You can use dynamic binding:
 
 {{{
-$list = Owner::retrieve()
+$list = Model_Owner::retrieve()
     ->where('name LIKE :pattern')
     ->orWhere('id IN :ids')
-    ->fetchAll(array(
-        'pattern'=>'[[:alnum:]]', 
-        'ids' => array(1, 3, 45, 98)
-    ));
+    ->fetchAll(
+        array(
+            'pattern'=>'[[:alnum:]]', 
+            'ids' => array(1, 3, 45, 98)
+        )
+    );
 }}}
 
 == Delayed `fetchAll()` ==
