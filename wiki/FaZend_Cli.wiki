@@ -6,20 +6,21 @@
 You have some tasks to be performed from command line (routine operations for example). Now you can easily automate them. Just create a class in `application/cli` directory and inherit it from `FaZend_Cli_Abstract`:
 
 {{{
-class ArchiveFile extends FaZend_Cli_Abstract {
+class ArchiveFile extends FaZend_Cli_Abstract
+{
     /**
      * To be executed from command line
      *
      * @return int exit code
      */
-    public function execute() {
+    public function execute()
+    {
         $file = $this->_get('file');
         // do some operations
-
-        if ($this->_get('log', false))
+        if ($this->_get('log', false)) {
             echo 'File ' . $file . ' was processed';
-
-        return true;
+        }
+        return self::RESULTCODE_OK;
     }
 }
 }}}
