@@ -88,3 +88,18 @@ Alias /projectName "/_path_to_your_project_/php/src/public"
 Now this link should work: `http://localhost/projectName`.
 
 Review database configuration parameters you will find in `application/app.ini` in section `development`. You should create a local database and user with the mentioned names. Don't create any tables or views, they will be created automatically from SQL files, by FaZend_Deployer.
+
+Add this line to your local (in the development environment) `php.ini` file:
+
+{{{
+auto_prepend_file="/code/auto_prepend.php"
+}}}
+
+Create file `/code/auto_prepend.php` with the following content:
+
+{{{
+<?php
+if (!defined('APPLICATION_ENV')) {
+    define('APPLICATION_ENV', 'development');
+}
+}}}
