@@ -202,3 +202,36 @@ public static function retrieveNamesByPattern($pattern)
         ->fetchCol();
 }
 }}}
+
+One more example with a complex JOIN:
+
+{{{
+SELECT 
+  entity.*, 
+  COUNT(DISTINCT similar.tag) AS shared 
+FROM entity 
+INNER JOIN 
+  (tagged AS this INNER JOIN tagged AS similar USING (tag)) 
+  ON similar.entity = entity.id
+WHERE this.entity = 123
+AND entity.id != this.entity
+GROUP BY entity.id
+ORDER BY shared DESC
+}}}
+
+should look like this in FaZend:
+
+{{{
+self::retrieve()
+    ->columns(array('shared' => new Zend_Db_Expr('COUNT(DISTINCT similar.tag)')))
+    ->join(
+        new Zend_Db_Expr('(tagged AS this INNER JOIN tagged AS similar USING (tag))'),
+        'similar.entity = entity.id',
+        array()
+    )
+    ->where('this.entity = ?', 123)
+    ->where('entity.id != this.entity')
+    ->group('entity.id')
+    ->order('shared DESC');
+}
+}}}
