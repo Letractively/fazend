@@ -230,7 +230,7 @@ self::retrieve()
         array()
     )
     ->join(
-         array('similar' => 'tagged',
+        array('similar' => 'tagged'),
         new Zend_Db_Expr('USING(tag)'),
         array()
     )
