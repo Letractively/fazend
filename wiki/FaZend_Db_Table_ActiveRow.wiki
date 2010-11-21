@@ -231,7 +231,7 @@ self::retrieve()
     )
     ->join(
          array('similar' => 'tagged',
-        new Zend_Db_Expr('USING(tag)',
+        new Zend_Db_Expr('USING(tag)'),
         array()
     )
     ->where('this.entity = ?', 123)
