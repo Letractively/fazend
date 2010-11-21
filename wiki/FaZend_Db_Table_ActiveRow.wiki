@@ -225,8 +225,13 @@ should look like this in FaZend:
 self::retrieve()
     ->columns(array('shared' => new Zend_Db_Expr('COUNT(DISTINCT similar.tag)')))
     ->join(
-        new Zend_Db_Expr('(tagged AS this INNER JOIN tagged AS similar USING (tag))'),
+        array('this' => 'tagged'),
         'similar.entity = entity.id',
+        array()
+    )
+    ->join(
+         array('similar' => 'tagged',
+        new Zend_Db_Expr('USING(tag)',
         array()
     )
     ->where('this.entity = ?', 123)
