@@ -2,7 +2,7 @@
 
 = FaZend_Backup =
 
-Add the following lines to your `application/config/app.ini`:
+Add the following lines to your `application/config/app.ini` (don't forget to define `backup.password` in your `build.properties` to let `phing` replace it before actual deployment):
 
 {{{
 resources.fz_backup.execute = true
