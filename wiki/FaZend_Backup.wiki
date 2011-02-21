@@ -34,7 +34,7 @@ resources.fz_backup.policies.5.options.username = "john-doe"
 resources.fz_backup.policies.5.options.password = "secret"
 }}}
 
-The following policies are provide by FaZend out of the box:
+The following policies are provided by FaZend out of the box:
 
  * `archive_Tar`: archives a collection of files into a `tar` archive
  * `compress_Gzip`: compresses the file using gzip server-side command line utility
