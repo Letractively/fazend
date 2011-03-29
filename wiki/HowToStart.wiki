@@ -56,16 +56,6 @@ Key steps for a new project setup:
   # Setup Google Webmasters and verify it
   # configure files in your project: `build.properties`, `app.ini`, `backup.ini`
 
-== Initial Deployment of Directory Structure ==
-
-In order to add default FaZend files to your project directory you can do this:
-
-{{{
-$ svn co svn://svn.fazend.com/my-project /path/to/my/project
-$ svn export http://fazend.googlecode.com/svn/trunk/directory-structure /path/to/my/project
-$ svn ci -m "initial directory structure" /path/to/my/project
-}}}
-
 = Local Configuration =
 
 Add this line to your apache `httpd.conf` file and restart apache:
