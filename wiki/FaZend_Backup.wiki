@@ -22,6 +22,15 @@ $ php index.php FzBackup 2>&1
 
 Try it and you see what happens. 
 
+= Configuration =
+
+You can configure the component:
+
+{{{
+; how often backup cycle should run (hours)
+resources.fz_backup.period = 3
+}}}
+
 = Policies =
 
 Every policy has its own configuration parameters, specified via `options` attribute in config file, for example:
@@ -32,6 +41,8 @@ resources.fz_backup.policies.5.options.host = "ftp.example.com"
 resources.fz_backup.policies.5.options.port = 21
 resources.fz_backup.policies.5.options.username = "john-doe"
 resources.fz_backup.policies.5.options.password = "secret"
+; for how many hours should we keep old archives on the server
+resources.fz_backup.policies.5.options.age = 24
 }}}
 
 The following policies are provided by FaZend out of the box:
