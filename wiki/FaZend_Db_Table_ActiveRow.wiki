@@ -27,6 +27,12 @@ CREATE TABLE product (
 )
 }}}
 
+Start with bootstrapping the ORM (in your `Bootstrap.php`):
+
+{{{
+$this->bootstrap('fz_orm');
+}}}
+
 You declare two PHP classes (text after `FaZend_Db_Table_ActiveRow_` is the name of your table):
 
 {{{
