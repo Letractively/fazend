@@ -30,6 +30,7 @@ CREATE TABLE product (
 Start with bootstrapping the ORM (in your `Bootstrap.php`):
 
 {{{
+$this->bootstrap('fazend');
 $this->bootstrap('fz_orm');
 }}}
 
