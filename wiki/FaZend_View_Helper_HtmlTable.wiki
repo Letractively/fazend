@@ -31,6 +31,13 @@ tr.odd
 tr.highlight
 }}}
 
+It's possible to use anonymous functions, as in PHP 5.3+:
+
+{{{
+<?=$this->htmlTable()
+    ->setParser('password', function($value, $row) { return "***"; })
+}}}
+
 = Options =
 
 `setPaginator(Zend_Paginator $paginator)` sets data holder to render.
