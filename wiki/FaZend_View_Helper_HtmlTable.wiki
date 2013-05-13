@@ -10,7 +10,7 @@ Inside your view script:
     ->hideColumn('id')
     ->setColumnTitle('email', 'User email')
     ->addColumnLink('email', 'id', 'id', array('action'=>'edit'))
-    ->setParser('password', create_function('$value, $row', 'return "***";'))
+    ->addConverter('password', create_function('$value, $row', 'return "***";'))
     ->addColumnStyle('email', "width: 120px;")
     ->addConverter('email', 'Model_Email')
     ->allowRawHtml('details')
@@ -20,29 +20,42 @@ Inside your view script:
     ?>
 }}}
 
-In your CSS you should define classes:
+In HTML the table will look like (In your CSS you should define its proper classes):
 
 {{{
-tr
-th
-td
-tr.even
-tr.odd
-tr.highlight
+<table>
+  <thead>
+    <tr>
+      <th>..</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr class='odd'> <!-- or "even" or "highlight" -->
+      <td>..</td>
+    </tr>
+  </tbody>
+</table>
 }}}
 
 It's possible to use anonymous functions, as in PHP 5.3+:
 
 {{{
-<?=$this->htmlTable()
-    ->setParser('password', function($value, $row) { return "***"; })
+<?=$this->htmlTable()->addConverter('password', function($value, $row) { return "***"; }) ?>
 }}}
 
-= Options =
+== Setting order of columns == 
+
+To change the order of columns you should ask helper to show them in the right order:
+
+{{{
+<?=$this->htmlTable()->showColumns(array('id', 'name', 'age')) ?>
+}}}
+
+
+
+= Options (full reference) =
 
 `setPaginator(Zend_Paginator $paginator)` sets data holder to render.
-
-`setParser($column, $callback)` instructs the helper to call `$callback` function for the given column in every row. The callback will get two parameters (`$value` and `$row`) and must return string, which will be placed into the cell. First parameter sent to the parser is a current value of the cell, second parameter is an instance of the row, with all data in it.
 
 `hideColumn($column)` hides given column, it won't be displayed in the table. By default the table will show all columns received from the paginator.
 
