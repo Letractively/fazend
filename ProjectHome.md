@@ -1,0 +1,1 @@
+FaZend Framework moved to Github: https://github.com/yegor256/fazend-framework
